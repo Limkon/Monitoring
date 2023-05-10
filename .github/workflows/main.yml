@@ -10,8 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Visit URLs
-        env:
-          README_FILE_PATH: "./README.md"
         run: |
           urls=(
             "https://veg.linlim.repl.co"
@@ -29,17 +27,12 @@ jobs:
             delay=$(( RANDOM % 5 + 1 ))
 
             # 发送 HTTP 请求并保存响应结果
-            http_status=$(curl -s -o /dev/null -w "%{http_code}" -m 10 "$url")
+            curl -f -m 10 "$url"
             
-            # 检查 HTTP 响应状态码
-            if [ $http_status -eq 200 ]; then
-              result="成功"
-            else
-              result="失败"
+            # 检查 curl 命令的退出码
+            if [ $? -ne 0 ]; then
+              echo "URL ${url} 访问失败"
             fi
-            
-            # 输出结果并将其保存到 README.md 文件中
-            echo "| $url | $result |" >> "$README_FILE_PATH"
 
             # 在访问下一个 URL 前等待随机生成的延迟时间
             sleep "$delay"
