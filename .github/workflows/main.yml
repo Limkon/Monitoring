@@ -1,4 +1,4 @@
-name: Visit URLs and update status
+name: Visit URLs
 
 on:
   schedule:
@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Visit URLs
+        env:
+          README_FILE_PATH: "./README.md"
         run: |
           urls=(
             "https://veg.linlim.repl.co"
@@ -19,33 +21,26 @@ jobs:
             "https://V2.sukure.repl.co"
             "https://rray.chavir.repl.co"
             "https://tote.kaikaixin.repl.co"
-            "http://k2.shilh.repl.co"
+            "https://k2.shilh.repl.co"
           )
           for url in "${urls[@]}"
           do
             # 随机生成一个 1~5 秒之间的延迟时间
             delay=$(( RANDOM % 5 + 1 ))
 
-            # 发送 HTTP 请求并保存响应结果，并将结果存储到变量中
-            response=$(curl -f -m 10 "$url" 2>&1)
+            # 发送 HTTP 请求并保存响应结果
+            http_status=$(curl -s -o /dev/null -w "%{http_code}" -m 10 "$url")
             
-            # 检查 curl 命令的退出码
-            if [ $? -ne 0 ]; then
-              # 如果请求失败，则记录失败信息
-              status="失败"
+            # 检查 HTTP 响应状态码
+            if [ $http_status -eq 200 ]; then
+              result="successful"
             else
-              # 如果请求成功，则记录成功信息
-              status="正常"
+              result="failed"
             fi
+            
+            # 输出结果并将其保存到 README.md 文件中
+            echo "| $url | $result |" >> "$README_FILE_PATH"
 
             # 在访问下一个 URL 前等待随机生成的延迟时间
             sleep "$delay"
-
-            # 将结果输出到 README.md 文件
-            echo "| $url | $status |" >> README.md
           done
-
-      - name: Commit and push changes
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: "Update website status"
