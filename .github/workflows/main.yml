@@ -1,6 +1,7 @@
 name: Visit URLs
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: "0 0 */7 * *"
 
