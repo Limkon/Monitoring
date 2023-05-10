@@ -10,11 +10,12 @@ jobs:
     steps:
       - name: Visit URLs
         run: |
-          curl -f https://veg.linlim.repl.co
-          curl -f https://ko.limkco.repl.co
-          curl -f https://litv.yoyholee.repl.co
-          curl -f https://v2ray.yoyho.repl.co
-          curl -f https://V2.sukure.repl.co
-          curl -f https://rray.chavir.repl.co
-          curl -f https://tote.kaikaixin.repl.co
-          curl -f https://k2.shilh.repl.co
+          curl -f veg.linlim.repl.co
+          curl -f ko.limkco.repl.co
+          curl -f litv.yoyholee.repl.co
+          curl -f v2ray.yoyho.repl.co
+          curl -f V2.sukure.repl.co
+          curl -f rray.chavir.repl.co
+          curl -f tote.kaikaixin.repl.co
+          curl -f k2.shilh.repl.co
+          branch: master
