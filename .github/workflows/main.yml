@@ -27,13 +27,12 @@ jobs:
             delay=$(( RANDOM % 5 + 1 ))
 
             # 发送 HTTP 请求并保存响应结果
-            curl -f -m 10 "$url"
-            
-            # 检查 curl 命令的退出码
-            if [ $? -ne 0 ]; then
-              echo "URL ${url} 访问失败"
+            if curl -f -m 10 "$url"; then
+              echo "${url}: 正常" >> README.md
+            else
+              echo "${url}: 失败" >> README.md
             fi
-
+            
             # 在访问下一个 URL 前等待随机生成的延迟时间
             sleep "$delay"
           done
