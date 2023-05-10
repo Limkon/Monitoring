@@ -1,10 +1,9 @@
 name: Visit URLs
 
 on:
-  workflow_dispatch:
   schedule:
     - cron: "0 0 */7 * *"
-
+  workflow_dispatch:
 jobs:
   visit-urls:
     runs-on: ubuntu-latest
