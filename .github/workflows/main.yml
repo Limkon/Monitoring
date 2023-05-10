@@ -1,0 +1,20 @@
+name: Visit URLs
+
+on:
+  schedule:
+    - cron: "0 0 */7 * *"
+
+jobs:
+  visit-urls:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Visit URLs
+        run: |
+          curl https://veg.linlim.repl.co
+          curl https://ko.limkco.repl.co
+          curl https://litv.yoyholee.repl.co
+          curl https://v2ray.yoyho.repl.co
+          curl https://V2.sukure.repl.co
+          curl https://rray.chavir.repl.co
+          curl https://tote.kaikaixin.repl.co
+          curl https://k2.shilh.repl.co
