@@ -12,7 +12,8 @@ jobs:
       - name: Visit URLs
         run: |
           urls=(
-            “https://veg.linlim.repl.co”
+            "https://www.google.com"
+            "https://www.github.com"
           )
           for url in "${urls[@]}"
           do
