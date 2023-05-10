@@ -12,7 +12,7 @@ jobs:
       - name: Visit URLs
         run: |
           # 从 urls 文件中读取 URL 列表
-          urls=($(cat urls))
+          urls=($(cat ./urls))
 
           # 遍历 URL 列表并访问每个 URL
           for url in "${urls[@]}"
