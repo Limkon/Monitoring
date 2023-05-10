@@ -10,4 +10,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Visit URLs
-        run: curl -f https://oveg.linlim.repl.co
+        run: curl -f https://veg.linlim.repl.co
