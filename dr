@@ -1,8 +1,39 @@
-https://veg.linlim.repl.co
-https://ko.limkco.repl.co
-https://litv.yoyholee.repl.co
-https://v2ray.yoyho.repl.co
-https://V2.sukure.repl.co
-https://rray.chavir.repl.co
-https://tote.kaikaixin.repl.co
-http://k2.shilh.repl.co
+name: Visit URLs
+
+on:
+  schedule:
+    - cron: "0 0 */7 * *"
+  workflow_dispatch:
+
+jobs:
+  visit-urls:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Visit URLs
+        run: |
+          urls=(
+            "https://veg.linlim.repl.co"
+            "https://ko.limkco.repl.co"
+            "https://litv.yoyholee.repl.co"
+            "https://v2ray.yoyho.repl.co"
+            "https://V2.sukure.repl.co"
+            "https://rray.chavir.repl.co"
+            "https://tote.kaikaixin.repl.co"
+            "https://k2.shilh.repl.co"
+          )
+          for url in "${urls[@]}"
+          do
+            # 随机生成一个 1~5 秒之间的延迟时间
+            delay=$(( RANDOM % 5 + 1 ))
+
+            # 发送 HTTP 请求并保存响应结果
+            curl -f -m 10 "$url"
+            
+            # 检查 curl 命令的退出码
+            if [ $? -ne 0 ]; then
+              echo "URL ${url} 访问失败"
+            fi
+
+            # 在访问下一个 URL 前等待随机生成的延迟时间
+            sleep "$delay"
+          done
