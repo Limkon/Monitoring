@@ -4,11 +4,10 @@ on:
   schedule:
     - cron: "0 0 */7 * *"
   workflow_dispatch:
+
 jobs:
   visit-urls:
     runs-on: ubuntu-latest
     steps:
       - name: Visit URLs
-        run: |
-          curl -f https://oveg.linlim.repl.co
-          branch: master
+        run: curl -f https://oveg.linlim.repl.co
