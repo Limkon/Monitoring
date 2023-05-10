@@ -15,7 +15,7 @@ jobs:
       - name: Update URLs
         run: |
           export README_FILE_PATH="./README.md"
-          export URL_FILE_PATH="./urls.txt"
+          export URL_FILE_PATH="./urls"
 
           # Read URLs from file or environment variable
           if [ -f "$URL_FILE_PATH" ]; then
