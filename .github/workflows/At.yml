@@ -20,7 +20,7 @@ jobs:
       - name: Visit URLs
         run: |
           set -e
-          # Read the URL list from urls.txt file
+          # Read the URL list from urls file
           urls=($(cat urls))
 
           # Loop through the URL list and visit each URL
@@ -44,7 +44,7 @@ jobs:
 
       - name: Check URLs and Update README
         run: |
-          # Read the URL list from urls.txt file
+          # Read the URL list from urls file
           urls=($(cat urls))
 
           # Loop through the URL list and visit each URL, save the response result to an array variable
