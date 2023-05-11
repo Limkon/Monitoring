@@ -12,8 +12,9 @@ jobs:
       - name: Install Coreutils
         run: sudo apt-get update && sudo apt-get install -y coreutils
       
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2.5.3
+
       
       - name: Visit URLs
         run: |
