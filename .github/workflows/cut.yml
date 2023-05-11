@@ -66,8 +66,6 @@ jobs:
           mv new-readme.md README.md
 
           # 提交更改到远程仓库
-          git config user.name "<YOUR-USERNAME>"
-          git config user.email "<YOUR-EMAIL>"
           git add README.md
           git commit -m "Update website status"
           git push origin <YOUR-BRANCH>
