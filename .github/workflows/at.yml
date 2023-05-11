@@ -26,15 +26,17 @@ jobs:
           # Loop through the URL list and visit each URL
           for url in "${urls[@]}"
           do
-            # Randomly generate a delay time between 1 to 2 minutes
-            delay=$(( RANDOM % 120 + 60 ))
+            # Randomly generate a delay time between 2 to 3 minutes
+            delay=$(( RANDOM % 120 + 120 ))
 
             # Send an HTTP request and save the response result
-            response=$(timeout 30s curl -sf -o /dev/null -w '%{http_code}' "$url")
-            
-            # Check the HTTP response code
-            if [[ "$response" =~ ^2 ]]; then
-              echo "$url : Success"
+            if response=$(timeout 30s curl -sf -o /dev/null -w '%{http_code}' "$url" || true); then
+              if [[ "$response" =~ ^2 ]]; then
+                echo "$url : Success"
+              else
+                echo "$url : Failed"
+                echo "URL ${url} failed to visit" >> README.md
+              fi
             else
               echo "$url : Failed"
               echo "URL ${url} failed to visit" >> README.md
@@ -53,9 +55,13 @@ jobs:
           declare -a responses=()
           for url in "${urls[@]}"
           do
-            response=$(timeout 30s curl -sf -o /dev/null -w '%{http_code}' "$url")
-            if [[ "$response" =~ ^2 ]]; then
-              responses+=("$url : Success")
+            if response=$(timeout 30s curl -sf -o /dev/null -w '%{http_code}' "$url" || true); then
+              if [[ "$response" =~ ^2 ]]; then
+                responses+=("$url : Success")
+              else
+                responses+=("$url : Failed")
+                echo "URL ${url} failed to visit" >> README.md
+              fi
             else
               responses+=("$url : Failed")
               echo "URL ${url} failed to visit" >> README.md
