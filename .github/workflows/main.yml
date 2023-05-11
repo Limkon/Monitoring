@@ -9,8 +9,12 @@ jobs:
   visit-urls:
     runs-on: ubuntu-latest
     steps:
+      - name: Install Coreutils
+        run: sudo apt-get update && sudo apt-get install -y coreutils
+      
       - name: Visit URLs
         run: |
+          set -e
           # 从 urls 文件中读取 URL 列表
           urls=($(cat urls))
 
@@ -21,10 +25,10 @@ jobs:
             delay=$(( RANDOM % 240 + 60 ))
 
             # 发送 HTTP 请求并保存响应结果
-            curl -f -m 10 "$url"
+            timeout 10s curl -sf "$url" > /dev/null
 
             # 检查 curl 命令的退出码
-            if [ $? -ne 0 ]; then
+            if [ "${PIPESTATUS[0]}" -ne 0 ]; then
               echo "URL ${url} 访问失败"
             fi
 
