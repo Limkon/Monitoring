@@ -49,7 +49,7 @@ jobs:
             done
 
             sleep "$delay"
-          done
+          done || true
 
       - name: Check URLs and Update README
         run: |
