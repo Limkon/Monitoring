@@ -17,13 +17,13 @@ jobs:
           sudo apt-get update && \
           sudo apt-get install -y coreutils curl
       
-      - name: Wait for Random Interval
-        run: |
-          # Generate a random interval between 1 and 5 days in seconds
-          RANDOM_INTERVAL=$(( ( RANDOM % 5 + 1 ) * 24 * 60 * 60 ))
+      #- name: Wait for Random Interval
+      #  run: |
+      #    # Generate a random interval between 1 and 5 days in seconds
+      #    RANDOM_INTERVAL=$(( ( RANDOM % 5 + 1 ) * 24 * 60 * 60 ))
           # Wait for the randomly generated interval
-          echo "Waiting for $RANDOM_INTERVAL seconds..."
-          sleep $RANDOM_INTERVAL
+      #    echo "Waiting for $RANDOM_INTERVAL seconds..."
+      #    sleep $RANDOM_INTERVAL
 
       - name: Visit URLs
         run: |
