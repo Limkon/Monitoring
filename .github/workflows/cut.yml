@@ -65,15 +65,15 @@ jobs:
           done
 
           # Write the response result to status.md file
-          echo "## Website Status" > status.md
-          printf '%s\n' "${responses[@]}" >> status.md
-          cat README.md | sed '/## Website Status/,$d' > new-readme.md
-          cat status.md >> new-readme.md
-          mv new-readme.md README.md
+          # echo "## Website Status" > status.md
+          # printf '%s\n' "${responses[@]}" >> status.md
+          # cat README.md | sed '/## Website Status/,$d' > new-readme.md
+          # cat status.md >> new-readme.md
+          # mv new-readme.md README.md
 
           # Push the changes to the remote repository
-          git config --global user.name "${{ github.actor }}"
-          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-          git add README.md
-          git commit -m "Update website status"
-          git push origin ${{ github.ref }}
+          # git config --global user.name "${{ github.actor }}"
+          # git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          # git add README.md
+          # git commit -m "Update website status"
+          # git push origin ${{ github.ref }}
