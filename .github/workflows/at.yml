@@ -30,10 +30,10 @@ jobs:
             delay=$(( RANDOM % 120 + 60 ))
 
             # Send an HTTP request and save the response result
-            response=$(timeout 30s curl -sf -v "$url")
+            response=$(timeout 30s curl -sf -o /dev/null -w '%{http_code}' "$url")
             
-            # Check the exit code of curl command
-            if [ "${PIPESTATUS[0]}" -eq 0 ]; then
+            # Check the HTTP response code
+            if [[ "$response" =~ ^2 ]]; then
               echo "$url : Success"
             else
               echo "$url : Failed"
@@ -53,8 +53,8 @@ jobs:
           declare -a responses=()
           for url in "${urls[@]}"
           do
-            response=$(timeout 30s curl -sf -v "$url")
-            if [ "${PIPESTATUS[0]}" -eq 0 ]; then
+            response=$(timeout 30s curl -sf -o /dev/null -w '%{http_code}' "$url")
+            if [[ "$response" =~ ^2 ]]; then
               responses+=("$url : Success")
             else
               responses+=("$url : Failed")
