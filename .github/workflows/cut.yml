@@ -30,11 +30,14 @@ jobs:
             delay=$(( RANDOM % 120 + 60 ))
 
             # Send an HTTP request and save the response result
-            timeout 30s curl -sf -v "$url" > /dev/null
-
+            response=$(timeout 30s curl -sf -v "$url")
+            
             # Check the exit code of curl command
-            if [ "${PIPESTATUS[0]}" -ne 0 ]; then
-              echo "URL ${url} failed to visit"
+            if [ "${PIPESTATUS[0]}" -eq 0 ]; then
+              echo "$url : Success"
+            else
+              echo "$url : Failed"
+              echo "URL ${url} failed to visit" >> README.md
             fi
 
             # Wait for the randomly generated delay time before visiting the next URL
@@ -52,9 +55,9 @@ jobs:
           do
             response=$(timeout 30s curl -sf -v "$url")
             if [ "${PIPESTATUS[0]}" -eq 0 ]; then
-              responses+=("$url is up")
+              responses+=("$url : Success")
             else
-              responses+=("$url is down")
+              responses+=("$url : Failed")
               echo "URL ${url} failed to visit" >> README.md
             fi
           done
