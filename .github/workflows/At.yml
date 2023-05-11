@@ -38,19 +38,17 @@ jobs:
             delay=$(( RANDOM % 120 + 60 ))
 
             # Send an HTTP request and save the response result
-            response=$(timeout 30s curl -sf -v "$url")
-            
-            # Check the exit code of curl command
-            if [ "${PIPESTATUS[0]}" -eq 0 ]; then
+            if response=$(timeout 30s curl -sf -v "$url"); then
               echo "$url : Success"
             else
               echo "$url : Failed"
               echo "URL ${url} failed to visit" >> README.md
             fi
-
+            
             # Wait for the randomly generated delay time before visiting the next URL
             sleep "$delay"
           done
+
 
       - name: Check URLs and Update README
         run: |
