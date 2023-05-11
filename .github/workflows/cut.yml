@@ -1,0 +1,73 @@
+name: Visit URLs
+
+on:
+  #schedule:
+  # - cron: "0 */7 * * *"
+  workflow_dispatch:
+
+jobs:
+  visit-urls:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Coreutils
+        run: sudo apt-get update && sudo apt-get install -y coreutils
+      
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      
+      - name: Visit URLs
+        run: |
+          set -e
+          # 从 urls 文件中读取 URL 列表
+          urls=($(cat urls))
+
+          # 遍历 URL 列表并访问每个 URL
+          for url in "${urls[@]}"
+          do
+            # 随机生成一个 1~2 分钟之间的延迟时间
+            delay=$(( RANDOM % 120 + 60 ))
+
+            # 发送 HTTP 请求并保存响应结果
+            timeout 30s curl -sf "$url" > /dev/null
+
+            # 检查 curl 命令的退出码
+            if [ "${PIPESTATUS[0]}" -ne 0 ]; then
+              echo "URL ${url} 访问失败"
+            fi
+
+            # 在访问下一个 URL 前等待随机生成的延迟时间
+            sleep "$delay"
+          done
+
+      - name: Check URLs and Update README
+        run: |
+          # 从 urls 文件中读取 URL 列表
+          urls=($(cat urls))
+
+          # 遍历 URL 列表并访问每个 URL，将响应结果保存到数组变量中
+          declare -a responses=()
+          for url in "${urls[@]}"
+          do
+            response=$(timeout 30s curl -sf "$url")
+            if [ "${PIPESTATUS[0]}" -eq 0 ]; then
+              responses+=("$url is up")
+            else
+              responses+=("$url is down")
+              echo "URL ${url} 访问失败" >> README.md
+            fi
+          done
+
+          # 将响应结果写入 README.md 文件
+          echo "## Website Status" > status.md
+          printf '%s\n' "${responses[@]}" >> status.md
+          cat README.md | sed '/## Website Status/,$d' > new-readme.md
+          cat status.md >> new-readme.md
+          mv new-readme.md README.md
+
+          # 提交更改到远程仓库
+          git config user.name "<YOUR-USERNAME>"
+          git config user.email "<YOUR-EMAIL>"
+          git add README.md
+          git commit -m "Update website status"
+          git push origin <YOUR-BRANCH>
