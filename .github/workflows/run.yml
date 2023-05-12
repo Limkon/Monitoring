@@ -26,7 +26,7 @@ jobs:
           urls=($(cat urls))
 
           for url in "${urls[@]}"; do
-            delay=$((RANDOM % 120 + 120))
+            delay=$((RANDOM % 30 + 30))
             count=0
             while true; do
               response=$(timeout 5s curl -sf -o /dev/null -w '%{http_code}' "$url" || true)
