@@ -17,7 +17,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install Dependencies
+      - name: Install curl
         run: sudo apt-get update && sudo apt-get install -y curl
 
       - name: Visit URLs
@@ -97,4 +97,5 @@ jobs:
             # 保存新状态以备将来使用
             cp "$new_status_file" "$old_status_file"
           else
-            echo "No changes to website
+            echo "No changes to website"
+          fi
