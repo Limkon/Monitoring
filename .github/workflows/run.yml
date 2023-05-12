@@ -52,6 +52,7 @@ jobs:
           done || true
 
       - name: Check URLs and Update README
+        continue-on-error: true
         run: |
           urls=($(cat urls))
 
@@ -75,8 +76,8 @@ jobs:
           cat status.md >> new-readme.md
           mv new-readme.md README.md
 
-          git config --global user.name "Limkon"
-          git config --global user.email "Limkon@users.noreply.github.com"
-          git add README.md status.md
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git add README.md
           git commit -m "Update website status"
           git push origin ${{ github.ref }}
