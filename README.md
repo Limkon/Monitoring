@@ -1,5 +1,5 @@
 ## Website Status
-https://veg.linlim.repl.co: Failed (403)
+https://veg.linlim.repl.co: Success
 https://ko.limkco.repl.co: Success
 https://litv.yoyholee.repl.co: Success
 https://v2ray.yoyho.repl.co: Success
