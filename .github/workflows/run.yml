@@ -42,7 +42,7 @@ jobs:
               # 如果网站未响应，则等待5秒后重新尝试
               sleep 5
               ((count++))
-              if [ $count -ge 3 ]; then
+              if [ $count -ge 1 ]; then
                 echo "$url: Failed (exceeded retries)"
                 break
               fi
