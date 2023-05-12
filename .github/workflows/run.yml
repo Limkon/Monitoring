@@ -55,6 +55,16 @@ jobs:
         run: |
           urls=($(cat urls))
 
+          old_status_file="old-status.md"
+          new_status_file="new-status.md"
+
+          # 计算旧状态的哈希值
+          if [ -f "$old_status_file" ]; then
+            old_md5=$(md5sum "$old_status_file" | awk '{print $1}')
+          else
+            old_md5=""
+          fi
+
           declare -a responses=()
           for url in "${urls[@]}"; do
             response=$(timeout 5s curl -sf -o /dev/null -w '%{http_code}' "$url" || true)
@@ -62,28 +72,29 @@ jobs:
               responses+=("$url: Success")
             elif [ -z "$response" ]; then
               responses+=("$url: Failed (no response)")
-              echo "URL ${url} failed to visit (no response)" >> README.md
+              echo "URL ${url} failed to visit (no response)" >> "$new_status_file"
             else
               responses+=("$url: Failed ($response)")
-              echo "URL ${url} failed to visit ($response)" >> README.md
+              echo "URL ${url} failed to visit ($response)" >> "$new_status_file"
             fi
           done
 
-          new_status="$(printf '%s\n' "${responses[@]}")"
+          new_md5=$(md5sum "$new_status_file" | awk '{print $1}')
+          if [ "$old_md5" != "$new_md5" ]; then
+            echo "Website status has changed. Updating README.md." >&2
+            echo "## Website Status" > "$new_status_file"
+            printf '%s\n' "${responses[@]}" >> "$new_status_file"
+            cat README.md | sed '/## Website Status/,$d' > new-readme.md
+            cat "$new_status_file" >> new-readme.md
+            mv new-readme.md README.md
 
-          if ! cmp -s README.md <(echo "## Website Status"; echo "${new_status}"); then
-              echo "Website status has changed. Updating README.md." >&2
-              echo "## Website Status" > status.md
-              printf '%s\n' "${responses[@]}" >> status.md
-              cat README.md | sed '/## Website Status/,$d' > new-readme.md
-              cat status.md >> new-readme.md
-              mv new-readme.md README.md
+            git config --global user.name "${{ github.actor }}"
+            git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+            git add README.md
+            git commit -m "Update website status"
+            git push origin ${{ github.ref }}
 
-              git config --global user.name "${{ github.actor }}"
-              git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-              git add README.md
-              git commit -m "Update website status"
-              git push origin ${{ github.ref }}
+            # 保存新状态以备将来使用
+            cp "$new_status_file" "$old_status_file"
           else
-              echo "No changes to website status. Skipping update of README.md." >&2
-          fi
+            echo "No changes to website
