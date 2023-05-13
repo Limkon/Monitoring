@@ -5,5 +5,5 @@ https://litv.yoyholee.repl.co: Success
 https://v2ray.yoyho.repl.co: Success
 https://V2.sukure.repl.co: Success
 https://rray.chavir.repl.co: Success
-https://tote.kaikaixin.repl.co: Failed (403)
+https://tote.kaikaixin.repl.co: Success
 http://k2.shilh.repl.co: Success
