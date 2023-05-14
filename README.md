@@ -7,4 +7,3 @@ https://V2.sukure.repl.co: Success
 https://rray.chavir.repl.co: Success
 https://tote.kaikaixin.repl.co: Success
 https://k2.shilh.repl.co: Success
-http://v2.kaixin.cloudns.nz/: Failed (000)
