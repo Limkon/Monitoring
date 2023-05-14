@@ -4,6 +4,6 @@ https://ko.limkco.repl.co: Success
 https://litv.yoyholee.repl.co: Success
 https://v2ray.yoyho.repl.co: Success
 https://V2.sukure.repl.co: Success
-https://rray.chavir.repl.co: Success
+https://rray.chavir.repl.co: Failed (500)
 https://tote.kaikaixin.repl.co: Success
 https://k2.shilh.repl.co: Success
