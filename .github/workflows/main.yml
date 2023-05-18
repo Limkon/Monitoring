@@ -1,0 +1,39 @@
+name: 去除重复行
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  remove_duplicates:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 检查代码库
+        uses: actions/checkout@v2
+
+      - name: 更新系统包
+        run: sudo apt-get update
+
+      - name: 安装Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+
+      - name: 安装依赖
+        run: |
+          sudo apt-get install -y python3-pip
+          pip3 install pandas
+
+      - name: 去除重复行
+        run: |
+          python3 remove_duplicates.py
+
+      - name: 提交修改
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add urls
+          git commit -m "去除重复行"
+          git push
