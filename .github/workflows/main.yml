@@ -4,7 +4,10 @@ on:
   push:
     branches:
       - master
-
+  watch:
+    paths:
+      - '**/urls'
+      
 jobs:
   remove_duplicates:
     runs-on: ubuntu-latest
