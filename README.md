@@ -10,3 +10,4 @@ https://k2.shilh.repl.co: Success
 https://tr--slind.repl.co: Success
 https://chatgpt-ai-jet.vercel.app: Success
 https://chat-ai-five-orpin.vercel.app: Success
+https://ai-assistant-five-theta.vercel.app: Success
