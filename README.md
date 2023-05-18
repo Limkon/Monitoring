@@ -11,4 +11,4 @@ https://tr--slind.repl.co: Success
 https://chatai--cokio.repl.co: Success
 https://chatgpt-ai-jet.vercel.app: Success
 https://chat-ai-five-orpin.vercel.app: Success
-https://ai-assistant-five-theta.vercel.app/: Success
+https://ai-assistant-five-theta.vercel.app: Success
