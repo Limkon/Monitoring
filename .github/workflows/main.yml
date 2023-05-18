@@ -31,6 +31,7 @@ jobs:
           python3 remove_duplicates.py
 
       - name: 提交修改
+        continue-on-error: true
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
