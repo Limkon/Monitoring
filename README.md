@@ -5,9 +5,9 @@ https://su--yoyholee.repl.co: Failed (403)
 https://v2ray.yoyho.repl.co: Success
 https://V2.sukure.repl.co: Success
 https://v.chavir.repl.co: Failed (403)
-https://tote.kaikaixin.repl.co: Failed (no response)
+https://tote.kaikaixin.repl.co: Success
 https://k2.shilh.repl.co: Success
-https://tr--slind.repl.co: Failed (no response)
+https://tr--slind.repl.co: Success
 https://chatai--cokio.repl.co: Success
 https://chatgpt-ai-jet.vercel.app: Success
 https://chat-ai-five-orpin.vercel.app: Success
