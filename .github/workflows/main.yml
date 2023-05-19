@@ -3,7 +3,7 @@ name: 去除重复行
 on:
   push:
     branches:
-      - master
+      - '*'
   watch:
     paths:
       - '**/urls'
