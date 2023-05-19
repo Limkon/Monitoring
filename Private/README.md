@@ -42,7 +42,7 @@ bVdjHLzbcM@xooz.site----9nGOz5M0KP （谷歌账号登陆）
 密码5：Cea7IQj5ud
 查询openai api
 https://askgptai-1302482767.cos.ap-tokyo.myqcloud.com/checkbilling.html
-#chatgpt账号                  chatgpt密码
+#chatgpt账号                  chatgpt密码  
 zh4racyf4@yunweiloginmh3.com 	u83i0ZZeRy
 9jby8cwfj@yunweiloginmh3.com	 iXh7U0XzsC
 pcjzvbfz_@yunweiloginmh3.com	 Ce508NE41I
