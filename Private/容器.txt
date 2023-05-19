@@ -1,0 +1,17 @@
+https://vercel.com/
+sukure2002@gmail.com
+kcomlim@outlook.com
+https://railway.app/
+github limkon
+
+
+
+1.Replit ：輕量化 即開即用的免費容器， 可以自動載入GitHub項目！【官網】
+
+2.vercel： Vercel的自動化部署速度非常快，簡單易用，只需要幾秒鐘就能完成。這對於用戶來說非常重要，因為它可以讓我們更快地將代碼部署到生產環境中，從而更快地驗證我們的想法。 【官網】
+
+3.ide.groom ： 韓國提供的一款免費容器 【官網】
+
+4.railway： 每個月提供5美元的免費額度，不休眠，不刪數據，自定義域名，自動SSL加密 ! 【官網】
+
+5.Gitpod:  【官網】

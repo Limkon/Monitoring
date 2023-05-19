@@ -1,0 +1,16 @@
+https://dash.cloudflare.com/
+sukure2002@gmail.com 19821124r.
+KCONLIM@OUTLOOK.COM  
+ addEventListener(
+    "fetch", event => {
+        let url = new URL(event.request.url);
+        url.hostname = "chatgpt-ai-jet.vercel.app";                        
+        url.protocol = "https";
+        let request = new Request(url, event.request);
+        event.respondWith(
+            fetch(request)
+        )
+    }
+)
+https://auth.gcore.com/login/signin?lang=en
+sukure@mail.com 19821124Rl.

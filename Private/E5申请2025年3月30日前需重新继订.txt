@@ -1,0 +1,62 @@
+谷歌云压缩包密码：132579.
+
+
+用户密钥
+afX8Q~J2_EvTBxCdbgfu5HL2J9D200vcSJqNWbiB
+管理主页：https://admin.microsoft.com/Adminportal/Home?#/homepage
+E5主页：  https://portal.azure.com/#home
+创建更多的子账户 https://admin.microsoft.com/Adminportal/Home#/homepage
+
+申请5T：https://admin.onedrive.com/?v=StorageSettings
+
+申请E5https://developer.microsoft.com/zh-cn/office/dev-program
+
+自动续期   获取自己的api key：https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps
+自动续订https://e5.qyi.io
+yoyho github.com登陆  需用子账户登陆授权
+回调地址https://e5.qyi.io/outlook/auth2/26a4953426c1d1a39d1d1f9d80496f59/receive
+主账户sukure@kcocon.onmicrosoft.com 77157121519821124r.
+      kcoco@sukure.onmicrosoft.com
+子账户
+显示名称: li feng
+用户名: limu@kcocon.onmicrosoft.com
+密码: Fub99511  改132579r.
+
+用户名: long@kcocon.onmicrosoft.com
+密码: Laq16749
+Shiloh@kcocon.onmicrosoft.com  19821124r.
+
+lingo@kcocon.onmicrosoft.com
+
+https://onedrive.live.com/about/zh-cn/signin/
+以注册开发者账号的微软账号登录：https://developer.microsoft.com/zh-cn/microsoft-365/profile查看到期时间
+关闭双重验证－Azure Active Directory-属性－管理安全默认值－禁用
+https://aad.portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/Overview
+
+
+onedrive api 
+应用程序(客户端) ID :bc6ad2db-4458-42d4-a69e-e67e541a9455
+对象 ID:f8c11ab3-490c-4f47-a7dd-2b7f66768170
+目录(租户) ID:163a9bef-1e80-4204-944f-23c4a81222cc
+值
+zS08Q~XfbqR6KVwDBTnb_nmBT6SQ.kiJ7FKtxc1e
+
+主账户kcoco@sukure.onmicrosoft.com 77157121519821124r.
+ Jackson@sukure.onmicrosoft.com 19821124r.
+用户名: Jack@sukure.onmicrosoft.com
+密码: Pur64849
+用户名: Karl@sukure.onmicrosoft.com
+密码: Jup71939
+mr48Q~FFY4BSNOXzzOCUWrVpuxNkRN8BLUitjclS
+
+onedrive
+显示名称
+rcloneapi
+应用程序(客户端) ID
+1143e654-533e-455e-a374-93cc19c11732
+对象 ID
+db34832a-64c5-4037-bc7d-9e1972437945
+目录(租户) ID
+a9c2f682-3ae7-49f9-9f06-aca72d865508
+值
+Rz~8Q~I-FPjhPSNLapcK3NaUlRklR6UFxVllqbQV

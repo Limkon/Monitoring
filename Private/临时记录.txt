@@ -1,0 +1,25 @@
+on: 
+  schedule: #UTC+0               #UTC+8
+    - cron: '*/35 0-8 * * 1-5'   #工作日 上午8:00 - 下午4:00
+    - cron: '*/25 8-12 * * 1-5'  #工作日 下午4:00 - 晚上8:00
+    - cron: '*/55 12-21 * * 1-4' #工作日 晚上8:00 - 次日凌晨5:00
+    - cron: '*/25 21-23 * * 1-5' #工作日 次日凌晨5:00 - 次日上午8:00
+    - cron: '*/25 14-21 * * 5'   #星期五 晚上10:00 - 次日凌晨5:00
+    - cron: '*/25 * * * 0,6'     #休息日 全天候
+  # repository_dispatch: #https://www.chenshaowen.com/blog/how-to-trigger-github-action-remotely.html
+  #   types:
+  #     - Webhook
+  workflow_dispatch: #手动调试按钮
+https://www.tasexy.com/1187199.html
+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  	
+chatgpt密码
+zh4racyf4@yunweiloginmh3.com	u83i0ZZeRy
+9jby8cwfj@yunweiloginmh3.com	iXh7U0XzsC
+pcjzvbfz_@yunweiloginmh3.com	Ce508NE41I
+hp7tt3cuc@yunweiloginmh3.com	pBQOw3XYi8
+u67fcctzv@yunweiloginmh3.com	X577mb04u9
+hei8nrxp9@yunweiloginmh3.com	PHVPCiI2xr
+xncwphe2b@yunweiloginmh3.com	rg7Qaio3AL
+dzf4ijlgk@yunweiloginmh3.com	3v64cslL6r
+bx27mk56vt@yunweiloginmh3.com	O1JplWqE8V
+2cdw3jiy_@yunweiloginmh3.com	hmU761opfi
