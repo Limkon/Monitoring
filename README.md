@@ -10,7 +10,7 @@ https://k2.shilh.repl.co: Success
 https://rows--zixk.repl.co: Success
 https://tr--slind.repl.co: Success
 https://beaspy--hting.repl.co: Success
-https://chatai--cokio.repl.co: Success
+https://chatai--cokio.repl.co: Failed (000)
 https://game-example--rdianc.repl.co: Success
 https://chatgpt-ai-jet.vercel.app: Success
 https://chat-ai-five-orpin.vercel.app: Success
