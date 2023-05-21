@@ -11,6 +11,21 @@ on:
   workflow_dispatch:
 
 jobs:
+  delayed-job-trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Delay random minutes
+        id: random-delay
+        run: |
+          echo "::set-output name=delay::$(shuf -i 1-7 -n 1)"
+
+      - name: Wait for random delay
+        run: |
+          sleep ${{ steps.random-delay.outputs.delay }}m
+
   visit-urls:
     runs-on: ubuntu-latest
     steps:
