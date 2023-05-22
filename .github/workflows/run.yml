@@ -19,8 +19,9 @@ jobs:
 
       - name: Delay random minutes
         run:      
-         delay=$((RANDOM % 30 + 30))
-
+         delay=$((RANDOM % 600 + 600))
+         sleep "$delay"
+         
       - name: Visit URLs
         run: |
           set -e
