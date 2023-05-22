@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Delay random minutes
-        run:      
+        run: |      
          delay=$((RANDOM % 600 + 1))
          sleep "$delay"
          
