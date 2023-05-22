@@ -17,8 +17,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      #- name: Delay random minutes
-      #  delay=$((RANDOM % 30 + 30))
+      - name: Delay random minutes
+        run:      
+         delay=$((RANDOM % 30 + 30))
 
       - name: Visit URLs
         run: |
