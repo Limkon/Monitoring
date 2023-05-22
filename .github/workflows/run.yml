@@ -17,17 +17,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Delay random minutes
-        id: random-delay
-        run: |
-          echo "::set-output name=delay::$(shuf -i 1-7 -n 1)"
-
-      - name: Wait for random delay
-        run: |
-          sleep ${{ steps.random-delay.outputs.delay }}m
-
-      - name: Install Dependencies
-        run: sudo apt-get update && sudo apt-get install -y curl
+      #- name: Delay random minutes
+      #  delay=$((RANDOM % 30 + 30))
 
       - name: Visit URLs
         run: |
