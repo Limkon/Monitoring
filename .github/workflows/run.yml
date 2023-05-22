@@ -19,7 +19,7 @@ jobs:
 
       - name: Delay random minutes
         run:      
-         delay=$((RANDOM % 600 + 600))
+         delay=$((RANDOM % 600 + 1))
          sleep "$delay"
          
       - name: Visit URLs
