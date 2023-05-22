@@ -17,10 +17,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Delay random minutes
-        run: |      
-         delay=$((RANDOM % 500 + 1))
-         sleep "$delay"
+      #- name: Delay random minutes
+      #  run: |      
+       #  delay=$((RANDOM % 500 + 1))
+       #  sleep "$delay"
          
       - name: Visit URLs
         run: |
