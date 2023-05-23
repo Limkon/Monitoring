@@ -2,10 +2,9 @@ name: Visit URLs
 
 on:
   schedule:
-    - cron: '0 13-23/1 * * *' 
+    - cron: '30 0-12/1 * * *' 
 
   workflow_dispatch:
-
 
 jobs:
   delayed-job-trigger:
@@ -15,9 +14,9 @@ jobs:
         uses: actions/checkout@v3
 
       #- name: Delay random minutes
-      #  run: |      
-      #  delay=$((RANDOM % 500 + 1))
-      #  sleep "$delay"
+      #  run: |
+      #    delay=$((RANDOM % 5 + 1))
+      #    sleep "$delay"
          
       - name: Visit URLs
         run: |
@@ -25,29 +24,26 @@ jobs:
           urls=($(cat urls))
 
           for url in "${urls[@]}"; do
-              delay=$((RANDOM % 30 + 30))
-              count=0
-              while true; do
-                  response=$(timeout 5s curl -sf -o /dev/null -w '%{http_code}' "$url" || true)
-                  if [[ "$response" =~ ^2 ]]; then
-                      echo "$url: Success"
-                      break
-                  elif [ -z "$response" ]; then
-                      echo "$url: Failed (no response)"
-                  else
-                      echo "$url: Failed ($response)"
-                  fi
+            count=0
+            while true; do
+                response=$(timeout 5s curl -sf -o /dev/null -w '%{http_code}' "$url" || true)
+                if [[ "$response" =~ ^2 ]]; then
+                    echo "$url: Success"
+                    break
+                elif [ -z "$response" ]; then
+                    echo "$url: Failed (no response)"
+                else
+                    echo "$url: Failed ($response)"
+                fi
 
-                  # 如果网站未响应，则等待5秒后重新尝试
-                  sleep 5
-                  ((count++))
-                  if [ $count -ge 1 ]; then
-                      echo "$url: Failed (exceeded retries)"
-                      break
-                  fi
-              done
-
-              sleep "$delay"
+                # 如果网站未响应，则等待5秒后重新尝试
+                sleep 5
+                ((count++))
+                if [ $count -ge 1 ]; then
+                    echo "$url: Failed (exceeded retries)"
+                    break
+                fi
+            done
           done || true
 
       - name: Check URLs and Update README
