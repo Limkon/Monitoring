@@ -6,7 +6,7 @@ on:
       - '*'
   watch:
     paths:
-      - '**/urls'
+      - 'urls'
       
 jobs:
   remove_duplicates:
