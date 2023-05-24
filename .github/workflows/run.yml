@@ -2,8 +2,8 @@ name: Visit URLs
 
 on:
   schedule:
-    - cron: '30 0-12/1 * * *' 
-    - cron: '5 13-23/1 * * *' 
+    - cron: '15 13-23/1 * * *' 
+    - cron: '35 0-12/1 * * *' 
   workflow_dispatch:
 
 jobs:
