@@ -28,19 +28,23 @@ jobs:
             while true; do
                 response=$(timeout 5s curl -sf -o /dev/null -w '%{http_code}' "$url" || true)
                 if [[ "$response" =~ ^2 ]]; then
-                    echo "$url: Success"
+                    echo "$url: 成功"
+                    echo ""
                     break
                 elif [ -z "$response" ]; then
-                    echo "$url: Failed (no response)"
+                    echo "$url: 失败 (无响应)"
+                    echo ""
                 else
-                    echo "$url: Failed ($response)"
+                    echo "$url: 失败 ($response)"
+                    echo ""
                 fi
 
                 # 如果网站未响应，则等待5秒后重新尝试
                 sleep 5
                 ((count++))
                 if [ $count -ge 1 ]; then
-                    echo "$url: Failed (exceeded retries)"
+                    echo "$url: 失败 (超过重试次数)"
+                    echo ""
                     break
                 fi
             done
@@ -55,18 +59,18 @@ jobs:
           for url in "${urls[@]}"; do
               response=$(timeout 5s curl -sf -o /dev/null -w '%{http_code}' "$url" || true)
               if [[ "$response" =~ ^2 ]]; then
-                  responses+=("$url: Success")
+                  responses+=("$url: 成功")
               elif [ -z "$response" ]; then
-                  responses+=("$url: Failed (no response)")
-                  echo "URL ${url} failed to visit (no response)" >> README.md
+                  responses+=("$url: 失败 (无响应)")
+                  echo "URL ${url} 访问失败（无响应）" >> README.md
               else
-                  responses+=("$url: Failed ($response)")
-                  echo "URL ${url} failed to visit ($response)" >> README.md
+                  responses+=("$url: 失败 ($response)")
+                  echo "URL ${url} 访问失败（$response）" >> README.md
               fi
           done
 
-          echo "## Website Status" > status.md
-          printf '%s\n' "${responses[@]}" >> status.md
+          echo "## 网站状态" > status.md
+          printf '%s\n\n' "${responses[@]}" >> status.md
 
           # 使用 diff 命令比较新的结果和现有的 README.md 文件中的内容
           if ! diff -q README.md status.md >/dev/null ; then
@@ -75,8 +79,8 @@ jobs:
               git config --global user.name "${{ github.actor }}"
               git config --global user.email "${{ github.actor }}@users.noreply.github.com"
               git add README.md
-              git commit -m "Update website status"
+              git commit -m "更新网站状态"
               git push origin ${{ github.ref }}
           else
-              echo "No changes detected. Skipping commit."
+              echo "未检测到更改。跳过提交。"
           fi
