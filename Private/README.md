@@ -47,3 +47,4 @@ zh4racyf4@yunweiloginmh3.com 	u83i0ZZeRy
 9jby8cwfj@yunweiloginmh3.com	 iXh7U0XzsC
 pcjzvbfz_@yunweiloginmh3.com	 Ce508NE41I
 hp7tt3cuc@yunweiloginmh3.com	 pBQOw3XYi8
+https://github.com/akl7777777/free-chatgpt-client-pub
