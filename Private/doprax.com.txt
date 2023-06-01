@@ -1,6 +1,0 @@
-﻿UUID 302218d2-c01d-4b0b-bc4d-68bd417edea2
-ENV VMESS_WSPATH /vmess
-
-ENV VLESS_WSPATH /vless
-443
-https://v2rl3jm.eu-ccofhtfzmvsd.dopraxapp.com/
