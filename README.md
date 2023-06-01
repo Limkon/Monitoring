@@ -33,7 +33,7 @@ https://ask.skzey.repl.co: 成功
 
 https://deo.babox.repl.co: 成功
 
-https://qi.limqin.repl.co: 失败 (403)
+https://qi.limqin.repl.co: 成功
 
 https://ys.pyxzp.repl.co: 成功
 
