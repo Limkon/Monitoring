@@ -2,8 +2,8 @@ name: Visit URLs
 
 on:
   schedule:
-    - cron: '15 13-23/1 * * *' 
-    - cron: '35 0-12/1 * * *' 
+    - cron: '10 13-23/1 * * *' 
+    - cron: '39 0-12/1 * * *' 
   workflow_dispatch:
 
 jobs:
@@ -16,7 +16,7 @@ jobs:
 
       - name: Delay random minutes
         run: |
-          delay=$((RANDOM % 5 + 1))
+          delay=$((RANDOM % 20 + 1))
           sleep "$delay"
          
       - name: Visit URLs
