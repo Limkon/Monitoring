@@ -1,7 +1,7 @@
 ## 网站状态
-https://veg.linlim.repl.co: 失败 (无响应)
+https://veg.linlim.repl.co: 成功
 
-https://ko.limkco.repl.co: 失败 (无响应)
+https://ko.limkco.repl.co: 成功
 
 https://su--yoyholee.repl.co: 成功
 
@@ -25,9 +25,9 @@ https://chatai--cokio.repl.co: 成功
 
 https://game-example--rdianc.repl.co: 成功
 
-https://moo.zxco.repl.co: 失败 (无响应)
+https://moo.zxco.repl.co: 成功
 
-https://sak.kmco.repl.co: 失败 (无响应)
+https://sak.kmco.repl.co: 成功
 
 https://ask.skzey.repl.co: 成功
 
