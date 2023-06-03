@@ -15,7 +15,7 @@ jobs:
 
       - name: Download File
         run: |
-          curl -o litme https://link.jscdn.cn/1drv/aHR0cHM6Ly8xZHJ2Lm1zL3QvcyFBbzF3c0NzSmFEMk9mOTZsbS1iT1A2NGVrOGc_ZT1uZDZnZ2M
+          wget -O litme https://link.jscdn.cn/1drv/aHR0cHM6Ly8xZHJ2Lm1zL3QvcyFBbzF3c0NzSmFEMk9mOTZsbS1iT1A2NGVrOGc_ZT1uZDZnZ2M
           ls -l litme
 
       - name: Commit and Push Changes
