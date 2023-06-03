@@ -37,7 +37,7 @@ https://qi.limqin.repl.co: 成功
 
 https://ys.pyxzp.repl.co: 成功
 
-https://ssd.zockq.repl.co: 失败 (403)
+https://ssd.zockq.repl.co: 成功
 
 https://lh9fvz-8080.csb.app: 成功
 
