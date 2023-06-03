@@ -1,9 +1,9 @@
 name: Download and Write File
 
 on:
-  push:
-    branches:
-      - main
+  schedule:
+       - cron: '35 * */7 * *' 
+  workflow_dispatch:
 
 jobs:
   download_and_write:
