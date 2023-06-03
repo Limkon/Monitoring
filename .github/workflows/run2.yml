@@ -2,7 +2,7 @@ name: Visit URLs
 
 on:
   schedule:
-    - cron: '10 13-23/1 * * *' 
+    - cron: '5 13-23/1 * * *' 
     - cron: '39 0-12/1 * * *' 
   workflow_dispatch:
 
