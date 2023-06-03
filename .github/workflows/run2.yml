@@ -38,12 +38,18 @@ jobs:
             echo ""
           done
 
-          echo "## 网站状态" > README.md
-          printf '%s\n\n' "${responses[@]}" >> README.md
+          echo "## 网站状态" > status.md
+          printf '%s\n\n' "${responses[@]}" >> status.md
 
-      - name: Commit changes
-        run: |
-          git config --global user.name "${{ github.actor }}"
-          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-          git add README.md
-          git commit -m "Update website status"
+          # 使用 diff 命令比较新的结果和现有的 README.md 文件中的内容
+          if ! diff -q README.md status.md >/dev/null ; then
+              cat status.md > README.md
+
+              git config --global user.name "${{ github.actor }}"
+              git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+              git add README.md
+              git commit -m "更新网站状态"
+              git push origin ${{ github.ref }}
+          else
+              echo "未检测到更改。跳过提交。"
+          fi
