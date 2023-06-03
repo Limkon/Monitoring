@@ -37,7 +37,7 @@ https://qi.limqin.repl.co: 成功
 
 https://ys.pyxzp.repl.co: 成功
 
-https://ssd.zockq.repl.co: 失败 ()
+https://ssd.zockq.repl.co: 成功
 
 https://lh9fvz-8080.csb.app: 成功
 
@@ -47,7 +47,7 @@ https://chatgpt-ai-jet.vercel.app: 成功
 
 https://ai-assistant-five-theta.vercel.app: 成功
 
-https://bing-ai-coral.vercel.app: 成功
+https://bing-ai-coral.vercel.app: 失败 (302)
 
 https://vi.zogzr.repl.co: 成功
 
