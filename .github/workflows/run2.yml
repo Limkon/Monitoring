@@ -1,0 +1,100 @@
+name: Visit URLs
+
+on:
+  schedule:
+    - cron: '15 13-23/1 * * *' 
+    - cron: '35 0-12/1 * * *' 
+  workflow_dispatch:
+
+jobs:
+  visit_urls:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Delay random minutes
+        run: |
+          delay=$((RANDOM % 5 + 1))
+          sleep "$delay"
+         
+      - name: Visit URLs
+        run: |
+          set -e
+          urls=($(cat urls))
+
+          # Create an array to store the background process IDs
+          declare -a pids=()
+
+          for url in "${urls[@]}"; do
+            {
+              count=0
+              while true; do
+                  response=$(timeout 5s curl -sf -o /dev/null -w '%{http_code}' "$url" || true)
+                  if [[ "$response" =~ ^2 ]]; then
+                      echo "$url: 成功"
+                      echo ""
+                      break
+                  elif [ -z "$response" ]; then
+                      echo "$url: 失败 (无响应)"
+                      echo ""
+                  else
+                      echo "$url: 失败 ($response)"
+                      echo ""
+                  fi
+
+                  # 如果网站未响应，则等待5秒后重新尝试
+                  sleep 5
+                  ((count++))
+                  if [ $count -ge 1 ]; then
+                      echo "$url: 失败 (超过重试次数)"
+                      echo ""
+                      break
+                  fi
+              done
+            } &
+
+            # Store the background process ID
+            pids+=($!)
+
+            # Limit the number of parallel processes
+            if (( ${#pids[@]} % 5 == 0 )); then
+              wait "${pids[@]}"
+              pids=()
+            fi
+          done
+
+          # Wait for any remaining background processes to finish
+          wait "${pids[@]}" || true
+
+      - name: Check URLs and Update README
+        continue-on-error: true
+        run: |
+          urls=($(cat urls))
+
+          declare -a responses=()
+          for url in "${urls[@]}"; do
+              response=$(timeout 5s curl -sf -o /dev/null -w '%{http_code}' "$url" || true)
+              if [[ "$response" =~ ^2 ]]; then
+                  responses+=("$url: 成功")
+              elif [ -z "$response" ]; then
+                  responses+=("$url: 失败 (无响应)")
+                  echo "URL ${url} 访问失败（无响应）" >> README.md
+              else
+                  responses+=("$url: 失败 ($response)")
+                  echo "URL ${url} 访问失败（$response）" >> README.md
+              fi
+          done
+
+          echo "## 网站状态" > status.md
+          printf '%s\n\n' "${responses[@]}" >> status.md
+
+          # 使用 diff 命令比较新的结果和现有的 README.md 文件中的内容
+          if ! diff -q README.md status.md >/dev/null ; then
+              cat status.md > README.md
+
+              git config --global user.name "${{ github.actor }}"
+              git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+              git add README.md
+              git commit -m
