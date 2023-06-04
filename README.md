@@ -31,7 +31,7 @@ https://sak.kmco.repl.co: 失败 (403)
 
 https://ask.skzey.repl.co: 成功
 
-https://deo.babox.repl.co: 失败 (403)
+https://deo.babox.repl.co: 成功
 
 https://qi.limqin.repl.co: 成功
 
@@ -47,7 +47,7 @@ https://chatgpt-ai-jet.vercel.app: 成功
 
 https://ai-assistant-five-theta.vercel.app: 成功
 
-https://bing-ai-coral.vercel.app: 成功
+https://bing-ai-coral.vercel.app: 失败 (302)
 
 https://vi.zogzr.repl.co: 成功
 
@@ -63,5 +63,5 @@ https://ypto.tnpyv.repl.co: 成功
 
 https://figura.hpbmm.repl.co: 成功
 
-https://deployment-27500-uffizzixray-ss55.app.uffizzi.com: 成功
+https://deployment-27500-uffizzixray-ss55.app.uffizzi.com: 失败 (404)
 
