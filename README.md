@@ -13,7 +13,7 @@ https://v.chavir.repl.co: 成功
 
 https://tote.kaikaixin.repl.co: 成功
 
-https://k2.shilh.repl.co: 成功
+https://k2.shilh.repl.co: 失败 (429)
 
 https://rows--zixk.repl.co: 成功
 
@@ -55,7 +55,7 @@ https://ls.tpjow.repl.co: 失败 (403)
 
 https://Love.cfvqw.repl.co: 成功
 
-https://apping.eywjx.repl.co: 失败 (403)
+https://apping.eywjx.repl.co: 成功
 
 https://mization.edpjg.repl.co: 成功
 
