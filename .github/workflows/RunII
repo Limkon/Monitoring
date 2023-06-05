@@ -1,0 +1,55 @@
+name: Visit URLsII
+
+on:
+  schedule:
+    - cron: '0 13-23/2 */2 * *' 
+    - cron: '25 0-12/1 */2 * *' 
+  workflow_dispatch:
+
+jobs:
+  visit_urls:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Delay random minutes
+        run: |
+          delay=$((RANDOM % 20 + 1))
+          sleep "$delay"
+         
+      - name: Visit URLs
+        run: |
+          set -e
+          urls=($(cat urls | shuf))
+
+          declare -a responses=()
+
+          for url in "${urls[@]}"; do
+            response=$(timeout 5s curl -sf -o /dev/null -w '%{http_code}' "$url" || true)
+            if [[ "$response" =~ ^[23] ]]; then
+              echo "$url: 成功"
+              responses+=("$url: 成功")
+            else
+              echo "$url: 失败 ($response)"
+              responses+=("$url: 失败 ($response)")
+            fi
+            echo ""
+          done
+
+          echo "## 网站状态" > status.md
+          printf '%s\n\n' "${responses[@]}" >> status.md
+
+          # 使用 diff 命令比较新的结果和现有的 README.md 文件中的内容
+          if ! diff -q README.md status.md >/dev/null ; then
+              cat status.md > README.md
+
+              git config --global user.name "${{ github.actor }}"
+              git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+              git add README.md
+              git commit -m "更新网站状态"
+              git push origin ${{ github.ref }}
+          else
+              echo "未检测到更改。跳过提交。"
+          fi
