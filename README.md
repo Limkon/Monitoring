@@ -41,11 +41,11 @@ https://moo.zxco.repl.co: 失败 (403)
 
 https://sak.kmco.repl.co: 成功
 
-https://ask.skzey.repl.co: 失败 (无响应)
+https://ask.skzey.repl.co: 成功
 
-https://deo.babox.repl.co: 失败 (403)
+https://deo.babox.repl.co: 成功
 
-https://qi.limqin.repl.co: 成功
+https://qi.limqin.repl.co: 失败 (403)
 
 https://ys.pyxzp.repl.co: 成功
 
@@ -63,7 +63,7 @@ https://mization.edpjg.repl.co: 失败 (403)
 
 https://ypto.tnpyv.repl.co: 成功
 
-https://figura.hpbmm.repl.co: 失败 (无响应)
+https://figura.hpbmm.repl.co: 成功
 
 https://deployment-27500-uffizzixray-ss55.app.uffizzi.com: 失败 (404)
 
