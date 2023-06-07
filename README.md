@@ -13,7 +13,7 @@ https://bing-ai-coral.vercel.app: 失败 (302)
 
 https://veg.linlim.repl.co: 成功
 
-https://ko.limkco.repl.co: 失败 (无响应)
+https://ko.limkco.repl.co: 成功
 
 https://su--yoyholee.repl.co: 失败 (403)
 
