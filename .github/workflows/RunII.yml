@@ -18,7 +18,17 @@ jobs:
         run: |
           delay=$((RANDOM % 9 + 1))
           sleep "$delay"
-         
+
+      - name: Check for duplicate URLs
+        run: |
+          if sort urls | uniq -d | grep -q . ; then
+            echo "Detected duplicate URLs in the 'urls' file. Removing duplicates..."
+            sort -u urls -o urls
+            echo "Duplicates removed."
+          else
+            echo "No duplicate URLs detected."
+          fi
+
       - name: Visit URLs
         run: |
           set -e
@@ -40,8 +50,6 @@ jobs:
 
           echo "## 网站状态" > status.md
           printf '%s\n\n' "${responses[@]}" >> status.md
-
-          python remove_duplicates.py urls
 
           # 使用 diff 命令比较新的结果和现有的 README.md 文件中的内容
           if ! diff -q README.md status.md >/dev/null ; then
