@@ -15,7 +15,9 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Remove duplicate URLs
-        run: python remove_duplicates.py urls
+        run: |
+          python remove_duplicates.py urls
+          mv urls_no_duplicates urls
 
       - name: Delay random minutes
         run: |
