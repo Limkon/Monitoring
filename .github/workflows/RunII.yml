@@ -31,7 +31,7 @@ jobs:
           declare -a failed_urls=()
 
           for url in "${urls[@]}"; do
-            response=$(timeout 5s curl -sf -o /dev/null -w '%{http_code}' "$url" || true)
+            response=$(timeout 5s curl -sf -o /dev/null -w '%{http_code}\n' "$url" || echo "Failed")
             if [[ "$response" =~ ^[23] ]]; then
               echo "$url: 成功"
               responses+=("$url: 成功")
