@@ -26,4 +26,5 @@ if __name__ == '__main__':
         sys.exit(1)
 
     file_path = sys.argv[1]
+    print(f"文件路径: {file_path}")
     remove_duplicates(file_path)
