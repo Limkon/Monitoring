@@ -22,16 +22,6 @@ jobs:
           delay=$((RANDOM % 9 + 1))
           sleep "$delay"
 
-      - name: 检查URL是否有变化
-        id: check_urls
-        run: |
-          if ! cmp -s urls_tmp urls; then
-            mv urls_tmp urls
-            echo "urls_changed=true" >> $GITHUB_ENV
-          else
-            echo "urls_changed=false" >> $GITHUB_ENV
-          fi
-
       - name: Visit URLs
         run: |
           set -e
