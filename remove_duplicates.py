@@ -4,6 +4,10 @@ import os
 def remove_duplicates(file_path):
     lines = []
 
+    # 输出调试信息
+    print(f"文件路径: {file_path}")
+    print(f"当前工作目录: {os.getcwd()}")
+
     # 读取文件内容并去除重复行
     with open(file_path, 'r') as file:
         for line in file:
