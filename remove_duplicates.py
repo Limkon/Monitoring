@@ -14,7 +14,7 @@ def remove_duplicates(file_path):
     with open(file_path, 'r') as file:
         for line in file:
             line = line.strip()  # 去除行首和行尾的空格和换行符
-            if line and line not in lines:
+            if line not in lines:
                 lines.append(line)
 
     # 将去重后的结果保存到临时文件中
