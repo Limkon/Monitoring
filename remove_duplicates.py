@@ -1,5 +1,7 @@
 import sys
 import os
+import filecmp
+import shutil
 
 def remove_duplicates(file_path):
     lines = []
@@ -21,6 +23,17 @@ def remove_duplicates(file_path):
         file.write('\n'.join(lines))
 
     print(f"去重完成，结果保存到 {output_file_path} 文件中")
+
+    # 比较临时文件和原始文件
+    if filecmp.cmp(file_path, output_file_path):
+        print("文件无变化，跳过更新")
+    else:
+        # 复制临时文件到原始文件，并覆盖原始文件
+        shutil.copyfile(output_file_path, file_path)
+        print("文件已更新")
+
+    # 删除临时文件
+    os.remove(output_file_path)
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
