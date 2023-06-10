@@ -6,12 +6,13 @@ def remove_duplicates(file_path):
     # 读取文件内容并去除重复行
     with open(file_path, 'r') as file:
         for line in file:
+            line = line.rstrip('\n')  # 去除行尾的换行符
             lines.add(line)
 
     # 将去重后的结果保存到临时文件中
     output_file_path = file_path + "_tmp"
     with open(output_file_path, 'w') as file:
-        file.writelines(lines)
+        file.writelines(line + '\n' for line in lines)
 
     print(f"去重完成，结果保存到 {output_file_path} 文件中")
 
