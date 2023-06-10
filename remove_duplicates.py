@@ -10,9 +10,7 @@ def remove_duplicates(file_path):
     # 去重 URL
     lines = list(set(lines))
     
-    # 输出去重后的 URL 到新文件
-    new_file_path = "urls_no_duplicates"
-    with open(new_file_path, 'w') as file:
+    with open(file_path, 'w') as file:
         file.writelines(line + '\n' for line in lines)
 
 if __name__ == '__main__':
