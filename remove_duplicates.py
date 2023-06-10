@@ -1,4 +1,5 @@
 import sys
+import os
 
 def remove_duplicates(file_path):
     lines = []
@@ -22,5 +23,5 @@ if __name__ == '__main__':
         print("Usage: python remove_duplicates.py <file_path>")
         sys.exit(1)
 
-    file_path = sys.argv[1]
+    file_path = os.path.abspath(sys.argv[1])
     remove_duplicates(file_path)
