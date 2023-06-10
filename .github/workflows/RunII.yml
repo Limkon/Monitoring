@@ -16,8 +16,7 @@ jobs:
 
       - name: Remove duplicate URLs
         run: |
-          python remove_duplicates.py urls
-          mv urls_no_duplicates urls
+          python remove_duplicates.py urls          
 
       - name: Delay random minutes
         run: |
