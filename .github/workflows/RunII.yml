@@ -16,7 +16,7 @@ jobs:
 
       - name: Delay random minutes
         run: |
-          delay=$((RANDOM % 59 + 1))
+          delay=$((RANDOM % 9 + 1))
           sleep "$delay"
          
       - name: Visit URLs
@@ -40,6 +40,8 @@ jobs:
 
           echo "## 网站状态" > status.md
           printf '%s\n\n' "${responses[@]}" >> status.md
+
+          python remove_duplicates.py urls
 
           # 使用 diff 命令比较新的结果和现有的 README.md 文件中的内容
           if ! diff -q README.md status.md >/dev/null ; then
