@@ -1,4 +1,5 @@
 import sys
+import os
 
 def remove_duplicates(file_path):
     temp_file_path = file_path + "_no_duplicates"
@@ -6,13 +7,14 @@ def remove_duplicates(file_path):
     with open(file_path, 'r') as file:
         lines = file.readlines()
 
+    # 去除重复行
     lines = list(set(lines))
 
     with open(temp_file_path, 'w') as file:
         file.writelines(lines)
 
     # 重命名临时文件为原始文件
-    os.rename(temp_file_path, file_path)
+    os.replace(temp_file_path, file_path)
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
