@@ -13,8 +13,8 @@ def remove_duplicates(file_path):
     # 读取文件内容并去除重复行
     with open(file_path, 'r') as file:
         for line in file:
-            line = line.strip()  # 去除开头和结尾的空白字符
-            if line not in lines:
+            line = line.strip()  # 去除行首和行尾的空格和换行符
+            if line and line not in lines:
                 lines.append(line)
 
     # 将去重后的结果保存到临时文件中
