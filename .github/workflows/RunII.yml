@@ -44,15 +44,16 @@ jobs:
           done
 
           # Push failed URLs to README.md
-          echo "# Failed URLs" > README.md
+          echo "# 失败网址" > README.md
           for failed_url in "${failed_urls[@]}"; do
             echo "- $failed_url" >> README.md
           done
 
       - name: Commit and push changes
+      
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add README.md
+          git add .
           git commit -m "Update failed URLs"
           git push
