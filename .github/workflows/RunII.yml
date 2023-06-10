@@ -22,6 +22,16 @@ jobs:
           delay=$((RANDOM % 9 + 1))
           sleep "$delay"
 
+      - name: Check if URLs have changed
+        id: check_urls
+        run: |
+          if ! cmp -s urls_tmp urls; then
+            mv urls_tmp urls
+            echo "::set-output name=urls_changed::true"
+          else
+            echo "::set-output name=urls_changed::false"
+          fi
+
       - name: Visit URLs
         run: |
           set -e
@@ -43,8 +53,6 @@ jobs:
 
           echo "## 网站状态" > status.md
           printf '%s\n\n' "${responses[@]}" >> status.md
-
-          python remove_duplicates.py urls
 
           # 使用 diff 命令比较新的结果和现有的 README.md 文件中的内容
           if ! diff -q README.md status.md >/dev/null; then
