@@ -24,30 +24,30 @@ jobs:
           urls=($(cat urls))
 
           for url in "${urls[@]}"; do
-            count=0
-            while true; do
-                response=$(timeout 5s curl -sf -o /dev/null -w '%{http_code}' "$url" || true)
-                if [[ "$response" =~ ^2 ]]; then
-                    echo "$url: 成功"
-                    echo ""
-                    break
-                elif [ -z "$response" ]; then
-                    echo "$url: 失败 (无响应)"
-                    echo ""
-                else
-                    echo "$url: 失败 ($response)"
-                    echo ""
-                fi
+              count=0
+              while true; do
+                  response=$(timeout 5s curl -sf -o /dev/null -w '%{http_code}' "$url" || true)
+                  if [[ "$response" =~ ^2 ]]; then
+                      echo "$url: 成功"
+                      echo ""
+                      break
+                  elif [ -z "$response" ]; then
+                      echo "$url: 失败 (无响应)"
+                      echo ""
+                  else
+                      echo "$url: 失败 ($response)"
+                      echo ""
+                  fi
 
-                # 如果网站未响应，则等待5秒后重新尝试
-                sleep 5
-                ((count++))
-                if [ $count -ge 1 ]; then
-                    echo "$url: 失败 (超过重试次数)"
-                    echo ""
-                    break
-                fi
-            done
+                  # 如果网站未响应，则等待5秒后重新尝试
+                  sleep 5
+                  ((count++))
+                  if [ $count -ge 1 ]; then
+                      echo "$url: 失败 (超过重试次数)"
+                      echo ""
+                      break
+                  fi
+              done
           done || true
 
       - name: Check URLs and Update README
@@ -55,22 +55,27 @@ jobs:
         run: |
           urls=($(cat urls))
 
-          declare -a responses=()
+          declare -a failed_urls=()
           for url in "${urls[@]}"; do
               response=$(timeout 5s curl -sf -o /dev/null -w '%{http_code}' "$url" || true)
               if [[ "$response" =~ ^2 ]]; then
-                  responses+=("$url: 成功")
+                  continue
               elif [ -z "$response" ]; then
-                  responses+=("$url: 失败 (无响应)")
+                  failed_urls+=("$url")
                   echo "URL ${url} 访问失败（无响应）" >> README.md
               else
-                  responses+=("$url: 失败 ($response)")
+                  failed_urls+=("$url")
                   echo "URL ${url} 访问失败（$response）" >> README.md
               fi
           done
 
+          if [ ${#failed_urls[@]} -eq 0 ]; then
+              echo "所有网址都可访问。"
+              exit 0
+          fi
+
           echo "## 网站状态" > status.md
-          printf '%s\n' "${responses[@]}" >> status.md
+          printf '%s\n' "${failed_urls[@]}" >> status.md
 
           # 使用 diff 命令比较新的结果和现有的 README.md 文件中的内容
           if ! diff -q README.md status.md >/dev/null ; then
