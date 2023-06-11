@@ -33,9 +33,11 @@ jobs:
                       break
                   elif [ -z "$response" ]; then
                       echo "$url: 失败 (无响应)"
+                      echo "$url: $response" >> README.md
                       echo ""
                   else
                       echo "$url: 失败 ($response)"
+                      echo "$url: $response" >> README.md
                       echo ""
                   fi
 
@@ -44,6 +46,7 @@ jobs:
                   ((count++))
                   if [ $count -ge 1 ]; then
                       echo "$url: 失败 (超过重试次数)"
+                      echo "$url: $response" >> README.md
                       echo ""
                       break
                   fi
@@ -61,10 +64,10 @@ jobs:
               if [[ "$response" =~ ^2 ]]; then
                   continue
               elif [ -z "$response" ]; then
-                  failed_urls+=("$url")
+                  failed_urls+=("$url: 失败 (无响应)")
                   echo "URL ${url} 访问失败（无响应）" >> README.md
               else
-                  failed_urls+=("$url")
+                  failed_urls+=("$url: 失败 ($response)")
                   echo "URL ${url} 访问失败（$response）" >> README.md
               fi
           done
