@@ -1,14 +1,10 @@
-# 失败网址
-- https://sak.kmco.repl.co: 失败 (Failed)
-- https://cloud-limve.cloud.okteto.net: 失败 (503
-Failed)
-- http://u17sxl-8080.csb.app: 失败 (502
-Failed)
-- https://vi.zogzr.repl.co: 失败 (403
-Failed)
-- https://deployment-27500-uffizzixray-ss55.app.uffizzi.com: 失败 (404
-Failed)
-- https://Love.cfvqw.repl.co: 失败 (403
-Failed)
-- https://lh9fvz-8080.csb.app: 失败 (502
-Failed)
+## 网站状态
+https://chat-zx.zeabur.app: 失败 (302)
+https://chat-beta-woad.vercel.app: 失败 (302)
+https://lh9fvz-8080.csb.app: 失败 (502)
+http://u17sxl-8080.csb.app: 失败 (502)
+https://bing-ai-coral.vercel.app: 失败 (302)
+https://vi.zogzr.repl.co: 失败 (403)
+https://Love.cfvqw.repl.co: 失败 (403)
+https://deployment-27500-uffizzixray-ss55.app.uffizzi.com: 失败 (404)
+https://cloud-limve.cloud.okteto.net: 失败 (503)
