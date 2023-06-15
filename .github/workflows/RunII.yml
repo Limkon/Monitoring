@@ -1,4 +1,4 @@
-name: Visit URLsII
+name: Visit URLs
 
 on:
   schedule:
@@ -31,7 +31,7 @@ jobs:
 
       - name: Delay random minutes
         run: |
-          delay=$((RANDOM % 1 + 1))
+          delay=$((RANDOM % 58 + 1))
           sleep "$delay"
 
       - name: Visit URLs
