@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Remove duplicate URLs
-        run: python tools\remove_duplicates.py urls
+        run: python tools\remove_duplicates.py .\urls
 
       - name: Install dependencies
         run: |
