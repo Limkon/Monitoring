@@ -21,3 +21,4 @@ except Exception as e:
     print(e)
 finally:
     # 不管是否发生异常都会执行的代码
+    pass
