@@ -33,6 +33,12 @@ jobs:
         run: |
           delay=$((RANDOM % 1 + 1))
           sleep "$delay"
+          
+          - name: Check and create 'urls' file
+            run: |
+            if [ ! -f "urls" ]; then
+             touch urls
+            fi
 
       - name: Visit URLs
         run: |
