@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 import sys
 
 try:
@@ -17,7 +18,7 @@ try:
     driver.get(url)
 
     # 执行你想要的点击操作，例如点击一个按钮
-    button = driver.find_element_by_id('my-button')
+    button = driver.find_element(By.ID, 'my-button')
     button.click()
 
     # 关闭浏览器
