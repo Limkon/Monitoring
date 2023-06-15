@@ -31,7 +31,7 @@ jobs:
 
       - name: Delay random minutes
         run: |
-          delay=$((RANDOM % 58 + 1))
+          delay=$((RANDOM % 1 + 1))
           sleep "$delay"
 
       - name: Visit URLs
@@ -44,7 +44,7 @@ jobs:
 
           for url in "${urls[@]}"; do
             # 模拟点击页面操作
-            python tools\simulate_click.py "$url"
+            python tools\simulate_click.py ${{ github.workspace }}/"$url"
             
             # 执行原始的 curl 请求，并处理响应
             response=$(timeout 5s curl -sf -o /dev/null -w '%{http_code}\n' "$url" || echo "Failed")
