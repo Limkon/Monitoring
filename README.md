@@ -1,5 +1,5 @@
 # 失败网址
-- https://figura.hpbmm.repl.co: 失败 (403
+- https://turbo.flinthill.repl.co: 失败 (502
 Failed)
-- https://moo.zxco.repl.co: 失败 (403
+- https://figura.hpbmm.repl.co: 失败 (403
 Failed)
