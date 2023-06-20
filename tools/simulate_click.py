@@ -1,29 +1,36 @@
-from selenium import webdriver
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.common.by import By
 import random
-import sys
+import subprocess
 
-try:
-    if len(sys.argv) < 2:
-        raise ValueError("请提供要访问的 URL 参数")
+# 从文件中读取要访问的 URL 列表
+with open("urls", "r") as file:
+    urls = file.readlines()
+urls = [url.strip() for url in urls]
+random.shuffle(urls)
 
-    # 从命令行参数获取要访问的 URL
-    url = sys.argv[1]
+responses = []
+failed_urls = []
 
-    # 创建浏览器驱动，例如使用 Chrome 浏览器
-    options = webdriver.ChromeOptions()
-    options.add_argument('--headless')  # 以无头模式运行，可选
-    driver = webdriver.Chrome(options=options)
+for url in urls:
+    try:
+        # 模拟点击页面操作
+        subprocess.run(["python", "./tools/simulate_click.py", url], check=True)
 
-    # 打开网页
-    driver.get(url)
-    print("打开网页:", url)
-   
-except Exception as e:
-    print(f"发生错误：{str(e)}")
+        # 执行 curl 请求，并处理响应
+        command = ["timeout", "5s", "curl", "-sf", "-o", "/dev/null", "-w", "%{http_code}\\n", url]
+        result = subprocess.run(command, capture_output=True, text=True)
+        response = result.stdout.strip()
 
-finally:
-    # 不管是否发生异常都会执行的代码
-    driver.quit()
-    print("浏览器已关闭")
+        if response.startswith("2") or response.startswith("3"):
+            print(f"{url}: 成功")
+            responses.append(f"{url}: 成功")
+        else:
+            print(f"{url}: 失败 ({response})")
+            responses.append(f"{url}: 失败 ({response})")
+            failed_urls.append(f"{url}: 失败 ({response})")
+
+    except subprocess.CalledProcessError:
+        print(f"{url}: 执行命令失败")
+        responses.append(f"{url}: 执行命令失败")
+        failed_urls.append(f"{url}: 执行命令失败")
+
+    print("")
