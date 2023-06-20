@@ -30,7 +30,7 @@ jobs:
 
       - name: Delay random minutes
         run: |
-          delay=$((RANDOM % 49 + 1))
+          delay=$((RANDOM % 9 + 1))
           sleep "$delay"
           
       - name: Check and create 'urls' file
