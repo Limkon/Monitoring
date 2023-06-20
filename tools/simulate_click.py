@@ -1,6 +1,8 @@
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import random
 import sys
 
@@ -43,7 +45,21 @@ try:
         actions = ActionChains(driver)
         actions.move_to_element(random_element)
         actions.move_by_offset(move_offset_x, move_offset_y)
-        actions.click(random_element).perform()
+        actions.click(random_element)
+
+        # 模拟滚动页面
+        scroll_amount = random.randint(100, 500)
+        driver.execute_script(f"window.scrollBy(0, {scroll_amount})")
+
+        # 模拟填充输入框
+        input_element = driver.find_element(By.ID, 'inputFieldId')
+        input_element.send_keys('Hello, World!')
+
+        # 模拟点击链接
+        link_element = driver.find_element(By.LINK_TEXT, 'Click Here')
+        link_element.click()
+
+        actions.perform()
 
     # 关闭浏览器
     driver.quit()
