@@ -58,10 +58,7 @@ jobs:
           for failed_url in "${failed_urls[@]}"; do
             echo "- $failed_url" >> README.md
           done
-
-      - name: Simulate interaction URLs
-        run: python ./tools/simulate_interaction.py ${{ github.workspace }}/urls
-
+          
       - name: Commit and push changes
         continue-on-error: true
         run: |
