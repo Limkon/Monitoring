@@ -20,6 +20,7 @@ try:
 
     # 打开网页
     driver.get(url)
+    print("打开网页:", url)
 
     # 获取页面上的所有可点击元素
     clickable_elements = driver.find_elements(By.XPATH, '//*[@onclick]')
@@ -50,19 +51,23 @@ try:
         # 模拟滚动页面
         scroll_amount = random.randint(100, 500)
         driver.execute_script(f"window.scrollBy(0, {scroll_amount})")
+        print("滚动页面:", scroll_amount)
 
         # 模拟填充输入框
         input_element = driver.find_element(By.ID, 'inputFieldId')
         input_element.send_keys('Hello, World!')
+        print("填充输入框")
 
         # 模拟点击链接
         link_element = driver.find_element(By.LINK_TEXT, 'Click Here')
         link_element.click()
+        print("点击链接")
 
         actions.perform()
 
     # 关闭浏览器
     driver.quit()
+    print("浏览器已关闭")
 
 except Exception as e:
     print(f"发生错误：{str(e)}")
