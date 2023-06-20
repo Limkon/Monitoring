@@ -1,8 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 import random
 import sys
 
@@ -46,32 +44,18 @@ try:
         actions = ActionChains(driver)
         actions.move_to_element(random_element)
         actions.move_by_offset(move_offset_x, move_offset_y)
-        actions.click(random_element)
+        actions.click(random_element).perform()
+        print("执行点击和移动操作")
 
-        # 模拟滚动页面
-        scroll_amount = random.randint(100, 500)
-        driver.execute_script(f"window.scrollBy(0, {scroll_amount})")
-        print("滚动页面:", scroll_amount)
-
-        # 模拟填充输入框
-        input_element = driver.find_element(By.ID, 'inputFieldId')
-        input_element.send_keys('Hello, World!')
-        print("填充输入框")
-
-        # 模拟点击链接
-        link_element = driver.find_element(By.LINK_TEXT, 'Click Here')
-        link_element.click()
-        print("点击链接")
-
-        actions.perform()
-
-    # 关闭浏览器
-    driver.quit()
-    print("浏览器已关闭")
+    # 模拟滚动页面
+    scroll_amount = random.randint(100, 500)
+    driver.execute_script(f"window.scrollBy(0, {scroll_amount})")
+    print("执行页面滚动操作")
 
 except Exception as e:
     print(f"发生错误：{str(e)}")
 
 finally:
     # 不管是否发生异常都会执行的代码
-    pass
+    driver.quit()
+    print("浏览器已关闭")
