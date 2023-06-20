@@ -1,8 +1,12 @@
 import random
 import subprocess
+import sys
+
+# 从命令行参数中获取要访问的 URL 列表文件名
+url_file = sys.argv[1]
 
 # 从文件中读取要访问的 URL 列表
-with open("urls", "r") as file:
+with open(url_file, "r") as file:
     urls = file.readlines()
 urls = [url.strip() for url in urls]
 random.shuffle(urls)
