@@ -9,7 +9,6 @@ on:
     - cron: '*/30 9-16 * * 0,6'
     - cron: '*/50 17-23 * * 0,6'
     - cron: '*/30 0-8 * * 0,6'
-    
   workflow_dispatch:
 
 jobs:
@@ -23,15 +22,20 @@ jobs:
       - name: Remove duplicate URLs
         run: python ./tools/remove_duplicates.py ${{ github.workspace }}/urls
         
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10
+
       - name: Install Chrome browser and ChromeDriver
         run: |
-         apt-get update
-         apt-get install -y google-chrome-stable
-         LATEST_CHROMEDRIVER_VERSION=$(curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
-         curl -L -o /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/$LATEST_CHROMEDRIVER_VERSION/chromedriver_linux64.zip
-         unzip /tmp/chromedriver.zip -d /usr/local/bin
-         chmod +x /usr/local/bin/chromedriver
-   
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+          LATEST_CHROMEDRIVER_VERSION=$(curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
+          curl -L -o /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/$LATEST_CHROMEDRIVER_VERSION/chromedriver_linux64.zip
+          sudo unzip /tmp/chromedriver.zip -d /usr/local/bin
+          sudo chmod +x /usr/local/bin/chromedriver
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -45,7 +49,7 @@ jobs:
       - name: Check and create 'urls' file
         run: |
           if [ ! -f "urls" ]; then
-             touch urls
+            touch urls
           fi
 
       - name: Visit URLs
@@ -55,7 +59,6 @@ jobs:
           declare -a responses=()
           declare -a failed_urls=()
           for url in "${urls[@]}"; do
-
             # 执行原始的 curl 请求，并处理响应
             response=$(timeout 5s curl -sf -o /dev/null -w '%{http_code}\n' "$url" || echo "Failed")
             if [[ "$response" =~ ^[23] ]]; then
@@ -74,7 +77,7 @@ jobs:
           for failed_url in "${failed_urls[@]}"; do
             echo "- $failed_url" >> README.md
           done
-          
+
       - name: Simulate interaction URLs
         run: python ./tools/simulate_interaction.py ${{ github.workspace }}/urls
 
