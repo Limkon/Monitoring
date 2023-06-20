@@ -43,12 +43,10 @@ jobs:
         run: |
           set -e
           urls=($(cat urls | shuf))
-
           declare -a responses=()
           declare -a failed_urls=()
-
           for url in "${urls[@]}"; do
-           
+
             # 执行原始的 curl 请求，并处理响应
             response=$(timeout 5s curl -sf -o /dev/null -w '%{http_code}\n' "$url" || echo "Failed")
             if [[ "$response" =~ ^[23] ]]; then
