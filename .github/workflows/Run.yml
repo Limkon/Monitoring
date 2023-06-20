@@ -22,7 +22,16 @@ jobs:
 
       - name: Remove duplicate URLs
         run: python ./tools/remove_duplicates.py ${{ github.workspace }}/urls
-
+        
+      - name: Install Chrome browser and ChromeDriver
+        run: |
+         apt-get update
+         apt-get install -y google-chrome-stable
+         LATEST_CHROMEDRIVER_VERSION=$(curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
+         curl -L -o /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/$LATEST_CHROMEDRIVER_VERSION/chromedriver_linux64.zip
+         unzip /tmp/chromedriver.zip -d /usr/local/bin
+         chmod +x /usr/local/bin/chromedriver
+   
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
