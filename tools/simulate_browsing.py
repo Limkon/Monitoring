@@ -1,10 +1,6 @@
 import time
 import random
 from selenium import webdriver
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException
-from selenium.common.exceptions import StaleElementReferenceException
 
 def simulate_operations(filename):
     # 创建浏览器实例
@@ -28,37 +24,15 @@ def simulate_operations(filename):
                 driver.maximize_window()
                 print("窗口已最大化")
 
-                # 尝试多次执行操作
-                for _ in range(3):
-                    try:
-                        # 模拟操作
-                        element = driver.find_element(By.XPATH, "//a[@id='my-link']")
-                        ActionChains(driver).move_to_element(element).click().perform()
-                        print("模拟鼠标点击成功")
-
-                        # 模拟随机移动
-                        actions = ActionChains(driver)
-                        actions.move_to_element_with_offset(element, 10, 10)
-                        for _ in range(5):
-                            actions.move_by_offset(random.randint(-50, 50), random.randint(-50, 50))
-                            actions.perform()
-                            time.sleep(1)
-                        print("模拟随机移动成功")
-
-                        # 模拟滚动网页
-                        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                        time.sleep(2)
-                        driver.execute_script("window.scrollTo(0, 0);")
-                        time.sleep(2)
-                        print("模拟滚动网页成功")
-
-                        # 操作成功，跳出重试循环
-                        break
-
-                    except (NoSuchElementException, StaleElementReferenceException) as e:
-                        print(f"执行操作时出现异常: {str(e)}")
-                        print("重试中...")
-                        time.sleep(2)
+                # 模拟随机点击
+                for _ in range(5):
+                    # 随机生成点击位置的坐标
+                    x = random.randint(0, driver.get_window_size()['width'])
+                    y = random.randint(0, driver.get_window_size()['height'])
+                    # 执行JavaScript代码模拟点击
+                    driver.execute_script(f"window.scrollTo({x}, {y});")
+                    print(f"模拟点击成功：坐标({x}, {y})")
+                    time.sleep(1)
 
             except Exception as e:
                 print(f"打开网页时出现异常: {str(e)}")
