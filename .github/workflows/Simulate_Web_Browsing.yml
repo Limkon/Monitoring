@@ -16,12 +16,17 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install Chrome dependencies
+      - name: Check if Chrome is already downloaded
+        id: check_chrome
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libnss3-dev libgconf-2-4
+          if [[ ! -f google-chrome-stable_current_amd64.deb ]]; then
+            echo "::set-output name=download_chrome::true"
+          else
+            echo "::set-output name=download_chrome::false"
+          fi
 
       - name: Download Chrome
+        if: steps.check_chrome.outputs.download_chrome == 'true'
         run: |
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo dpkg -i google-chrome-stable_current_amd64.deb
