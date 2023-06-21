@@ -3,5 +3,3 @@
 Failed)
 - https://Love.cfvqw.repl.co: 失败 (403
 Failed)
-- https://figura.hpbmm.repl.co: 失败 (403
-Failed)
