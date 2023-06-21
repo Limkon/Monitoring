@@ -43,6 +43,11 @@ jobs:
 
       - name: Install dependencies
         run: pip install selenium
+        
+      - name: Delay random minutes
+        run: |
+          delay=$((RANDOM % 19 + 1))
+          sleep "$delay"
 
       - name: Run Python script
         env:
