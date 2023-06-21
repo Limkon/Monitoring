@@ -21,19 +21,20 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libnss3-dev libgconf-2-4
 
-      - name: Download Chrome Driver
-        run: |
-          wget https://chromedriver.storage.googleapis.com/LATEST_RELEASE -O LATEST_RELEASE
-          wget https://chromedriver.storage.googleapis.com/$(cat LATEST_RELEASE)/chromedriver_linux64.zip -O chromedriver_linux64.zip
-          unzip chromedriver_linux64.zip
-          chmod +x chromedriver
-          sudo mv chromedriver /usr/local/bin/
-
-      - name: Install Chrome browser
+      - name: Download Chrome
         run: |
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo dpkg -i google-chrome-stable_current_amd64.deb
           sudo apt-get -f install -y
+
+      - name: Install ChromeDriver
+        run: |
+          LATEST_CHROME_VERSION=$(google-chrome-stable --version | awk '{print $3}' | cut -d. -f1-3)
+          wget "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${LATEST_CHROME_VERSION}" -O LATEST_RELEASE
+          wget "https://chromedriver.storage.googleapis.com/$(cat LATEST_RELEASE)/chromedriver_linux64.zip" -O chromedriver_linux64.zip
+          unzip chromedriver_linux64.zip
+          sudo mv chromedriver /usr/local/bin/
+          sudo chmod +x /usr/local/bin/chromedriver
 
       - name: Install dependencies
         run: pip install selenium
@@ -41,4 +42,7 @@ jobs:
       - name: Run Python script
         env:
           FILENAME: 'urls'  # 替换为您的URL地址文件名
-        run: python ./tools/simulate_browsing.py $FILENAME
+        run: |
+          export DISPLAY=:99
+          Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+          python ./tools/simulate_browsing.py $FILENAME
