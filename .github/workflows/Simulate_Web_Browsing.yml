@@ -16,6 +16,19 @@ jobs:
         with:
           python-version: '3.x'
 
+      - name: Install Chrome dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libnss3-dev libgconf-2-4
+
+      - name: Set up Chrome browser
+        uses: nanasess/setup-chrome@v1
+
+      - name: Set up ChromeDriver
+        uses: nanasess/setup-webdriver@v1
+        with:
+          browser: chrome
+
       - name: Install dependencies
         run: pip install selenium
 
