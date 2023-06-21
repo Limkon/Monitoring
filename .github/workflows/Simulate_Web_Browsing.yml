@@ -20,4 +20,4 @@ jobs:
         run: pip install selenium
 
       - name: Run Python script
-        run: python ./tool/simulate_browsing.py urls
+        run: python ./tools/simulate_browsing.py urls
