@@ -1,6 +1,7 @@
 import time
 import random
 from selenium import webdriver
+from selenium.webdriver.common.action_chains import ActionChains
 
 def simulate_operations(filename):
     # 创建浏览器实例
@@ -34,8 +35,25 @@ def simulate_operations(filename):
                     print(f"模拟点击成功：坐标({x}, {y})")
                     time.sleep(1)
 
+                # 模拟随机移动鼠标
+                actions = ActionChains(driver)
+                for _ in range(5):
+                    x_offset = random.randint(-100, 100)
+                    y_offset = random.randint(-100, 100)
+                    actions.move_by_offset(x_offset, y_offset).perform()
+                    print(f"模拟鼠标移动成功：偏移量({x_offset}, {y_offset})")
+                    time.sleep(1)
+
+                # 模拟滚动网页
+                driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                print("模拟滚动到页面底部")
+                time.sleep(2)
+                driver.execute_script("window.scrollTo(0, 0);")
+                print("模拟滚动到页面顶部")
+                time.sleep(2)
+
             except Exception as e:
-                print(f"打开网页时出现异常: {str(e)}")
+                print(f"执行操作时出现异常: {str(e)}")
 
     except FileNotFoundError:
         print("URL文件未找到")
