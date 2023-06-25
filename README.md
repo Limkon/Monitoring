@@ -3,8 +3,7 @@
 Failed)
 - https://figura.hpbmm.repl.co: 失败 (403
 Failed)
+- https://turbo.flinthill.repl.co: 失败 (502
+Failed)
 - https://sak.kmco.repl.co: 失败 (403
 Failed)
-- https://ko.limkco.repl.co: 失败 (Failed)
-- https://moo.zxco.repl.co: 失败 (Failed)
-- https://veg.linlim.repl.co: 失败 (Failed)
