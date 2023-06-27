@@ -1,3 +1,3 @@
 # 失败网址
-- https://vi.zogzr.repl.co: 失败 (500
+- https://oko-limkon.cloud.okteto.net: 失败 (502
 Failed)
