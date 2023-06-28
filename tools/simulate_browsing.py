@@ -4,6 +4,7 @@ import concurrent.futures
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException
+import os
 
 def process_url(url):
     # 创建浏览器实例
@@ -58,6 +59,10 @@ def process_url(url):
         driver.quit()
         print("浏览器已关闭")
 
+        # 设置输出值为成功打开的网页URL
+        output_name = f"URL_{url}"
+        os.environ[output_name] = url
+
 def simulate_operations(filename):
     try:
         # 读取URL文件
@@ -71,6 +76,12 @@ def simulate_operations(filename):
 
             # 等待所有任务完成
             concurrent.futures.wait(futures)
+
+        # 保存输出到环境文件
+        with open("outputs.env", "w") as env_file:
+            for url in urls:
+                output_name = f"URL_{url.strip()}"
+                env_file.write(f"{output_name}={os.environ.get(output_name, '')}\n")
 
     except FileNotFoundError:
         print("URL文件未找到")
