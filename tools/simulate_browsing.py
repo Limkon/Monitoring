@@ -3,6 +3,7 @@ import random
 import concurrent.futures
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.common.exceptions import NoSuchElementException
 
 def process_url(url):
     # 创建浏览器实例
@@ -21,14 +22,17 @@ def process_url(url):
 
         # 模拟随机点击
         for _ in range(5):
-            # 随机生成点击位置的坐标
-            x = random.randint(0, window_size['width'])
-            y = random.randint(0, window_size['height'])
-            # 执行点击操作
-            element = driver.find_element("body")
-            ActionChains(driver).move_to_element_with_offset(element, x, y).click().perform()
-            print(f"模拟点击成功：坐标({x}, {y})")
-            time.sleep(1)
+            try:
+                # 随机生成点击位置的坐标
+                x = random.randint(0, window_size['width'])
+                y = random.randint(0, window_size['height'])
+                # 执行点击操作
+                element = driver.find_element("tag name", "body")
+                ActionChains(driver).move_to_element_with_offset(element, x, y).click().perform()
+                print(f"模拟点击成功：坐标({x}, {y})")
+                time.sleep(1)
+            except NoSuchElementException:
+                print("无法找到元素")
 
         # 模拟随机移动鼠标
         actions = ActionChains(driver)
