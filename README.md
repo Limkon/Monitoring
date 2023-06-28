@@ -1,3 +1,15 @@
 # 失败网址
+- https://k2.shilh.repl.co: 失败 (Failed)
+- https://ask.skzey.repl.co: 失败 (Failed)
+- https://mization.edpjg.repl.co: 失败 (Failed)
+- https://tr--slind.repl.co: 失败 (Failed)
+- https://deo.babox.repl.co: 失败 (Failed)
+- https://game-example.rdianc.repl.co: 失败 (Failed)
+- https://Love.cfvqw.repl.co: 失败 (Failed)
 - https://oko-limkon.cloud.okteto.net: 失败 (502
 Failed)
+- https://figura.hpbmm.repl.co: 失败 (Failed)
+- https://ypto.tnpyv.repl.co: 失败 (Failed)
+- https://vi.zogzr.repl.co: 失败 (Failed)
+- https://ssd.zockq.repl.co: 失败 (Failed)
+- https://tote.kaikaixin.repl.co: 失败 (Failed)
