@@ -1,5 +1,7 @@
 # 失败网址
-- https://veg.linlim.repl.co: 失败 (403
+- https://ssd.zockq.repl.co: 失败 (502
 Failed)
-- https://ssd.zockq.repl.co: 失败 (403
+- https://rows--zixk.repl.co: 失败 (Failed)
+- https://k2.shilh.repl.co: 失败 (Failed)
+- https://veg.linlim.repl.co: 失败 (403
 Failed)
