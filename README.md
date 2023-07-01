@@ -1,9 +1,7 @@
 # 失败网址
-- https://oko-limkon.cloud.okteto.net: 失败 (502
+- https://figura.hpbmm.repl.co: 失败 (403
 Failed)
 - https://veg.linlim.repl.co: 失败 (403
 Failed)
-- https://figura.hpbmm.repl.co: 失败 (403
-Failed)
-- https://ask.skzey.repl.co: 失败 (500
+- https://ask.skzey.repl.co: 失败 (502
 Failed)
