@@ -1,5 +1,15 @@
 # 失败网址
-- https://apping.eywjx.repl.co: 失败 (403
+- https://aro.flinthill.repl.co: 失败 (403
 Failed)
-- https://ypto.tnpyv.repl.co: 失败 (403
+- https://sak.kmco.repl.co: 失败 (403
+Failed)
+- https://chatai.cokio.repl.co: 失败 (403
+Failed)
+- https://ls.tpjow.repl.co: 失败 (Failed)
+- https://figura.hpbmm.repl.co: 失败 (Failed)
+- https://mization.edpjg.repl.co: 失败 (403
+Failed)
+- https://beaspy--hting.repl.co: 失败 (403
+Failed)
+- https://tote.kaikaixin.repl.co: 失败 (403
 Failed)
