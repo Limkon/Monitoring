@@ -58,3 +58,12 @@ jobs:
           export DISPLAY=:99
           Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
           python ./tools/simulate_browsing.py $FILENAME
+         
+      - name: Commit and push changes
+        continue-on-error: true
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "Update failed URLs" -q
+          git push
