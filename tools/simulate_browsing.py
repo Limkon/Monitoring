@@ -79,7 +79,7 @@ def simulate_operations(filename):
             urls = file.readlines()
 
         # 创建线程池，最大线程数为10（可根据实际情况调整）
-        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
             # 提交每个URL的处理任务到线程池
             futures = [executor.submit(process_url, url.strip()) for url in urls]
 
