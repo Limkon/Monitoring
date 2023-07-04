@@ -39,7 +39,7 @@ jobs:
           LATEST_CHROME_VERSION=$(google-chrome-stable --version | awk '{print $3}' | cut -d. -f1-3)
           wget "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${LATEST_CHROME_VERSION}" -O LATEST_RELEASE
           wget "https://chromedriver.storage.googleapis.com/$(cat LATEST_RELEASE)/chromedriver_linux64.zip" -O chromedriver_linux64.zip
-          unzip chromedriver_linux64.zip
+          unzip -n chromedriver_linux64.zip
           sudo mv chromedriver /usr/local/bin/
           sudo chmod +x /usr/local/bin/chromedriver
 
