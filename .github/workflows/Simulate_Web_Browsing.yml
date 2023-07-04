@@ -22,9 +22,9 @@ jobs:
         id: check_chrome
         run: |
           if [[ ! -f google-chrome-stable_current_amd64.deb ]]; then
-            echo "::set-output name=download_chrome::true"
+            echo "name=download_chrome::true" >> $GITHUB_ENV
           else
-            echo "::set-output name=download_chrome::false"
+            echo "name=download_chrome::false" >> $GITHUB_ENV
           fi
 
       - name: Download Chrome
