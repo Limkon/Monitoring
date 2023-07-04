@@ -44,8 +44,10 @@ jobs:
           sudo chmod +x /usr/local/bin/chromedriver
 
       - name: Install dependencies
-        run: pip install selenium
-        
+        run: |
+           pip install selenium
+           pip install requests
+
       - name: Delay random minutes
         run: |
           delay=$((RANDOM % 19 + 1))
