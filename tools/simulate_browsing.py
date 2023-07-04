@@ -51,6 +51,11 @@ def process_url(url):
         print("模拟滚动到页面底部和顶部")
         time.sleep(2)
 
+        # 刷新网页
+        driver.refresh()
+        print("刷新网页")
+        time.sleep(2)
+
     except Exception as e:
         print(f"执行操作时出现异常: {str(e)}")
 
