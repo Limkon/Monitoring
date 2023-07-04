@@ -52,7 +52,7 @@ jobs:
           sleep "$delay"
           
       - name: Run script url
-        run: python script.py urls
+        run: python ./tools/script.py urls
 
       - name: Run Python script
         env:
