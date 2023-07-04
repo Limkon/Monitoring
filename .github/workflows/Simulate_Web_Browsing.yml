@@ -50,6 +50,9 @@ jobs:
         run: |
           delay=$((RANDOM % 19 + 1))
           sleep "$delay"
+          
+      - name: Run script url
+        run: python script.py urls
 
       - name: Run Python script
         env:
