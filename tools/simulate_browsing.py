@@ -21,35 +21,39 @@ def process_url(url):
 
         window_size = driver.get_window_size()  # 获取窗口大小
 
-        # 模拟随机点击
+        # 随机选择一种操作并执行5次
         for _ in range(5):
-            try:
-                # 随机生成点击位置的坐标
-                x = random.randint(0, window_size['width'])
-                y = random.randint(0, window_size['height'])
-                # 执行点击操作
-                element = driver.find_element("tag name", "body")
-                ActionChains(driver).move_to_element_with_offset(element, x, y).click().perform()
-                print(f"模拟点击成功：坐标({x}, {y})")
-                time.sleep(1)
-            except NoSuchElementException:
-                print("无法找到元素")
+            operation = random.randint(1, 3)  # 1: 模拟点击, 2: 模拟移动鼠标, 3: 模拟滚动网页
 
-        # 模拟随机移动鼠标
-        actions = ActionChains(driver)
-        for _ in range(5):
-            x_offset = random.randint(-100, 100)
-            y_offset = random.randint(-100, 100)
-            actions.move_by_offset(x_offset, y_offset)
-            print(f"模拟鼠标移动成功：偏移量({x_offset}, {y_offset})")
-            time.sleep(1)
-        actions.perform()
+            if operation == 1:  # 模拟点击
+                try:
+                    # 随机生成点击位置的坐标
+                    x = random.randint(0, window_size['width'])
+                    y = random.randint(0, window_size['height'])
+                    # 执行点击操作
+                    element = driver.find_element("tag name", "body")
+                    ActionChains(driver).move_to_element_with_offset(element, x, y).click().perform()
+                    print(f"模拟点击成功：坐标({x}, {y})")
+                    time.sleep(1)
+                except NoSuchElementException:
+                    print("无法找到元素")
+                    continue
 
-        # 模拟滚动网页
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);"
-                              "window.scrollTo(0, 0);")
-        print("模拟滚动到页面底部和顶部")
-        time.sleep(2)
+            elif operation == 2:  # 模拟移动鼠标
+                actions = ActionChains(driver)
+                for _ in range(5):
+                    x_offset = random.randint(-100, 100)
+                    y_offset = random.randint(-100, 100)
+                    actions.move_by_offset(x_offset, y_offset)
+                    print(f"模拟鼠标移动成功：偏移量({x_offset}, {y_offset})")
+                    time.sleep(1)
+                actions.perform()
+
+            else:  # 模拟滚动网页
+                driver.execute_script("window.scrollTo(0, document.body.scrollHeight);"
+                                      "window.scrollTo(0, 0);")
+                print("模拟滚动到页面底部和顶部")
+                time.sleep(2)
 
         # 刷新网页
         driver.refresh()
@@ -75,7 +79,7 @@ def simulate_operations(filename):
             urls = file.readlines()
 
         # 创建线程池，最大线程数为10（可根据实际情况调整）
-        with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
             # 提交每个URL的处理任务到线程池
             futures = [executor.submit(process_url, url.strip()) for url in urls]
 
