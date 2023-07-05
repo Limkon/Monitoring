@@ -17,11 +17,17 @@ def generate_random_data():
         'number': random.randint(1, 10)
     }
 
+def generate_random_filename():
+    # 生成随机文件名，包含字母、数字和特殊字符的组合
+    characters = string.ascii_letters + string.digits + string.punctuation
+    filename = ''.join(random.choices(characters, k=random.randint(8, 12)))
+    return filename
+
 def generate_code_file(directory):
     # 在指定目录中随机生成代码文件
     code_type = random.choice(["html", "css", "js"])
     template_file = f"templates/{code_type}.jinja2"
-    output_file = f"{directory}/code_{random.randint(1, 1000)}.{code_type}"
+    output_file = f"{directory}/{generate_random_filename()}.{code_type}"
     with open(template_file, 'r') as file:
         template_content = file.read()
         template = Template(template_content)
