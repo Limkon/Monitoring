@@ -21,7 +21,7 @@ def generate_code_file(directory):
     # 在指定目录中随机生成代码文件
     code_type = random.choice(["html", "css", "js"])
     template_file = f"templates/{code_type}.jinja2"
-    output_file = f"{directory}/code.{code_type}"
+    output_file = f"{directory}/code_{random.randint(1, 1000)}.{code_type}"
     with open(template_file, 'r') as file:
         template_content = file.read()
         template = Template(template_content)
@@ -29,7 +29,7 @@ def generate_code_file(directory):
         code = template.render(data=data)
         with open(output_file, 'w') as output:
             output.write(code)
-    print(f"生成文件：code.{code_type}")
+    print(f"生成文件：{os.path.basename(output_file)}")
 
 # 通过命令行参数获取目录和文件数阈值
 if len(sys.argv) < 3:
@@ -52,5 +52,8 @@ num_files = count_files_in_directory(target_directory)
 print(f"当前文件数：{num_files}")
 
 if num_files > threshold:
-    clear_directory(target_directory)
+    for file in os.listdir(target_directory):
+        file_path = os.path.join(target_directory, file)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
     print("目录已清空")
