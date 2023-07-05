@@ -18,9 +18,12 @@ def generate_random_data():
     }
 
 def generate_random_filename():
-    # 生成随机文件名，包含字母、数字和特殊字符的组合
+    # 生成随机文件名，可以是包含字母、数字和特殊字符的组合，也可以是纯字母或纯数字
     characters = string.ascii_letters + string.digits + string.punctuation
     filename = ''.join(random.choices(characters, k=random.randint(8, 12)))
+    if random.choice([True, False]):
+        # 纯字母或纯数字
+        filename = ''.join(random.choices(string.ascii_letters + string.digits, k=random.randint(8, 12)))
     return filename
 
 def generate_code_file(directory):
