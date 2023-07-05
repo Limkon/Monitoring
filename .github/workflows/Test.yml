@@ -1,4 +1,4 @@
-name: Visit URLs
+name: Test
 
 on:
  # schedule:
