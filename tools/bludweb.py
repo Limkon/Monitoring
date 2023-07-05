@@ -46,6 +46,7 @@ threshold = int(sys.argv[2])
 # 如果目录不存在，则创建目录
 if not os.path.exists(target_directory):
     os.makedirs(target_directory)
+    print(f"目录 {target_directory} 创建成功")
 
 # 生成代码文件并统计文件数
 generate_code_files(target_directory, 10)
