@@ -4,6 +4,11 @@ import string
 import sys
 from jinja2 import Template
 
+def count_files_in_directory(directory):
+    # 统计目录中的文件数
+    file_count = sum(1 for _ in os.scandir(directory) if _.is_file())
+    return file_count
+
 def generate_random_data():
     # 随机生成一些数据，用于在代码模板中使用
     return {
