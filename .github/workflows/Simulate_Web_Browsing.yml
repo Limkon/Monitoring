@@ -47,6 +47,7 @@ jobs:
         run: |
            pip install selenium
            pip install requests
+           pip install jinja2
 
       - name: Delay random minutes
         run: |
