@@ -8,13 +8,13 @@ def generate_random_code():
     code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
     return f"<html><body>{code}</body></html>"
 
-def generate_webpage_files(directory, num_files):
-    # 在指定目录中随机生成网页文件
-    for i in range(num_files):
-        filename = f"webpage{i+1}.html"
-        filepath = os.path.join(directory, filename)
-        with open(filepath, 'w') as file:
-            file.write(generate_random_code())
+def generate_webpage_file(directory):
+    # 在指定目录中生成随机网页文件
+    code = generate_random_code()
+    filename = f"webpage.html"
+    filepath = os.path.join(directory, filename)
+    with open(filepath, 'w') as file:
+        file.write(code)
 
 def count_files_in_directory(directory):
     # 统计目录中的文件数
@@ -40,7 +40,7 @@ if not os.path.exists(target_directory):
     os.makedirs(target_directory)
 
 # 生成网页文件并统计文件数
-generate_webpage_files(target_directory, 10)
+generate_webpage_file(target_directory)
 num_files = count_files_in_directory(target_directory)
 print(f"当前文件数：{num_files}")
 
