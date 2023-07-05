@@ -18,11 +18,11 @@ def generate_code_file(directory):
     # 在指定目录中随机生成代码文件
     code = generate_random_code()
     code_type = code.split(' ')[0].lower()
-    filename = f"{code_type}_{random.randint(1000, 9999)}.{code_type}"
-    filepath = os.path.join(directory, filename)
+    filename = f"{code_type}_{random.randint(1000, 9999)}"
+    filepath = os.path.join(directory, f"{filename}.{code_type}")
     with open(filepath, 'w') as file:
         file.write(code)
-    print(f"生成文件：{filename}")
+    print(f"生成文件：{filename}.{code_type}")
 
 # 通过命令行参数获取目录
 if len(sys.argv) < 2:
