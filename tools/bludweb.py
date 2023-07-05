@@ -14,15 +14,14 @@ def generate_random_code():
     elif code_type == "js":
         return f"console.log('{code}');"
 
-def generate_code_files(directory, num_files):
-    # 在指定目录中随机生成代码文件
-    for i in range(num_files):
-        code = generate_random_code()
-        code_type = code.split(' ')[0].lower()
-        filename = f"code_{i+1}.{code_type}"
-        filepath = os.path.join(directory, filename)
-        with open(filepath, 'w') as file:
-            file.write(code)
+def generate_code_file(directory):
+    # 在指定目录中生成一个代码文件
+    code = generate_random_code()
+    code_type = code.split(' ')[0].lower()
+    filename = f"code.{code_type}"
+    filepath = os.path.join(directory, filename)
+    with open(filepath, 'w') as file:
+        file.write(code)
 
 def count_files_in_directory(directory):
     # 统计目录中的文件数
@@ -48,8 +47,8 @@ if not os.path.exists(target_directory):
     os.makedirs(target_directory)
     print(f"目录 {target_directory} 创建成功")
 
-# 生成代码文件并统计文件数
-generate_code_files(target_directory, 10)
+# 生成一个代码文件并统计文件数
+generate_code_file(target_directory)
 num_files = count_files_in_directory(target_directory)
 print(f"当前文件数：{num_files}")
 
