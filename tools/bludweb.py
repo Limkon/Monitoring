@@ -6,7 +6,7 @@ import sys
 def generate_random_code():
     # 随机生成代码
     code_type = random.choice(["html", "css", "js"])
-    code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+    code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=random.randint(5, 10)))
     if code_type == "html":
         return f"<html><body>{code}</body></html>"
     elif code_type == "css":
@@ -14,11 +14,17 @@ def generate_random_code():
     elif code_type == "js":
         return f"console.log('{code}');"
 
+def generate_random_filename():
+    # 生成随机文件名
+    filename_length = random.randint(8, 15)
+    filename = ''.join(random.choices(string.ascii_lowercase + string.digits, k=filename_length))
+    return filename
+
 def generate_code_file(directory):
     # 在指定目录中生成随机代码文件
     code = generate_random_code()
     code_type = code.split(' ')[0].lower()
-    filename = f"code_{random.randint(1, 1000)}.{code_type}"
+    filename = f"{generate_random_filename()}.{code_type}"
     filepath = os.path.join(directory, filename)
     with open(filepath, 'w') as file:
         file.write(code)
