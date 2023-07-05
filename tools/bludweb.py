@@ -4,7 +4,7 @@ import string
 import sys
 
 def generate_random_code():
-    # 生成随机的代码
+    # 随机生成代码
     code_type = random.choice(["html", "css", "js"])
     code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
     if code_type == "html":
@@ -15,10 +15,10 @@ def generate_random_code():
         return f"console.log('{code}');"
 
 def generate_code_file(directory):
-    # 在指定目录中生成一个代码文件
+    # 在指定目录中生成随机代码文件
     code = generate_random_code()
     code_type = code.split(' ')[0].lower()
-    filename = f"code.{code_type}"
+    filename = f"code_{random.randint(1, 1000)}.{code_type}"
     filepath = os.path.join(directory, filename)
     with open(filepath, 'w') as file:
         file.write(code)
@@ -47,7 +47,7 @@ if not os.path.exists(target_directory):
     os.makedirs(target_directory)
     print(f"目录 {target_directory} 创建成功")
 
-# 生成一个代码文件并统计文件数
+# 生成代码文件并统计文件数
 generate_code_file(target_directory)
 num_files = count_files_in_directory(target_directory)
 print(f"当前文件数：{num_files}")
