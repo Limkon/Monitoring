@@ -17,8 +17,8 @@ def generate_random_code():
 def generate_code_file(directory):
     # 在指定目录中随机生成代码文件
     code = generate_random_code()
-    code_type = code.split(' ')[0].lower()
-    filename = f"{random.randint(1000, 9999)}"
+    code_type = random.choice(["html", "css", "js"])
+    filename = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
     filepath = os.path.join(directory, f"{filename}.{code_type}")
     with open(filepath, 'w') as file:
         file.write(code)
