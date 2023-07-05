@@ -4,17 +4,25 @@ import string
 import sys
 
 def generate_random_code():
-    # 生成随机的网页代码
+    # 生成随机的代码
+    code_type = random.choice(["html", "css", "js"])
     code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
-    return f"<html><body>{code}</body></html>"
+    if code_type == "html":
+        return f"<html><body>{code}</body></html>"
+    elif code_type == "css":
+        return f"body {{ color: {code}; }}"
+    elif code_type == "js":
+        return f"console.log('{code}');"
 
-def generate_webpage_file(directory):
-    # 在指定目录中生成随机网页文件
-    code = generate_random_code()
-    filename = f"webpage.html"
-    filepath = os.path.join(directory, filename)
-    with open(filepath, 'w') as file:
-        file.write(code)
+def generate_code_files(directory, num_files):
+    # 在指定目录中随机生成代码文件
+    for i in range(num_files):
+        code = generate_random_code()
+        code_type = code.split(' ')[0].lower()
+        filename = f"code_{i+1}.{code_type}"
+        filepath = os.path.join(directory, filename)
+        with open(filepath, 'w') as file:
+            file.write(code)
 
 def count_files_in_directory(directory):
     # 统计目录中的文件数
@@ -39,8 +47,8 @@ threshold = int(sys.argv[2])
 if not os.path.exists(target_directory):
     os.makedirs(target_directory)
 
-# 生成网页文件并统计文件数
-generate_webpage_file(target_directory)
+# 生成代码文件并统计文件数
+generate_code_files(target_directory, 10)
 num_files = count_files_in_directory(target_directory)
 print(f"当前文件数：{num_files}")
 
