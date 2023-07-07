@@ -41,6 +41,16 @@ def generate_code_file(directory):
             output.write(code)
     print(f"生成文件：{os.path.basename(output_file)}")
 
+def remove_directory_contents(directory):
+    # 递归删除目录及其内容
+    for root, dirs, files in os.walk(directory, topdown=False):
+        for file in files:
+            file_path = os.path.join(root, file)
+            os.remove(file_path)
+        for dir in dirs:
+            dir_path = os.path.join(root, dir)
+            os.rmdir(dir_path)
+
 # 通过命令行参数获取目录和文件数阈值
 if len(sys.argv) < 3:
     print("请提供目录和文件数阈值作为命令行参数")
@@ -57,13 +67,10 @@ if not os.path.exists(target_directory):
 # 生成代码文件
 generate_code_file(target_directory)
 
-# 统计文件数并清空目录
+# 统计文件数并清空目录及其内容
 num_files = count_files_in_directory(target_directory)
 print(f"当前文件数：{num_files}")
 
 if num_files > threshold:
-    for file in os.listdir(target_directory):
-        file_path = os.path.join(target_directory, file)
-        if os.path.isfile(file_path):
-            os.remove(file_path)
+    remove_directory_contents(target_directory)
     print("目录已清空")
