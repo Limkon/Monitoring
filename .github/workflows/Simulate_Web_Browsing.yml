@@ -58,7 +58,7 @@ jobs:
         run: python ./tools/script.py urls
         
       - name: bulid web
-        run: python ./tools/bludweb.py webs 50
+        run: python ./tools/bludweb.py webs 20
 
       - name: Run Python script
         env:
