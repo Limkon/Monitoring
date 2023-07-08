@@ -1,10 +1,6 @@
 # 失败网址
+- https://figura.hpbmm.repl.co: 失败 (HTTPSConnectionPool(host='figura.hpbmm.repl.co', port=443): Read timed out. (read timeout=5))
 - https://Love.cfvqw.repl.co: 失败 (403)
-- https://apping.eywjx.repl.co: 失败 (403)
-- https://tote.kaikaixin.repl.co: 失败 (HTTPSConnectionPool(host='tote.kaikaixin.repl.co', port=443): Read timed out. (read timeout=5))
-- https://ssd.zockq.repl.co: 失败 (HTTPSConnectionPool(host='ssd.zockq.repl.co', port=443): Read timed out. (read timeout=5))
-- https://jsn.limkon.repl.co: 失败 (HTTPSConnectionPool(host='jsn.limkon.repl.co', port=443): Read timed out. (read timeout=5))
-- https://vi.zogzr.repl.co: 失败 (HTTPSConnectionPool(host='vi.zogzr.repl.co', port=443): Read timed out. (read timeout=5))
+- https://aro.flinthill.repl.co: 失败 (HTTPSConnectionPool(host='aro.flinthill.repl.co', port=443): Read timed out. (read timeout=5))
 - https://chat-zx.zeabur.app: 失败 (502)
-- https://aro.flinthill.repl.co: 失败 (403)
-- https://stds.stpsc.repl.co: 失败 (HTTPSConnectionPool(host='stds.stpsc.repl.co', port=443): Read timed out. (read timeout=5))
+- https://game-example.rdianc.repl.co: 失败 (HTTPSConnectionPool(host='game-example.rdianc.repl.co', port=443): Read timed out. (read timeout=5))
