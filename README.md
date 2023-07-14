@@ -1,11 +1,5 @@
 # 失败网址
 - https://ask.skzey.repl.co: 失败 (HTTPSConnectionPool(host='ask.skzey.repl.co', port=443): Read timed out. (read timeout=5))
-- https://aro.flinthill.repl.co: 失败 (HTTPSConnectionPool(host='aro.flinthill.repl.co', port=443): Read timed out. (read timeout=5))
-- https://stds.stpsc.repl.co: 失败 (HTTPSConnectionPool(host='stds.stpsc.repl.co', port=443): Read timed out. (read timeout=5))
-- https://rows--zixk.repl.co: 失败 (403)
-- https://deo.babox.repl.co: 失败 (HTTPSConnectionPool(host='deo.babox.repl.co', port=443): Read timed out. (read timeout=5))
-- https://V2.sukure.repl.co: 失败 (HTTPSConnectionPool(host='v2.sukure.repl.co', port=443): Read timed out. (read timeout=5))
-- https://tr--slind.repl.co: 失败 (HTTPSConnectionPool(host='tr--slind.repl.co', port=443): Read timed out. (read timeout=5))
 - https://apping.eywjx.repl.co: 失败 (403)
+- https://Love.cfvqw.repl.co: 失败 (HTTPSConnectionPool(host='love.cfvqw.repl.co', port=443): Read timed out. (read timeout=5))
 - https://mization.edpjg.repl.co: 失败 (HTTPSConnectionPool(host='mization.edpjg.repl.co', port=443): Read timed out. (read timeout=5))
-- https://tote.kaikaixin.repl.co: 失败 (HTTPSConnectionPool(host='tote.kaikaixin.repl.co', port=443): Read timed out. (read timeout=5))
