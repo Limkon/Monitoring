@@ -1,5 +1,10 @@
 # 失败网址
-- https://jsn.limkon.repl.co: 失败 (403)
+- https://ys.pyxzp.repl.co: 失败 (HTTPSConnectionPool(host='ys.pyxzp.repl.co', port=443): Read timed out. (read timeout=5))
+- https://oko-limkon.cloud.okteto.net: 失败 (502)
+- https://ssd.zockq.repl.co: 失败 (HTTPSConnectionPool(host='ssd.zockq.repl.co', port=443): Read timed out. (read timeout=5))
 - https://rows--zixk.repl.co: 失败 (403)
-- https://ko.limkco.repl.co: 失败 (HTTPSConnectionPool(host='ko.limkco.repl.co', port=443): Read timed out. (read timeout=5))
+- https://mization.edpjg.repl.co: 失败 (HTTPSConnectionPool(host='mization.edpjg.repl.co', port=443): Read timed out. (read timeout=5))
+- https://deo.babox.repl.co: 失败 (HTTPSConnectionPool(host='deo.babox.repl.co', port=443): Read timed out. (read timeout=5))
 - https://r7gjwy-8787.csb.app: 失败 (HTTPSConnectionPool(host='r7gjwy-8787.csb.app', port=443): Read timed out. (read timeout=5))
+- https://jsn.limkon.repl.co: 失败 (403)
+- https://ko.limkco.repl.co: 失败 (HTTPSConnectionPool(host='ko.limkco.repl.co', port=443): Read timed out. (read timeout=5))
