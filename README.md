@@ -1,6 +1,6 @@
 # 失败网址
-- https://r7gjwy-8787.csb.app: 失败 (HTTPSConnectionPool(host='r7gjwy-8787.csb.app', port=443): Read timed out. (read timeout=5))
+- https://ko.limkco.repl.co: 失败 (HTTPSConnectionPool(host='ko.limkco.repl.co', port=443): Read timed out. (read timeout=5))
 - https://jsn.limkon.repl.co: 失败 (403)
+- https://k2.shilh.repl.co: 失败 (HTTPSConnectionPool(host='k2.shilh.repl.co', port=443): Read timed out. (read timeout=5))
+- https://r7gjwy-8787.csb.app: 失败 (HTTPSConnectionPool(host='r7gjwy-8787.csb.app', port=443): Read timed out. (read timeout=5))
 - https://rows--zixk.repl.co: 失败 (403)
-- https://qi.limqin.repl.co: 失败 (HTTPSConnectionPool(host='qi.limqin.repl.co', port=443): Read timed out. (read timeout=5))
-- https://su--yoyholee.repl.co: 失败 (HTTPSConnectionPool(host='su--yoyholee.repl.co', port=443): Read timed out. (read timeout=5))
