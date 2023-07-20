@@ -1,6 +1,5 @@
 # 失败网址
-- https://rows--zixk.repl.co: 失败 (HTTPSConnectionPool(host='rows--zixk.repl.co', port=443): Read timed out. (read timeout=5))
-- https://game-example.rdianc.repl.co: 失败 (HTTPSConnectionPool(host='game-example.rdianc.repl.co', port=443): Read timed out. (read timeout=5))
-- https://start--stpstyc.repl.co: 失败 (HTTPSConnectionPool(host='start--stpstyc.repl.co', port=443): Read timed out. (read timeout=5))
-- https://v.chavir.repl.co: 失败 (403)
-- https://ask.skzey.repl.co: 失败 (HTTPSConnectionPool(host='ask.skzey.repl.co', port=443): Read timed out. (read timeout=5))
+- https://Love.cfvqw.repl.co: 失败 (HTTPSConnectionPool(host='love.cfvqw.repl.co', port=443): Read timed out. (read timeout=5))
+- https://k2.shilh.repl.co: 失败 (HTTPSConnectionPool(host='k2.shilh.repl.co', port=443): Read timed out. (read timeout=5))
+- https://su--yoyholee.repl.co: 失败 (HTTPSConnectionPool(host='su--yoyholee.repl.co', port=443): Read timed out. (read timeout=5))
+- https://ys.pyxzp.repl.co: 失败 (HTTPSConnectionPool(host='ys.pyxzp.repl.co', port=443): Read timed out. (read timeout=5))
