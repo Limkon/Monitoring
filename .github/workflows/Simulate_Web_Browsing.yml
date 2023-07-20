@@ -2,7 +2,7 @@ name: Simulate Web Browsing
 
 on:
   schedule:
-    - cron: '*/200 * * * *'
+    - cron: '*/50 * * * *'
   workflow_dispatch:
 
 jobs:
