@@ -1,5 +1,7 @@
 # 失败网址
-- https://tr--slind.repl.co: 失败 (403)
-- https://jsn.limkon.repl.co: 失败 (HTTPSConnectionPool(host='jsn.limkon.repl.co', port=443): Read timed out. (read timeout=5))
+- https://apping.eywjx.repl.co: 失败 (HTTPSConnectionPool(host='apping.eywjx.repl.co', port=443): Read timed out. (read timeout=5))
 - https://vi.zogzr.repl.co: 失败 (403)
-- https://figura.hpbmm.repl.co: 失败 (HTTPSConnectionPool(host='figura.hpbmm.repl.co', port=443): Read timed out. (read timeout=5))
+- https://ys.pyxzp.repl.co: 失败 (HTTPSConnectionPool(host='ys.pyxzp.repl.co', port=443): Read timed out. (read timeout=5))
+- https://oko-limkon.cloud.okteto.net: 失败 (502)
+- https://v.chavir.repl.co: 失败 (HTTPSConnectionPool(host='v.chavir.repl.co', port=443): Read timed out. (read timeout=5))
+- https://tr--slind.repl.co: 失败 (403)
