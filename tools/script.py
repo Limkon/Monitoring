@@ -15,7 +15,7 @@ def visit_urls(urls):
 
     # 将失败的 URL 写入 README.md 文件
     with open("README.md", "w") as readme:
-        readme.write("# 失败网址\n")
+        readme.write("# 网页状态\n")
         for failed_url in failed_urls:
             readme.write(f"- {failed_url}\n")
 
