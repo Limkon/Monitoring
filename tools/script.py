@@ -8,13 +8,9 @@ def visit_urls(urls):
     for url in urls:
         try:
             response = requests.get(url, timeout=5)
-            if response.status_code == 200:
-                print(f"{url}: 成功 ({response.status_code})")
-            else:
-                print(f"{url}: 失败 ({response.status_code})")
+            if response.status_code != 200:
                 failed_urls.append(f"{url}: 失败 ({response.status_code})")
         except requests.RequestException as e:
-            print(f"{url}: 失败 ({str(e)})")
             failed_urls.append(f"{url}: 失败 ({str(e)})")
 
     # 将失败的 URL 写入 README.md 文件
