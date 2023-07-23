@@ -11,7 +11,8 @@ def visit_urls(urls):
             if response.status_code != 200:
                 failed_urls.append(f"{url}: 失败 ({response.status_code})")
         except requests.RequestException as e:
-            failed_urls.append(f"{url}: 失败 ({str(e)})")
+            # Handle exceptions here, but don't include the error message
+            failed_urls.append(f"{url}: 失败")
 
     # 将失败的 URL 写入 README.md 文件
     with open("README.md", "w") as readme:
