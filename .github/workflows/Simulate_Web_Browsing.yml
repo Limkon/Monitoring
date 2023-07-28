@@ -15,7 +15,7 @@ jobs:
 
       - name: Cache Chrome and ChromeDriver
         id: cache-chrome
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             google-chrome-stable_current_amd64.deb
@@ -34,7 +34,7 @@ jobs:
         if: steps.cache-size.outputs.size >= '1G'
         run: |
           echo "Cache size is greater than 1GB. Clearing cache..."
-          actions/cache@v2
+          actions/cache@v3
           with:
             path: |
               google-chrome-stable_current_amd64.deb
@@ -45,7 +45,7 @@ jobs:
               ${{ runner.os }}-chrome-cache-
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: '3.x'
 
