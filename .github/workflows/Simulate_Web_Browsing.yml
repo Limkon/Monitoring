@@ -1,4 +1,4 @@
-name: simulate browsing
+name: simulatebrowsing
 
 on:
   schedule:
@@ -12,15 +12,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Cache Chrome and ChromeDriver
-        uses: actions/cache@v3
-        with:
-          path: |
-            /usr/bin/google-chrome
-            /usr/bin/google-chrome-stable
-            /usr/local/bin/chromedriver
-          key: ${{ runner.os }}-chrome-cache-${{ hashFiles('google-chrome-stable_current_amd64.deb') }}
 
       - name: Set up Python
         uses: actions/setup-python@v3
@@ -82,4 +73,4 @@ jobs:
           git config --local user.name "GitHub Action"
           git add .
           git commit -m "Update failed URLs" -q
-          git push origin HEAD:${{ github.ref }}
+          git push
