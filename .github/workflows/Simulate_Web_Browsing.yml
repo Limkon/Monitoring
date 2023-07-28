@@ -1,4 +1,4 @@
-name: simulate browsing
+name: simulatebrowsing
 
 on:
   schedule:
@@ -11,24 +11,34 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
+
+      - name: Cache Chrome and ChromeDriver
+        uses: actions/cache@v2
+        with:
+          path: |
+            /usr/bin/google-chrome
+            /usr/bin/google-chrome-stable
+            /usr/local/bin/chromedriver
+          key: ${{ runner.os }}-chrome-cache-${{ hashFiles('google-chrome-stable_current_amd64.deb') }}
 
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v2
         with:
           python-version: '3.x'
 
-      - name: Cache Chrome dependencies
-        id: cache-chrome
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/chromium
-          key: ${{ runner.os }}-chrome-${{ hashFiles('google-chrome-stable_current_amd64.deb') }}
-        if: steps.check_chrome.outputs.download_chrome == 'true'
+      - name: Check if Chrome is already downloaded
+        id: check_chrome
+        run: |
+          if [[ ! -f google-chrome-stable_current_amd64.deb ]]; then
+            echo "name=download_chrome::true" >> $GITHUB_ENV
+          else
+            echo "name=download_chrome::false" >> $GITHUB_ENV
+          fi
 
       - name: Download Chrome
         continue-on-error: true
-        if: steps.check_chrome.outputs.download_chrome == 'true' && !steps.cache-chrome.outputs.cache-hit
+        if: steps.check_chrome.outputs.download_chrome == 'true'
         run: |
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo dpkg -i google-chrome-stable_current_amd64.deb
@@ -72,4 +82,4 @@ jobs:
           git config --local user.name "GitHub Action"
           git add .
           git commit -m "Update failed URLs" -q
-          git push
+          git push origin HEAD:${{ github.ref }}
