@@ -18,8 +18,9 @@ jobs:
         with:
           path: |
             google-chrome-stable_current_amd64.deb
+            chromedriver_linux64.zip
             /usr/local/bin/chromedriver
-          key: ${{ runner.os }}-chrome-cache-${{ hashFiles('google-chrome-stable_current_amd64.deb') }}-${{ hashFiles('/usr/local/bin/chromedriver') }}
+          key: ${{ runner.os }}-chrome-cache-${{ hashFiles('google-chrome-stable_current_amd64.deb') }}-${{ hashFiles('chromedriver_linux64.zip') }}-${{ hashFiles('/usr/local/bin/chromedriver') }}
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -74,11 +75,15 @@ jobs:
           Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
           python ./tools/simulate_browsing.py $FILENAME
 
-      - name: Commit and push changes
-        continue-on-error: true
+      - name: Configure Git
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
+
+      - name: Commit and push changes
+        continue-on-error: true
+        run: |
           git add .
-          git commit -m "Update failed URLs" -q
-          git push
+          git diff-index --quiet HEAD || git commit -m "Update failed URLs" -q
+          git pull origin HEAD --rebase
+          git push origin HEAD
