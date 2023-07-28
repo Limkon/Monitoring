@@ -28,6 +28,7 @@ jobs:
           fi
 
       - name: Download Chrome
+        continue-on-error: true
         if: steps.check_chrome.outputs.download_chrome == 'true'
         run: |
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
