@@ -14,7 +14,8 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Cache Chrome and ChromeDriver
-        uses: actions/cache@v3
+        id: cache-chrome
+        uses: actions/cache@v2
         with:
           path: |
             google-chrome-stable_current_amd64.deb
@@ -22,8 +23,29 @@ jobs:
             /usr/local/bin/chromedriver
           key: ${{ runner.os }}-chrome-cache-${{ hashFiles('google-chrome-stable_current_amd64.deb') }}-${{ hashFiles('chromedriver_linux64.zip') }}-${{ hashFiles('/usr/local/bin/chromedriver') }}
 
+      - name: Get cache size
+        id: cache-size
+        run: |
+          cache_size=$(du -sh $GITHUB_WORKSPACE | awk '{print $1}')
+          echo "Cache size: $cache_size"
+          echo "::set-output name=size::$cache_size"
+
+      - name: Clear cache if size > 1GB
+        if: steps.cache-size.outputs.size >= '1G'
+        run: |
+          echo "Cache size is greater than 1GB. Clearing cache..."
+          actions/cache@v2
+          with:
+            path: |
+              google-chrome-stable_current_amd64.deb
+              chromedriver_linux64.zip
+              /usr/local/bin/chromedriver
+            key: ${{ runner.os }}-chrome-cache-${{ hashFiles('google-chrome-stable_current_amd64.deb') }}-${{ hashFiles('chromedriver_linux64.zip') }}-${{ hashFiles('/usr/local/bin/chromedriver') }}
+            restore-keys: |
+              ${{ runner.os }}-chrome-cache-
+
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v2
         with:
           python-version: '3.x'
 
