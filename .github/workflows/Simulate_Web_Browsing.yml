@@ -1,4 +1,4 @@
-name: simulatebrowsing
+name: simulate browsing
 
 on:
   schedule:
@@ -18,18 +18,17 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Check if Chrome is already downloaded
-        id: check_chrome
-        run: |
-          if [[ ! -f google-chrome-stable_current_amd64.deb ]]; then
-            echo "name=download_chrome::true" >> $GITHUB_ENV
-          else
-            echo "name=download_chrome::false" >> $GITHUB_ENV
-          fi
+      - name: Cache Chrome dependencies
+        id: cache-chrome
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/chromium
+          key: ${{ runner.os }}-chrome-${{ hashFiles('google-chrome-stable_current_amd64.deb') }}
+        if: steps.check_chrome.outputs.download_chrome == 'true'
 
       - name: Download Chrome
         continue-on-error: true
-        if: steps.check_chrome.outputs.download_chrome == 'true'
+        if: steps.check_chrome.outputs.download_chrome == 'true' && !steps.cache-chrome.outputs.cache-hit
         run: |
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo dpkg -i google-chrome-stable_current_amd64.deb
