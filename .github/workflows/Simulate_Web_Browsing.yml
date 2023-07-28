@@ -53,9 +53,7 @@ jobs:
           delay=$((RANDOM % 19 + 1))
           sleep "$delay"
 
-      # ... Rest of the steps in the workflow ...
-
-          
+    
       - name: Run script url
         run: python ./tools/script.py urls
         
