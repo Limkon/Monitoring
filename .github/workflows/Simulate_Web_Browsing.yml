@@ -11,10 +11,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Cache Chrome and ChromeDriver
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             /usr/bin/google-chrome
