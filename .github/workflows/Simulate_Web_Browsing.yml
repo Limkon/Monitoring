@@ -1,3 +1,4 @@
+name :simulatebrowsing
 on:
   schedule:
     - cron: '*/50 * * * *'
