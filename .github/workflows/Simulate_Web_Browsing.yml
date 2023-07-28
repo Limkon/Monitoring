@@ -28,7 +28,7 @@ jobs:
         run: |
           cache_size=$(du -sh $GITHUB_WORKSPACE | awk '{print $1}')
           echo "Cache size: $cache_size"
-          echo "::set-output name=size::$cache_size"
+          echo "size=$cache_size" >> $GITHUB_ENV
 
       - name: Clear cache if size > 1GB
         if: steps.cache-size.outputs.size >= '1G'
