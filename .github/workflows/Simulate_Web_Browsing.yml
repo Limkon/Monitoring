@@ -13,8 +13,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Cache Chrome and ChromeDriver
+        uses: actions/cache@v2
+        with:
+          path: |
+            google-chrome-stable_current_amd64.deb
+            /usr/local/bin/chromedriver
+          key: ${{ runner.os }}-chrome-cache-${{ hashFiles('google-chrome-stable_current_amd64.deb') }}-${{ hashFiles('/usr/local/bin/chromedriver') }}
+
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v2
         with:
           python-version: '3.x'
 
@@ -54,7 +62,7 @@ jobs:
 
       - name: Run script url
         run: python ./tools/script.py urls
-        
+
       - name: Build web
         run: python ./tools/bludweb.py webs 150
 
@@ -65,7 +73,7 @@ jobs:
           export DISPLAY=:99
           Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
           python ./tools/simulate_browsing.py $FILENAME
-         
+
       - name: Commit and push changes
         continue-on-error: true
         run: |
