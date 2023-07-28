@@ -53,16 +53,15 @@ jobs:
           delay=$((RANDOM % 19 + 1))
           sleep "$delay"
 
-    
       - name: Run script url
         run: python ./tools/script.py urls
         
-      - name: bulid web
+      - name: Build web
         run: python ./tools/bludweb.py webs 150
 
       - name: Run Python script
         env:
-          FILENAME: 'urls'  # 替换为您的URL地址文件名
+          FILENAME: 'urls'  # 替换为您的 URL 地址文件名
         run: |
           export DISPLAY=:99
           Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
