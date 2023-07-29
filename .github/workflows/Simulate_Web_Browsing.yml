@@ -45,7 +45,7 @@ jobs:
               ${{ runner.os }}-chrome-cache-
 
       - name: Set up Python
-        uses: actions/setup-python@v3  # 使用最新的 actions/setup-python 版本
+        uses: actions/setup-python@v3
         with:
           python-version: '3.x'
 
@@ -87,7 +87,9 @@ jobs:
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-cache-${{ hashFiles('requirements.txt') }}
-          
+          restore-keys: |
+            ${{ runner.os }}-pip-cache-
+
       - name: Install dependencies
         if: steps.cache-pip-deps.outputs.cache-hit != 'true'
         run: |
@@ -95,7 +97,7 @@ jobs:
 
       - name: Delay random minutes
         run: |
-          delay=$((RANDOM % 19 + 1))
+          delay=$((RANDOM % 9 + 1))
           sleep "$delay"
 
       - name: Run script url
