@@ -87,9 +87,7 @@ jobs:
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-cache-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-cache-
-
+          
       - name: Install dependencies
         if: steps.cache-pip-deps.outputs.cache-hit != 'true'
         run: |
