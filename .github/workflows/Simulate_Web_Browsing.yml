@@ -81,7 +81,15 @@ jobs:
           sudo mv chromedriver /usr/local/bin/
           sudo chmod +x /usr/local/bin/chromedriver
 
+      - name: Cache Python dependencies
+        id: cache-pip-deps
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-cache-${{ hashFiles('requirements.txt') }}
+          
       - name: Install dependencies
+        if: steps.cache-pip-deps.outputs.cache-hit != 'true'
         run: |
            pip install selenium
            pip install requests
