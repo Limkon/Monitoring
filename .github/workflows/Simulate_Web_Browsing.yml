@@ -45,7 +45,7 @@ jobs:
               ${{ runner.os }}-chrome-cache-
 
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v3  # 使用最新的 actions/setup-python 版本
         with:
           python-version: '3.x'
 
@@ -91,9 +91,7 @@ jobs:
       - name: Install dependencies
         if: steps.cache-pip-deps.outputs.cache-hit != 'true'
         run: |
-           pip install selenium
-           pip install requests
-           pip install jinja2
+           pip install -r requirements.txt
 
       - name: Delay random minutes
         run: |
