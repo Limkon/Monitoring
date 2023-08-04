@@ -1,4 +1,4 @@
-name: simulatebrowsing
+name: simulate_browsing
 
 on:
   schedule:
