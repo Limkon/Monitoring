@@ -1,16 +1,9 @@
 # 网页状态
-- https://figura.hpbmm.repl.co: 失败
-- https://deo.babox.repl.co: 失败
-- https://v2ray.yoyho.repl.co: 失败
-- https://mization.edpjg.repl.co: 失败
-- https://ask.skzey.repl.co: 失败
-- https://game-example.rdianc.repl.co: 失败 (403)
-- https://apping.eywjx.repl.co: 失败
-- https://k2.shilh.repl.co: 失败
-- https://std.skvip.eu.org: 失败
-- https://sak.kmco.repl.co: 失败 (403)
-- https://ls.tpjow.repl.co: 失败 (502)
+- https://moo.zxco.repl.co: 失败
+- https://ls.tpjow.repl.co: 失败
 - https://start--stpstyc.repl.co: 失败 (403)
-- https://qi.limqin.repl.co: 失败
-- https://su--yoyholee.repl.co: 失败
 - https://ssd.zockq.repl.co: 失败 (403)
+- https://figura.hpbmm.repl.co: 失败
+- https://sak.kmco.repl.co: 失败 (403)
+- https://oko-limkon.cloud.okteto.net: 失败 (502)
+- https://game-example.rdianc.repl.co: 失败 (403)
