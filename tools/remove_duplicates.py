@@ -2,6 +2,7 @@ import os
 import sys
 import tempfile
 import shutil
+import re
 
 def remove_duplicates_and_empty_lines_from_file(filename):
     lines_seen = set()  # 用于跟踪已经出现过的行
@@ -10,6 +11,7 @@ def remove_duplicates_and_empty_lines_from_file(filename):
     with open(filename, 'r') as file:
         for line in file:
             line = line.strip()  # 去除行首尾的空白字符
+            line = re.sub(r'^[^a-zA-Z0-9]+|[^a-zA-Z0-9]+$', '', line)  # 去除行首尾的非字母数字字符
 
             if line:  # 检查是否是空行，如果不是空行才进行去重操作
                 if line not in lines_seen:  # 如果行不在已出现的行集合中
@@ -22,7 +24,7 @@ def remove_duplicates_and_empty_lines_from_file(filename):
 
     shutil.move(temp_filename, filename)  # 将临时文件移动到原始文件的位置，覆盖原始文件
 
-    print("去重和去空行操作完成并已将结果保存到原始文件中。")
+    print("去重、去空行和去除非字母数字字符操作完成并已将结果保存到原始文件中。")
 
 # 获取命令行参数
 if len(sys.argv) != 2:
