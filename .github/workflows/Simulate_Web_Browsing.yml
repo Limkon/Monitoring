@@ -98,6 +98,9 @@ jobs:
       - name: Build web
         run: python ./tools/bludweb.py webs 150
 
+      - name: Fetch web
+        run: python ./tools/fetch_urls.py urls
+
       - name: Run Python script
         env:
           FILENAME: 'urls'  # 替换为您的 URL 地址文件名
