@@ -12,9 +12,9 @@ def count_files_in_directory(directory):
 def generate_random_data():
     # 随机生成一些数据，用于在代码模板中使用
     return {
-        'name': ''.join(random.choices(string.ascii_uppercase, k=5)),
-        'color': random.choice(['red', 'green', 'blue']),
-        'number': random.randint(1, 10)
+        'title': ''.join(random.choices(string.ascii_uppercase, k=10)),
+        'heading': 'Random Heading',
+        'content': 'This is some random content.'
     }
 
 def generate_random_filename():
@@ -35,11 +35,11 @@ def generate_code_file(directory):
     with open(template_file, 'r') as file:
         template_content = file.read()
         template = Template(template_content)
-        data = generate_random_data()
-        code = template.render(data=data)
+        data = generate_random_data()  # 生成随机数据
+        code = template.render(data=data)  # 使用随机数据渲染模板
         with open(output_file, 'w') as output:
             output.write(code)
-    print(f"生成文件：{os.path.basename(output_file)}")
+            print(f"生成文件：{os.path.basename(output_file)}")  # 添加这行以显示生成的文件名
 
 def remove_directory_contents(directory):
     # 递归删除目录及其内容
