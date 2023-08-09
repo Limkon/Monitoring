@@ -29,18 +29,19 @@ def generate_random_filename():
 
 def generate_code_file(directory):
     # 在指定目录中随机生成代码文件
-    code_type = random.choice(["html", "css", "js"])
-    template_file = f"templates/{code_type}.jinja2"
-    output_file = f"{directory}/{generate_random_filename()}.{code_type}"
-    os.makedirs(os.path.dirname(output_file), exist_ok=True)  # 创建目录
-    with open(template_file, 'r') as file:
-        template_content = file.read()
-        template = Template(template_content)
-        data = generate_random_data()  # 生成随机数据
-        code = template.render(data=data)  # 使用随机数据渲染模板
-        with open(output_file, 'w') as output:
-            output.write(code)
-            print(f"生成文件：{os.path.basename(output_file)}")  # 添加这行以显示生成的文件名
+    code_types = ["html", "css", "js"]
+    for code_type in code_types:
+        template_file = f"templates/{code_type}.jinja2"
+        output_file = f"{directory}/{generate_random_filename()}.{code_type}"
+        os.makedirs(os.path.dirname(output_file), exist_ok=True)  # 创建目录
+        with open(template_file, 'r') as file:
+            template_content = file.read()
+            template = Template(template_content)
+            data = generate_random_data()  # 生成随机数据
+            code = template.render(data=data)  # 使用随机数据渲染模板
+            with open(output_file, 'w') as output:
+                output.write(code)
+                print(f"生成文件：{os.path.basename(output_file)}")  # 添加这行以显示生成的文件名
 
 def remove_directory_contents(directory):
     # 递归删除目录及其内容
