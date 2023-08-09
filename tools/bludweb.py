@@ -27,23 +27,20 @@ def generate_random_filename():
         filename = ''.join(random.choices(string.ascii_letters + string.digits, k=random.randint(8, 12)))
     return filename
 
-def generate_code_file(directory, num_files=1):  # 添加 num_files 参数
+def generate_code_file(directory):
     # 在指定目录中随机生成代码文件
     code_type = random.choice(["html", "css", "js"])
     template_file = f"templates/{code_type}.jinja2"
-    
-    os.makedirs(directory, exist_ok=True)  # 创建目录
-    
-    for _ in range(num_files):  # 循环生成多个文件
-        output_file = f"{directory}/{generate_random_filename()}.{code_type}"
-        with open(template_file, 'r') as file:
-            template_content = file.read()
-            template = Template(template_content)
-            data = generate_random_data()  # 生成随机数据
-            code = template.render(data=data)  # 使用随机数据渲染模板
-            with open(output_file, 'w') as output:
-                output.write(code)
-                print(f"生成文件：{os.path.basename(output_file)}")  # 添加这行以显示生成的文件名
+    output_file = f"{directory}/{generate_random_filename()}.{code_type}"
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)  # 创建目录
+    with open(template_file, 'r') as file:
+        template_content = file.read()
+        template = Template(template_content)
+        data = generate_random_data()  # 生成随机数据
+        code = template.render(data=data)  # 使用随机数据渲染模板
+        with open(output_file, 'w') as output:
+            output.write(code)
+            print(f"生成文件：{os.path.basename(output_file)}")  # 添加这行以显示生成的文件名
 
 def remove_directory_contents(directory):
     # 递归删除目录及其内容
@@ -56,13 +53,12 @@ def remove_directory_contents(directory):
             os.rmdir(dir_path)
 
 # 通过命令行参数获取目录和文件数阈值
-if len(sys.argv) < 4:  # 修改为 < 4
-    print("请提供目录、文件数阈值和生成文件数作为命令行参数")  # 修改提示信息
+if len(sys.argv) < 3:
+    print("请提供目录和文件数阈值作为命令行参数")
     sys.exit(1)
 
 target_directory = sys.argv[1]
 threshold = int(sys.argv[2])
-num_to_generate = int(sys.argv[3])  # 获取生成文件数
 
 # 如果目录不存在，则创建目录
 if not os.path.exists(target_directory):
@@ -70,7 +66,7 @@ if not os.path.exists(target_directory):
     print(f"目录 {target_directory} 创建成功")
 
 # 生成代码文件
-generate_code_file(target_directory, num_to_generate)  # 使用 num_to_generate 参数
+generate_code_file(target_directory)
 
 # 统计文件数并清空目录及其内容
 num_files = count_files_in_directory(target_directory)
