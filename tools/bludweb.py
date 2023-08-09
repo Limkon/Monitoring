@@ -14,7 +14,8 @@ def generate_random_data():
     return {
         'title': ''.join(random.choices(string.ascii_uppercase, k=10)),
         'heading': 'Random Heading',
-        'content': 'This is some random content.'
+        'content': 'This is some random content.',
+        'color': f'#{random.randint(0, 255):02X}{random.randint(0, 255):02X}{random.randint(0, 255):02X}'
     }
 
 def generate_random_filename():
