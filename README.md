@@ -1,6 +1,6 @@
 # 网页状态
-- https://jsn.limkon.repl.co: 失败
-- https://sak.kmco.repl.co: 失败
+- https://ypto.tnpyv.repl.co: 失败
+- https://chatai.cokio.repl.co: 失败
+- https://v2ray.yoyho.repl.co: 失败
+- https://aro.flinthill.repl.co: 失败
 - : 失败
-- https://apping.eywjx.repl.co: 失败
-- https://V2.sukure.repl.co: 失败
