@@ -1,2 +1,4 @@
 # 网页状态
-- https://oko-limkon.cloud.okteto.net: 失败 (502)
+- https://jsn.limkon.repl.co: 失败
+- https://deo.babox.repl.co: 失败
+- https://ys.pyxzp.repl.co: 失败 (403)
