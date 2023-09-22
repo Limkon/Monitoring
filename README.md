@@ -1,2 +1,2 @@
 # 网页状态
-- https://std.skvip.eu.org: 失败
+- https://game-example.rdianc.repl.co: 失败
