@@ -1,11 +1,6 @@
 # 网页状态
-- https://ls.tpjow.repl.co: 失败
-- https://cloud-limve.cloud.okteto.net: 失败 (502)
-- https://ypto.tnpyv.repl.co: 失败
-- https://stds.stpsc.repl.co: 失败
-- https://vi.zogzr.repl.co: 失败
+- https://vi.zogzr.repl.co: 失败 (403)
 - https://Love.cfvqw.repl.co: 失败
-- https://tr--slind.repl.co: 失败 (403)
 - https://moo.zxco.repl.co: 失败 (403)
-- https://std.skvip.eu.org: 失败
-- https://chatai.cokio.repl.co: 失败
+- https://ls.tpjow.repl.co: 失败
+- https://stds.stpsc.repl.co: 失败
