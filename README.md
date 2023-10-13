@@ -1,6 +1,3 @@
 # 网页状态
-- https://tr--slind.repl.co: 失败
-- https://Love.cfvqw.repl.co: 失败
-- https://deo.babox.repl.co: 失败
-- https://figura.hpbmm.repl.co: 失败
-- https://su--yoyholee.repl.co: 失败 (502)
+- https://su--yoyholee.repl.co: 失败
+- https://tote.kaikaixin.repl.co: 失败
