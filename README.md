@@ -1,3 +1,2 @@
 # 网页状态
-- https://v.chavir.repl.co: 失败
-- https://apping.eywjx.repl.co: 失败
+- https://V2.sukure.repl.co: 失败
