@@ -1,6 +1,7 @@
 # 网页状态
-- https://aro.flinthill.repl.co: 失败
-- https://learninggarden.repl.co: 失败
-- https://ypto.tnpyv.repl.co: 失败
-- https://tr--slind.repl.co: 失败 (403)
+- https://V2.sukure.repl.co: 失败
+- https://rows--zixk.repl.co: 失败
+- https://std.skvip.eu.org: 失败
+- https://vi.zogzr.repl.co: 失败
 - https://start--stpstyc.repl.co: 失败
+- https://tr--slind.repl.co: 失败
