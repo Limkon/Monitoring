@@ -1,12 +1,8 @@
 # 网页状态
-- https://vi.zogzr.repl.co: 失败
-- https://v.chavir.repl.co: 失败
-- https://ssd.zockq.repl.co: 失败
-- https://v2ray.yoyho.repl.co: 失败
-- https://chatai.cokio.repl.co: 失败
-- https://jsn.limkon.repl.co: 失败
-- https://aro.flinthill.repl.co: 失败 (500)
-- https://ypto.tnpyv.repl.co: 失败
-- https://rows--zixk.repl.co: 失败
-- https://mization.edpjg.repl.co: 失败
+- https://ys.pyxzp.repl.co: 失败
+- https://sak.kmco.repl.co: 失败
+- https://apping.eywjx.repl.co: 失败
+- https://deo.babox.repl.co: 失败
+- https://oko-limkon.cloud.okteto.net: 失败 (502)
 - https://happy-pinnate-revolve.glitch.me: 失败
+- https://su--yoyholee.repl.co: 失败
