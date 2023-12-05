@@ -1,8 +1,14 @@
 # 网页状态
-- https://ys.pyxzp.repl.co: 失败
-- https://sak.kmco.repl.co: 失败
-- https://apping.eywjx.repl.co: 失败
-- https://deo.babox.repl.co: 失败
-- https://oko-limkon.cloud.okteto.net: 失败 (502)
+- https://k2.shilh.repl.co: 失败
+- https://Love.cfvqw.repl.co: 失败
 - https://happy-pinnate-revolve.glitch.me: 失败
-- https://su--yoyholee.repl.co: 失败
+- https://ys.pyxzp.repl.co: 失败
+- https://apping.eywjx.repl.co: 失败
+- https://moo.zxco.repl.co: 失败
+- https://ko.limkco.repl.co: 失败
+- https://ls.tpjow.repl.co: 失败
+- https://ypto.tnpyv.repl.co: 失败
+- https://qi.limqin.repl.co: 失败
+- https://aro.flinthill.repl.co: 失败
+- https://sak.kmco.repl.co: 失败
+- https://jsn.limkon.repl.co: 失败
