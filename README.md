@@ -1,15 +1,9 @@
 # 网页状态
-- https://v.chavir.repl.co: 失败
-- https://ypto.tnpyv.repl.co: 失败
-- https://qi.limqin.repl.co: 失败
-- https://ls.tpjow.repl.co: 失败
-- https://happy-pinnate-revolve.glitch.me: 失败
-- https://start--stpstyc.repl.co: 失败
-- https://sak.kmco.repl.co: 失败 (403)
-- https://learninggarden.repl.co: 失败
-- https://game-example.rdianc.repl.co: 失败 (403)
-- https://tote.kaikaixin.repl.co: 失败 (403)
-- https://stds.stpsc.repl.co: 失败
-- https://aro.flinthill.repl.co: 失败 (403)
 - https://deo.babox.repl.co: 失败 (403)
+- https://happy-pinnate-revolve.glitch.me: 失败
+- https://sak.kmco.repl.co: 失败 (403)
+- https://aro.flinthill.repl.co: 失败 (403)
+- https://game-example.rdianc.repl.co: 失败 (403)
+- https://oko-limkon.cloud.okteto.net: 失败 (502)
+- https://tote.kaikaixin.repl.co: 失败
 - https://apping.eywjx.repl.co: 失败 (403)
