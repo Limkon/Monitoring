@@ -1,12 +1,12 @@
 # 网页状态
-- https://chatai.cokio.repl.co: 失败 (403)
-- https://ypto.tnpyv.repl.co: 失败
-- https://rows--zixk.repl.co: 失败
-- https://game-example.rdianc.repl.co: 失败
-- https://leaf-relieved-chestnut.glitch.me: 失败
-- https://special-tiny-run.glitch.me: 失败
 - https://happy-pinnate-revolve.glitch.me: 失败
-- https://reminiscent- Plastic-cheek.glitch.me: 失败
-- https://qi.limqin.repl.co: 失败
+- https://learninggarden.repl.co: 失败
+- https://leaf-relieved-chestnut.glitch.me: 失败 (426)
+- https://game-example.rdianc.repl.co: 失败 (429)
+- https://alist-5244-limkco.cloud.okteto.net: 失败 (502)
+- https://special-tiny-run.glitch.me: 失败
 - : 失败
-- https://thundering-morning-kryptops.glitch.me: 失败
+- https://chatai.cokio.repl.co: 失败 (403)
+- https://thundering-morning-kryptops.glitch.me: 失败 (426)
+- https://reminiscent- Plastic-cheek.glitch.me: 失败
+- https://ypto.tnpyv.repl.co: 失败
