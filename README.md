@@ -1,14 +1,12 @@
 # 网页状态
-- https://mization.edpjg.repl.co: 失败 (403)
+- https://oko-limkon.cloud.okteto.net: 失败 (502)
+- https://sak.kmco.repl.co: 失败 (403)
+- https://mization.edpjg.repl.co: 失败
+- https://leaf-relieved-chestnut.glitch.me: 失败
+- https://game-example.rdianc.repl.co: 失败 (429)
 - https://thundering-morning-kryptops.glitch.me: 失败
+- https://reminiscent- Plastic-cheek.glitch.me: 失败
+- https://beaspy--hting.repl.co: 失败 (500)
 - https://happy-pinnate-revolve.glitch.me: 失败
 - https://special-tiny-run.glitch.me: 失败
-- https://sak.kmco.repl.co: 失败 (403)
-- https://chatai.cokio.repl.co: 失败
-- https://learninggarden.repl.co: 失败 (500)
-- https://game-example.rdianc.repl.co: 失败
-- https://start--stpstyc.repl.co: 失败
-- https://leaf-relieved-chestnut.glitch.me: 失败
-- https://reminiscent- Plastic-cheek.glitch.me: 失败
-- https://ls.tpjow.repl.co: 失败
 - https://lon-kjt5.onrender.com: 失败
