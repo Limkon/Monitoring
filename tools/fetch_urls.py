@@ -3,20 +3,6 @@ import os
 import threading
 import subprocess
 
-def fetch_url(url):
-    try:
-        output = subprocess.check_output(['curl', '-s', url])  # 使用subprocess运行curl命令
-        print(f"URL: {url}\nResponse:\n{output.decode('utf-8')}\n{'='*30}")
-    except subprocess.CalledProcessError as e:
-        print(f"Error fetching URL {url}: {e}")
-
-def send_request(url, data):
-    try:
-        output = subprocess.check_output(['curl', '-s', '-X', 'POST', '-d', data, url])  # 发送POST请求
-        print(f"URL: {url}\nRequest Data: {data}\nResponse:\n{output.decode('utf-8')}\n{'='*30}")
-    except subprocess.CalledProcessError as e:
-        print(f"Error sending request to URL {url}: {e}")
-
 def main():
     if len(sys.argv) != 2:
         print("Usage: python fetch_urls.py <filename>")
@@ -45,7 +31,7 @@ def main():
             data = parts[1]
             thread = threading.Thread(target=send_request, args=(url, data))
         else:
-            print(f"Invalid line: {line}")
+            # 忽略不属于 GET 或 POST 请求的 URL
             continue
 
         threads.append(thread)
@@ -57,3 +43,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
