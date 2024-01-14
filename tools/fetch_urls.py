@@ -19,9 +19,21 @@ def main():
     # 去除每行两端的空白字符
     lines = [line.strip() for line in lines]
 
+    # 检查 URL 是否有效
+    valid_lines = []
+    for line in lines:
+        if line.startswith("GET ") or line.startswith("POST "):
+            url = line[4:] if line.startswith("GET ") else line[5:]
+            if url.startswith("https://") and "." in url[8:]:  # 检查 URL 是否包含有效的域名部分
+                valid_lines.append(line)
+            else:
+                print(f"Invalid URL: {url}")
+        else:
+            print(f"Invalid line: {line}")
+
     # 使用多线程并发处理URL
     threads = []
-    for line in lines:
+    for line in valid_lines:
         if line.startswith("GET "):  # 如果行以 "GET " 开头，执行获取操作
             url = line[4:]  # 去掉 "GET " 后的部分
             thread = threading.Thread(target=fetch_url, args=(url,))
@@ -30,9 +42,6 @@ def main():
             url = parts[0]
             data = parts[1]
             thread = threading.Thread(target=send_request, args=(url, data))
-        else:
-            print(f"Invalid line: {line}")
-            continue
 
         threads.append(thread)
         thread.start()
