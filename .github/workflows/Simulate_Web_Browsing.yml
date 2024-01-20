@@ -92,7 +92,7 @@ jobs:
           delay=$((RANDOM % 19 + 1))
           sleep "$delay"
 
-      - name: Run script url
+      - name: Run script
         run: python ./tools/script.py urls
 
       - name: Build web
