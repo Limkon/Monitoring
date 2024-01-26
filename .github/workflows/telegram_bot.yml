@@ -1,9 +1,12 @@
 name: Send Telegram Message
 
 on:
-  push:
-    branches:
-      - '*'
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to run the workflow on'
+        required: true
+        default: 'main'
 
 jobs:
   send-message:
@@ -22,15 +25,11 @@ jobs:
         run: |
           pip install requests
 
-      - name: Get Branch Name
-        id: branch_name
-        run: echo "::set-output name=branch::$(echo $GITHUB_REF | awk 'BEGIN{FS="/"} {print $3}')"
-
       - name: Send Telegram Message
         run: |
           TELEGRAM_BOT_TOKEN=$YOUR_TELEGRAM_BOT_TOKEN
           CHAT_ID=$YOUR_CHAT_ID
-          MESSAGE="Hello from GitHub Actions on branch ${{ steps.branch_name.outputs.branch }}!"
+          MESSAGE="Hello from GitHub Actions on branch ${{ github.event.inputs.branch }}!"
 
           curl -s -X POST https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage \
             -d chat_id=$CHAT_ID \
