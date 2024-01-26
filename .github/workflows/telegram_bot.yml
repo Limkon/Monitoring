@@ -25,7 +25,7 @@ jobs:
       - name: Send Telegram Message
         run: |
           TELEGRAM_BOT_TOKEN=$YOUR_TELEGRAM_BOT_TOKEN
-          CHAT_ID=714490388
+          CHAT_ID=-714490388
           MESSAGE="Hello from GitHub Actions!"
 
           curl -s -X POST https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage \
