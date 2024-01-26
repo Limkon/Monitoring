@@ -3,7 +3,7 @@ name: Send Telegram Message
 on:
   push:
     branches:
-      - main
+      - '*'
 
 jobs:
   send-message:
@@ -22,11 +22,15 @@ jobs:
         run: |
           pip install requests
 
+      - name: Get Branch Name
+        id: branch_name
+        run: echo "::set-output name=branch::$(echo $GITHUB_REF | awk 'BEGIN{FS="/"} {print $3}')"
+
       - name: Send Telegram Message
         run: |
           TELEGRAM_BOT_TOKEN=$YOUR_TELEGRAM_BOT_TOKEN
-          CHAT_ID=-714490388
-          MESSAGE="Hello from GitHub Actions!"
+          CHAT_ID=$YOUR_CHAT_ID
+          MESSAGE="Hello from GitHub Actions on branch ${{ steps.branch_name.outputs.branch }}!"
 
           curl -s -X POST https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage \
             -d chat_id=$CHAT_ID \
