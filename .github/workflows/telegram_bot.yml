@@ -1,7 +1,9 @@
 name: Send Telegram Message
 
 on:
-  workflow_dispatch:
+   schedule:
+   - cron: '5 * */10 * *'
+   workflow_dispatch:
     inputs:
       branch:
         description: 'Branch to run the workflow on'
