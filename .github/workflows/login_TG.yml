@@ -46,12 +46,12 @@ jobs:
             restore-keys: |
               ${{ runner.os }}-chrome-cache-
       - name: Install Chrome
-        if: not steps.cache-chrome.outputs.cache-hit
+        if: steps.cache-chrome.outputs.cache-hit != true
         run: |
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo dpkg -i google-chrome-stable_current_amd64.deb
       - name: Install ChromeDriver
-        if: not steps.cache-chrome.outputs.cache-hit
+        if: steps.cache-chrome.outputs.cache-hit != true
         run: |
           curl -fsSL https://chromedriver.storage.googleapis.com/121.0.6167.184/chromedriver_linux64.zip -o chromedriver_linux64.zip
           unzip chromedriver_linux64.zip
