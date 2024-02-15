@@ -1,4 +1,4 @@
-name: Send Telegram Message
+name: login webtelegram
 
 on:
    schedule:
