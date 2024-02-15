@@ -25,6 +25,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
+          pip install selenium
           pip install requests
 
       - name: Build web
