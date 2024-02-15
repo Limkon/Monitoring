@@ -45,6 +45,17 @@ jobs:
             key: ${{ runner.os }}-chrome-cache-${{ hashFiles('google-chrome-stable_current_amd64.deb') }}-${{ hashFiles('chromedriver_linux64.zip') }}-${{ hashFiles('/usr/local/bin/chromedriver') }}
             restore-keys: |
               ${{ runner.os }}-chrome-cache-
+      - name: Install Chrome
+        if: !steps.cache-chrome.outputs.cache-hit
+        run: |
+          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          sudo dpkg -i google-chrome-stable_current_amd64.deb
+      - name: Install ChromeDriver
+        if: !steps.cache-chrome.outputs.cache-hit
+        run: |
+          curl -fsSL https://chromedriver.storage.googleapis.com/121.0.6167.184/chromedriver_linux64.zip -o chromedriver_linux64.zip
+          unzip chromedriver_linux64.zip
+          sudo mv chromedriver /usr/local/bin/chromedriver
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
