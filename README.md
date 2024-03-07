@@ -1,5 +1,4 @@
 # 网页状态
-- http://telx.zot.line.pm: 失败
 - https://zote.alwaysdata.net/%E5%8C%BB%E5%AD%A6: 失败 (404)
 - https://dsk.alwaysdata.net: 失败 (404)
 - https://zote.alwaysdata.net: 失败 (404)
