@@ -1,2 +1,2 @@
 # 网页状态
-- : 失败
+- cdue.cloudns.ch: 失败
