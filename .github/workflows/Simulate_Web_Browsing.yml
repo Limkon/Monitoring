@@ -97,6 +97,9 @@ jobs:
 
       - name: Build web
         run: python ./tools/bludweb.py webs 150
+        
+      - name: remove_duplicates
+        run: python ./tools/remove_duplicates.py urls
 
       - name: Fetch web
         run: python ./tools/fetch_urls.py urls
