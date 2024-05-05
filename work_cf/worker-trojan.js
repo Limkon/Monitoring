@@ -4,7 +4,7 @@ const proxyIPs = ['www.visa.com'];
 
 let proxyIP = proxyIPs[Math.floor(Math.random() * proxyIPs.length)];
 
-let sha224Password = '08f32643dbdacf81d0d511f1ee24b06de759e90f8edf742bbdc57d88';
+let sha224Password = '6649e68167fcf93c357ad52c0ff06b6bc74d1d3ac6fa7806dcf6ff59';
 
 const worker_default = {
    /**
