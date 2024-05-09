@@ -1,4 +1,5 @@
 // src/worker.js
+// 访问 https://[你的域名]/link 并用你的明文密码替换 ca110us
 import { connect } from "cloudflare:sockets";
 let sha224Password = '6649e68167fcf93c357ad52c0ff06b6bc74d1d3ac6fa7806dcf6ff59';
 const proxyIPs = ['www.visa.com'];
