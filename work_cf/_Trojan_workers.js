@@ -3,7 +3,7 @@
 import { connect } from "cloudflare:sockets";
 
 let Pswd = '771571215';
-const proxyIPs = ["www.visa.com"]; //workers.cloudflare.cyou bestproxy.onecf.eu.org cdn-all.xn--b6gac.eu.org cdn.xn--b6gac.eu.org
+const proxyIPs = ["www.visa.com.tw"]; //workers.cloudflare.cyou bestproxy.onecf.eu.org cdn-all.xn--b6gac.eu.org cdn.xn--b6gac.eu.org
 let hostnames = ['www.mxdm6.com'];
 
 let sha224Password ;
