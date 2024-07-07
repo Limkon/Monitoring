@@ -3,7 +3,7 @@ import { connect } from "cloudflare:sockets";
 
 let Pswd = '771571215';
 const proxyIPs = ["www.visa.com"]; //workers.cloudflare.cyou bestproxy.onecf.eu.org cdn-all.xn--b6gac.eu.org cdn.xn--b6gac.eu.org
-let hostnames = ['https://author.baidu.com/home?app_id=1571504388580919&from=homepage_nickname'];
+let hostnames = ['m3u8-player.com'];
 
 let sha224Password ;
 let proxyIP = proxyIPs[Math.floor(Math.random() * proxyIPs.length)];
