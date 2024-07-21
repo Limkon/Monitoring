@@ -1,11 +1,12 @@
 /*!
-  * v2ray Subscription Worker v2.4
+  * v2ray Subscription Worker v2.5
+  *建立KV并设置，名称settings
   * Copyright 2024 Vahid Farid (https://twitter.com/vahidfarid)
   * Licensed under GPLv3 (https://github.com/vfarid/v2ray-worker/blob/main/Licence.md)
   */
 
-var dddv = "v2ray1234";
-var dddc = "clash1234";
+var dddv = "v2ray";
+var dddc = "clash";
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
