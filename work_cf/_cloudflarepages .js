@@ -1,21 +1,25 @@
 export default {
     async fetch(request, env) {
-        // 从请求中提取当前 URL
         let url = new URL(request.url);
 
-        // 检查路径是否以 '/' 开头，并且是否设置了主机名的环境变量
+        // 检查路径是否符合你的自定义逻辑（如检查路径或其他条件）
         if (url.pathname.startsWith('/')) {
-            // 使用环境变量设置主机名
-            url.hostname = env.HOSTNAME || "m3u8-player.com";
+            // 通过拼接的方式设置主机名（url.hostname 是只读的）
+            let newUrl = `${request.url.replace(url.hostname, env.HOSTNAME || "m3u8-player.com")}`;
 
-            // 使用更新后的 URL 创建新的请求
-            let new_request = new Request(url, request);
+            // 创建新请求，保留原始请求的所有属性
+            let newRequest = new Request(newUrl, {
+                method: request.method,
+                headers: request.headers,
+                body: request.body,
+                redirect: request.redirect
+            });
 
             // 发送更新后的请求
-            return fetch(new_request);
+            return fetch(newRequest);
         }
 
-        // 如果路径不是以 '/' 开头，则从 ASSETS 中获取请求
+        // 如果路径不符合条件，则从 ASSETS 中获取请求
         return env.ASSETS.fetch(request);
     }
 };
