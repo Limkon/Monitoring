@@ -1,21 +1,21 @@
 export default {
     async fetch(request, env) {
+        // 从请求中提取当前 URL
         let url = new URL(request.url);
 
+        // 检查路径是否以 '/' 开头，并且是否设置了主机名的环境变量
         if (url.pathname.startsWith('/')) {
-            // 使用 PROXY_HOST 环境变量
-            url.hostname = env.PROXY_HOST || "m3u8-player.com";
+            // 使用环境变量设置主机名
+            url.hostname = env.CUSTOM_HOSTNAME || "default.hostname.com";
 
-            let newRequest = new Request(url.toString(), {
-                method: request.method,
-                headers: request.headers,
-                body: request.body,
-                redirect: request.redirect
-            });
+            // 使用更新后的 URL 创建新的请求
+            let new_request = new Request(url, request);
 
-            return fetch(newRequest);
+            // 发送更新后的请求
+            return fetch(new_request);
         }
 
+        // 如果路径不是以 '/' 开头，则从 ASSETS 中获取请求
         return env.ASSETS.fetch(request);
     }
 };
