@@ -104,6 +104,11 @@ jobs:
       - name: Fetch web
         run: python ./tools/fetch_urls.py urls
 
+      - name: cut web
+        run: |
+         chmod +x generate_traffic.sh
+         ./generate_traffic.sh
+
       - name: Run Python script
         env:
           FILENAME: 'urls'  # 替换为您的 URL 地址文件名
