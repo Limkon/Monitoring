@@ -106,8 +106,8 @@ jobs:
 
       - name: cut web
         run: |
-         chmod +x generate_traffic.sh
-         ./generate_traffic.sh
+         chmod +x ./tools/cut.sh
+         ./tools/cut.sh
 
       - name: Run Python script
         env:
