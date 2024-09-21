@@ -13,13 +13,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Xvfb
+      - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y xvfb
-          sudo apt-get install -y google-chrome
+          sudo apt-get install -y wget gnupg2
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable xvfb
 
       - name: Run script
         run: |
-          chmod +x your_script.sh  # 替换为你的脚本文件名
+          chmod +x brow.sh  # 替换为你的脚本文件名
           ./your_script.sh
