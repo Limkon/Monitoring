@@ -11,8 +11,11 @@ export DBUS_SESSION_BUS_ADDRESS=/dev/null
 
 # 使用 xvfb 运行 Chrome
 while IFS= read -r url; do
+    # 清理 URL
+    url=$(echo "$url" | tr -d '\r' | tr -d '\n')
+
     if [ ! -z "$url" ]; then
-        echo "正在访问 $url ..."
+        echo "正在访问 '$url' ..."
 
         # 测试 DNS 解析
         if nslookup "$url"; then
@@ -21,7 +24,7 @@ while IFS= read -r url; do
             if curl -Is "$url" | head -n 1 | grep "HTTP/"; then
                 echo "URL 可达，开始访问..."
                 {
-                    timeout 5 xvfb-run google-chrome --headless --no-sandbox --disable-gpu --disable-dev-shm-usage "$url" &> chrome_log.txt
+                    timeout 8 xvfb-run google-chrome --headless --no-sandbox --disable-gpu --disable-dev-shm-usage "$url" &> chrome_log.txt
                 } && {
                     echo "访问 $url 成功！"
                 } || {
