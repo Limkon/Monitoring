@@ -1,6 +1,9 @@
 name: Run Selenium Script
 
-on: [push]
+on:
+  schedule:
+    - cron: '*/50 * * * *'
+  workflow_dispatch:
 
 jobs:
   run-selenium:
