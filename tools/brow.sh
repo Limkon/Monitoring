@@ -13,19 +13,25 @@ export DBUS_SESSION_BUS_ADDRESS=/dev/null
 while IFS= read -r url; do
     if [ ! -z "$url" ]; then
         echo "正在访问 $url ..."
-        
-        # 测试访问 URL
-        if curl -Is "$url" | head -n 1 | grep "HTTP/"; then
-            echo "URL 可达，开始访问..."
-            {
-                timeout 5 xvfb-run google-chrome --headless --no-sandbox --disable-gpu --disable-dev-shm-usage "$url" &> chrome_log.txt
-            } && {
-                echo "访问 $url 成功！"
-            } || {
-                echo "访问 $url 失败或超时！查看 chrome_log.txt 以获取更多信息。"
-            }
+
+        # 测试 DNS 解析
+        if nslookup "$url"; then
+            echo "DNS 解析成功，开始访问..."
+            # 测试访问 URL
+            if curl -Is "$url" | head -n 1 | grep "HTTP/"; then
+                echo "URL 可达，开始访问..."
+                {
+                    timeout 5 xvfb-run google-chrome --headless --no-sandbox --disable-gpu --disable-dev-shm-usage "$url" &> chrome_log.txt
+                } && {
+                    echo "访问 $url 成功！"
+                } || {
+                    echo "访问 $url 失败或超时！查看 chrome_log.txt 以获取更多信息。"
+                }
+            else
+                echo "无法访问 $url，可能是网络问题。"
+            fi
         else
-            echo "无法访问 $url，可能是网络问题。"
+            echo "DNS 解析失败，无法访问 $url。"
         fi
     fi
 done < "url.txt"
