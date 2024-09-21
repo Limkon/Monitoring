@@ -1,0 +1,22 @@
+name: Run Selenium Script
+
+on: [push]
+
+jobs:
+  run-selenium:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Xvfb
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+          sudo apt-get install -y google-chrome
+
+      - name: Run script
+        run: |
+          chmod +x your_script.sh  # 替换为你的脚本文件名
+          ./your_script.sh
