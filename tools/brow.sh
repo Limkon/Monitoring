@@ -14,14 +14,19 @@ while IFS= read -r url; do
     if [ ! -z "$url" ]; then
         echo "正在访问 $url ..."
         
-        # 使用 timeout 包装 Chrome 命令
-        {
-            timeout 30 xvfb-run --server-args="-screen 0 1280x1024x24" google-chrome --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --remote-debugging-port=9222 "$url" &> chrome_log.txt
-        } && {
-            echo "访问 $url 成功！"
-        } || {
-            echo "访问 $url 失败或超时！查看 chrome_log.txt 以获取更多信息。"
-        }
+        # 测试访问 URL
+        if curl -Is "$url" | head -n 1 | grep "HTTP/"; then
+            echo "URL 可达，开始访问..."
+            {
+                timeout 5 xvfb-run google-chrome --headless --no-sandbox --disable-gpu --disable-dev-shm-usage "$url" &> chrome_log.txt
+            } && {
+                echo "访问 $url 成功！"
+            } || {
+                echo "访问 $url 失败或超时！查看 chrome_log.txt 以获取更多信息。"
+            }
+        else
+            echo "无法访问 $url，可能是网络问题。"
+        fi
     fi
 done < "url.txt"
 
