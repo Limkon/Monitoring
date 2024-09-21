@@ -6,11 +6,14 @@ if [ ! -f "url.txt" ]; then
     exit 1
 fi
 
+# 设置 D-Bus 地址
+export DBUS_SESSION_BUS_ADDRESS=/dev/null
+
 # 使用 xvfb 运行 Chrome
 while IFS= read -r url; do
     if [ ! -z "$url" ]; then
         echo "正在访问 $url ..."
-        xvfb-run -a google-chrome --headless --no-sandbox --disable-gpu --remote-debugging-port=9222 "$url"
+        xvfb-run -a google-chrome --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --remote-debugging-port=9222 "$url"
     fi
 done < "url.txt"
 
