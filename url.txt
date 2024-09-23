@@ -1,4 +1,4 @@
-﻿zoot.serv00.net 
+zoot.serv00.net 
 gzols.serv00.net 
 zko.xio.live-on.net 
 zkc.xio.live-on.net 
@@ -72,6 +72,14 @@ suco.edu.ezpz.work
 wov.soho.lovedub.net 
 zipn.soho.lbahq.com 
 parp.xeo.dedyn.io 
+agei.svip.app.tc 
+baic.kuilut.tic.tc 
+dziy.svip.blogu.tc 
+flq.wwon.con.tc 
+rowb.svip.san.tc 
+itss.wxio.sitesi.tc 
+sni=xn--rss272l.us.kg
+cxaz.sohoo.isgre.at 
 stdu.nyc.mn
 mokin.nyc.mn
 jxio.nyc.mn
