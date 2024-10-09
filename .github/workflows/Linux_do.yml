@@ -1,0 +1,34 @@
+name: Automated Deployment
+
+# 事件触发条件
+on:
+  # 支持手动触发
+  workflow_dispatch:
+  # 定时触发，每两小时运行一次
+  schedule:
+    - cron: '0 */2 * * *'  # 每两小时运行一次，UTC时间
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # 运行环境，ubuntu-latest 是常用的环境
+
+    steps:
+      # 检出仓库代码
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # 设置环境变量（从 GitHub Secrets 中获取）
+      - name: Set environment variables from secrets
+        run: |
+          echo "LINUXDO_USERNAME=${{ secrets.LINUXDO_USERNAME }}" >> $GITHUB_ENV
+          echo "LINUXDO_PASSWORD=${{ secrets.LINUXDO_PASSWORD }}" >> $GITHUB_ENV
+
+      # 安装依赖（如果有需要）
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3  # 根据你的项目需求，安装依赖包
+
+      # 执行你的脚本
+      - name: Run deployment script
+        run: python3 tools/Linux_do.py  # 替换为你的脚本路径
