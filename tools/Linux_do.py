@@ -53,7 +53,6 @@ VIEW_COUNT = int(os.getenv("VIEW_COUNT", 1000))
 HOME_URL = os.getenv("HOME_URL", "https://linux.do/")
 CONNECT_URL = os.getenv("CONNECT_URL", "https://connect.linux.do/")
 
-
 browse_count = 0
 connect_info = ""
 like_count = 0
@@ -198,8 +197,8 @@ class LinuxDoBrowser:
                         views_count_str = views_title.split("此话题已被浏览 ")[1].split(" 次")[0]
                         views_count = int(views_count_str.replace(",", ""))
                     else:
-                        logging.warning(f"无法解析浏览次数，跳过该帖子: {views_title}")
-                        continue
+                        logging.warning(f"无法解析浏览次数，继续处理该帖子: {views_title}")
+                        views_count = 0  # 无法解析时，默认浏览次数为0
 
                     article_title = topic.text.strip()
                     logging.info(f"打开第 {idx + 1}/{total_topics} 个帖子 ：{article_title}")
@@ -276,200 +275,33 @@ class LinuxDoBrowser:
                 self.driver.get(HOME_URL)
 
                 if not self.login():
-                    logging.error(f"{self.username} 登录失败")
+                    logging.error(f"{self.username} 登录失败，终止该账号操作。")
                     continue
 
                 self.click_topic()
-                logging.info(f"🎉 恭喜：{self.username}，帖子浏览全部完成")
-                self.print_connect_info()
 
-                self.logout()
+                end_time = time.time()
+                total_time = end_time - start_time
+                logging.info(f"账号 {self.username} 操作总耗时: {total_time:.2f}秒")
 
-            except WebDriverException as e:
-                logging.error(f"WebDriver 初始化失败: {e}")
-                logging.info("请尝试重新搭建青龙面板或换个机器运行")
-                exit(1)
             except Exception as e:
-                logging.error(f"运行过程中出错: {e}")
+                logging.error(f"账号 {self.username} 执行过程中发生错误: {e}")
+
             finally:
-                if self.driver is not None:
+                if self.driver:
                     self.driver.quit()
 
-            end_time = time.time()
-            spend_time = int((end_time - start_time) // 60)
-
-            account_info.append(
-                {
-                    "username": self.username,
-                    "browse_count": browse_count,
-                    "like_count": like_count,
-                    "spend_time": spend_time,
-                    "connect_info": connect_info,
-                }
-            )
-
-            # 重置状态
-            browse_count = 0
-            like_count = 0
-            connect_info = ""
-
-        logging.info("所有账户处理完毕")
-        summary = ""
-        for info in account_info:
-            summary += (
-                f"用户：{info['username']}\n\n"
-                f"本次共浏览 {info['browse_count']} 个帖子\n"
-                f"共点赞{info['like_count']} 个帖子\n"
-                f"共用时 {info['spend_time']} 分钟\n"
-                f"{info['connect_info']}\n\n"
-            )
-        send = load_send()
-        if callable(send):
-            send("Linux.do浏览帖子", summary)
-        else:
-            print("\n加载通知服务失败")
-
-    def click_like(self):
-        try:
-            global like_count
-            like_button = WebDriverWait(self.driver, 10).until(
-                EC.element_to_be_clickable(
-                    (By.CSS_SELECTOR, ".btn-toggle-reaction-like")
-                )
-            )
-
-            if "移除此赞" in like_button.get_attribute("title"):
-                logging.info("该帖子已点赞，跳过点赞操作。")
-            else:
-                self.driver.execute_script("arguments[0].click();", like_button)
-                like_count += 1
-                logging.info("点赞帖子成功")
-
-        except TimeoutException:
-            logging.error("点赞操作失败：点赞按钮定位超时")
-        except WebDriverException as e:
-            logging.error(f"点赞操作失败: {e}")
-        except Exception as e:
-            logging.error(f"未知错误导致点赞操作失败: {e}")
-
-    def print_connect_info(self):
-        self.driver.execute_script("window.open('');")
-        self.driver.switch_to.window(self.driver.window_handles[-1])
-        logging.info("导航到LINUX DO Connect页面")
-        self.driver.get(CONNECT_URL)
-
-        global connect_info
-
-        rows = self.driver.find_elements(By.CSS_SELECTOR, "table tr")
-
-        info = []
-
-        for row in rows:
-            cells = row.find_elements(By.TAG_NAME, "td")
-            if len(cells) >= 3:
-                project = cells[0].text.strip()
-                current = cells[1].text.strip()
-                requirement = cells[2].text.strip()
-                info.append([project, current, requirement])
-
-        column_widths = [24, 22, 16]
-
-        def calculate_content_width(content):
-            return sum(2 if ord(char) > 127 else 1 for char in content)
-
-        def format_cell(content, width, alignment="left"):
-            content_length = calculate_content_width(content)
-            padding = width - content_length
-            if padding > 0:
-                if alignment == "left":
-                    return content + " " * padding
-                elif alignment == "right":
-                    return " " * padding + content
-                elif alignment == "center":
-                    left_padding = padding // 2
-                    right_padding = padding - left_padding
-                    return " " * left_padding + content + " " * right_padding
-            else:
-                return content[:width]
-
-        def build_row(cells):
-            return "| " + " | ".join(cells) + " |"
-
-        def build_separator():
-            return "+" + "+".join(["-" * (width + 2) for width in column_widths]) + "+"
-
-        formatted_info = [
-            build_row(
-                [
-                    format_cell(row[0], column_widths[0]),
-                    format_cell(row[1], column_widths[1], "center"),
-                    format_cell(row[2], column_widths[2], "center"),
-                ]
-            )
-            for row in info
-        ]
-
-        header = build_row(
-            [
-                format_cell("项目", column_widths[0]),
-                format_cell("当前", column_widths[1], "center"),
-                format_cell("要求", column_widths[2], "center"),
-            ]
-        )
-
-        separator = build_separator()
-
-        output = StringIO()
-        output.write("在过去 💯 天内：\n")
-        output.write(separator + "\n")
-        output.write(header + "\n")
-        output.write(separator.replace("-", "=") + "\n")
-        output.write("\n".join(formatted_info) + "\n")
-        output.write(separator + "\n")
-
-        table_output = output.getvalue()
-        output.close()
-
-        print(table_output)
-
-        connect_info = "\n在过去 💯 天内：\n" + "\n".join(
-            [f"{row[0]}（{row[2]}）：{row[1]}" for row in info]
-        )
-
-        self.driver.close()
-        self.driver.switch_to.window(self.driver.window_handles[0])
-
-    def logout(self):
-        try:
-            user_menu_button = self.driver.find_element(By.ID, "toggle-current-user")
-            user_menu_button.click()
-            profile_tab_button = WebDriverWait(self.driver, 20).until(
-                EC.element_to_be_clickable((By.ID, "user-menu-button-profile"))
-            )
-            profile_tab_button.click()
-
-            logout_button = WebDriverWait(self.driver, 20).until(
-                EC.element_to_be_clickable(
-                    (By.CSS_SELECTOR, "li.logout button.profile-tab-btn")
-                )
-            )
-            logout_button.click()
-            self.driver.refresh()
-
-            elements = self.driver.find_elements(
-                By.CSS_SELECTOR, ".header-buttons .login-button"
-            )
-            if elements:
-                logging.info(f"{self.username}登出成功")
-            else:
-                logging.info(f"{self.username}登出失败")
-
-        except (TimeoutException, NoSuchElementException) as e:
-            logging.error(f"登出失败，可能由于元素未找到或超时: {e}")
-        except Exception as e:
-            logging.error(f"登出过程中发生错误: {e}")
+        if connect_info:
+            try:
+                notify = load_send()
+                if notify:
+                    notify(
+                        f"任务已完成, 账号共浏览 {browse_count} 个帖子，点赞 {like_count} 次。\n\n{connect_info}"
+                    )
+            except Exception as e:
+                logging.error(f"发送通知失败: {e}")
 
 
 if __name__ == "__main__":
-    linuxdo_browser = LinuxDoBrowser()
-    linuxdo_browser.run()
+    browser = LinuxDoBrowser()
+    browser.run()
