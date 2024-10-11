@@ -68,19 +68,16 @@ if user_count != len(PASSWORD):
 
 logging.info(f"共找到 {user_count} 个账户")
 
-
 def load_send():
     cur_path = path.abspath(path.dirname(__file__))
     if path.exists(cur_path + "/notify.py"):
         try:
             from notify import send
-
             return send
         except ImportError:
             return False
     else:
         return False
-
 
 class LinuxDoBrowser:
     def __init__(self) -> None:
@@ -102,6 +99,7 @@ class LinuxDoBrowser:
             exit(1)
 
         self.driver = None
+        self.viewed_topics = set()
 
     def simulate_typing(self, element, text, typing_speed=0.1, random_delay=True):
         for char in text:
@@ -175,8 +173,15 @@ class LinuxDoBrowser:
 
             logging.info("--- 开始浏览帖子 ---")
             global browse_count
+            global like_count
 
-            for idx, topic in enumerate(topics):
+            available_topics = [topic for topic in topics if topic.get_attribute("href") not in self.viewed_topics]
+            
+            if not available_topics:
+                logging.info("没有更多未浏览的帖子了")
+                return
+
+            for idx, topic in enumerate(random.sample(available_topics, min(len(available_topics), total_topics))):
                 try:
                     parent_element = topic.find_element(By.XPATH, "./ancestor::tr")
 
@@ -204,6 +209,10 @@ class LinuxDoBrowser:
                     logging.info(f"打开第 {idx + 1}/{total_topics} 个帖子 ：{article_title}")
                     article_url = topic.get_attribute("href")
 
+                    if article_url in self.viewed_topics:
+                        logging.info(f"跳过已浏览的帖子：{article_title}")
+                        continue
+
                     try:
                         self.driver.execute_script("window.open('');")
                         self.driver.switch_to.window(self.driver.window_handles[-1])
@@ -217,10 +226,12 @@ class LinuxDoBrowser:
                             raise  # 重新抛出异常，让外层catch处理
 
                         browse_count += 1
+                        self.viewed_topics.add(article_url)
                         start_time = time.time()
                         if views_count > VIEW_COUNT:
                             logging.info(f"📈 当前帖子浏览量为{views_count} 大于设定值 {VIEW_COUNT}，🥳 开始进行点赞操作")
                             self.click_like()
+                            like_count += 1
 
                         scroll_duration = random.uniform(5, 10)
                         try:
@@ -255,6 +266,16 @@ class LinuxDoBrowser:
         except Exception as e:
             logging.error(f"click_topic 方法发生错误: {e}")
 
+    def click_like(self):
+        try:
+            like_button = WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, ".like-button"))
+            )
+            like_button.click()
+            logging.info("点赞成功")
+        except Exception as e:
+            logging.error(f"点赞失败: {e}")
+
     def run(self):
         global browse_count
         global connect_info
@@ -264,6 +285,7 @@ class LinuxDoBrowser:
             start_time = time.time()
             self.username = USERNAME[i]
             self.password = PASSWORD[i]
+            self.viewed_topics.clear()  # 清空已浏览帖子集合
 
             logging.info(f"▶️▶️▶️  开始执行第{i+1}个账号: {self.username}")
 
@@ -300,7 +322,6 @@ class LinuxDoBrowser:
                     )
             except Exception as e:
                 logging.error(f"发送通知失败: {e}")
-
 
 if __name__ == "__main__":
     browser = LinuxDoBrowser()
