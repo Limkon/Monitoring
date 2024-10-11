@@ -7,7 +7,7 @@ import { connect } from "cloudflare:sockets";
 let userID = "0058c4cc-82a2-4cd0-92ed-fe8286d261d2";
 
 const proxyIPs = ["proxy.xxxxxxxx.tk"]; //ts.hpc.tw edgetunnel.anycast.eu.org bestproxy.onecf.eu.org cdn-all.xn--b6gac.eu.org cdn.xn--b6gac.eu.org proxy.xxxxxxxx.tk
-const cn_hostnames = [''];
+const cn_hostnames = ['jxio.nyc.mn'];
 let CDNIP = 'www.visa.com.sg'
 // http_ip
 let IP1 = 'www.visa.com'
