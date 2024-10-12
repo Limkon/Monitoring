@@ -23,6 +23,11 @@ jobs:
         python3 -m pip install --upgrade pip
         pip install selenium
 
+    - name: Delay random minutes
+        run: |
+          delay=$((RANDOM % 19 + 1))
+          sleep "$delay"
+
     - name: Run Linux_do.py script
       run: |
         python3 tools/Linux_do.py
