@@ -2,7 +2,7 @@ name: LinuxDo Automation
 
 on:
   schedule:
-    - cron: "0 */3 * * *" # 每两小时运行一次
+    - cron: "0 */3 * * *" # 每三小时运行一次
   workflow_dispatch: # 手动触发
 
 jobs:
@@ -24,9 +24,10 @@ jobs:
         pip install selenium
 
     - name: Delay random minutes
-        run: |
-          delay=$((RANDOM % 19 + 1))
-          sleep "$delay"
+      run: |
+        delay=$((RANDOM % 19 + 1))
+        echo "Sleeping for $delay minutes..."
+        sleep "${delay}m"
 
     - name: Run Linux_do.py script
       run: |
