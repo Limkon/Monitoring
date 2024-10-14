@@ -44,11 +44,9 @@ jobs:
             restore-keys: |
               ${{ runner.os }}-chrome-cache-
 
-      - name: Set up Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.x'
-
+      - name: Install dependencies
+        run: python3 -m pip install --upgrade pip
+        
       - name: Check if Chrome is already downloaded
         id: check_chrome
         run: |
