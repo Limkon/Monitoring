@@ -16,10 +16,10 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@vlatest
 
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@vlatest
         with:
           python-version: 3.8
 
