@@ -25,7 +25,7 @@ jobs:
 
     - name: Delay random minutes
       run: |
-        delay=$((RANDOM % 19 + 1))
+        delay=$((RANDOM % 2 + 1))
         echo "Sleeping for $delay minutes..."
         sleep "${delay}m"
 
