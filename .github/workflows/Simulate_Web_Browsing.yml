@@ -2,7 +2,7 @@ name: simulate browsing
 
 on:
   schedule:
-    - cron: '*/50 * * * *'
+    - cron: '* */5 * * *'
   workflow_dispatch:
 
 jobs:
@@ -10,120 +10,79 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Cache Chrome and ChromeDriver
-        id: cache-chrome
-        uses: actions/cache@v4
-        with:
-          path: |
-            google-chrome-stable_current_amd64.deb
-            chromedriver_linux64.zip
-            /usr/local/bin/chromedriver
-          key: ${{ runner.os }}-chrome-cache-${{ hashFiles('google-chrome-stable_current_amd64.deb') }}-${{ hashFiles('chromedriver_linux64.zip') }}-${{ hashFiles('/usr/local/bin/chromedriver') }}
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
 
-      - name: Get cache size
-        id: cache-size
-        run: |
-          cache_size=$(du -sh $GITHUB_WORKSPACE | awk '{print $1}')
-          echo "Cache size: $cache_size"
-          echo "size=$cache_size" >> $GITHUB_ENV
+    - name: Cache Chrome and ChromeDriver
+      id: cache-chrome
+      uses: actions/cache@v4
+      with:
+        path: |
+          google-chrome-stable_current_amd64.deb
+          chromedriver_linux64.zip
+          /usr/local/bin/chromedriver
+        key: ${{ runner.os }}-chrome-cache-${{ hashFiles('google-chrome-stable_current_amd64.deb') }}-${{ hashFiles('chromedriver_linux64.zip') }}-${{ hashFiles('/usr/local/bin/chromedriver') }}
 
-      - name: Clear cache if size > 1GB
-        if: steps.cache-size.outputs.size >= '1G'
-        run: |
-          echo "Cache size is greater than 1GB. Clearing cache..."
-          actions/cache@v3
-          with:
-            path: |
-              google-chrome-stable_current_amd64.deb
-              chromedriver_linux64.zip
-              /usr/local/bin/chromedriver
-            key: ${{ runner.os }}-chrome-cache-${{ hashFiles('google-chrome-stable_current_amd64.deb') }}-${{ hashFiles('chromedriver_linux64.zip') }}-${{ hashFiles('/usr/local/bin/chromedriver') }}
-            restore-keys: |
-              ${{ runner.os }}-chrome-cache-
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install selenium requests jinja2
 
-      - name: Install dependencies
-        run: python3 -m pip install --upgrade pip
-        
-      - name: Check if Chrome is already downloaded
-        id: check_chrome
-        run: |
-          if [[ ! -f google-chrome-stable_current_amd64.deb ]]; then
-            echo "name=download_chrome::true" >> $GITHUB_ENV
-          else
-            echo "name=download_chrome::false" >> $GITHUB_ENV
-          fi
+    - name: Download and install Chrome
+      if: steps.cache-chrome.outputs.cache-hit != 'true'
+      run: |
+        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        sudo dpkg -i google-chrome-stable_current_amd64.deb
+        sudo apt-get -f install -y
 
-      - name: Download Chrome
-        continue-on-error: true
-        if: steps.check_chrome.outputs.download_chrome == 'true'
-        run: |
-          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-          sudo dpkg -i google-chrome-stable_current_amd64.deb
-          sudo apt-get -f install -y
+    - name: Install ChromeDriver
+      if: steps.cache-chrome.outputs.cache-hit != 'true'
+      run: |
+        wget https://chromedriver.storage.googleapis.com/$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE)/chromedriver_linux64.zip
+        unzip chromedriver_linux64.zip
+        sudo mv chromedriver /usr/local/bin/
+        sudo chmod +x /usr/local/bin/chromedriver
 
-      - name: Cache ChromeDriver
-        id: cache-chromedriver
-        uses: actions/cache@v3
-        with:
-          path: |
-            /usr/local/bin/chromedriver
-          key: ${{ runner.os }}-chromedriver-cache-${{ hashFiles('/usr/local/bin/chromedriver') }}
+    - name: Delay random minutes
+      run: |
+        delay=$((RANDOM % 5 + 1))
+        echo "Sleeping for $delay minutes..."
+        sleep "${delay}m"
 
-      - name: Install ChromeDriver
-        if: steps.cache-chromedriver.outputs.cache-hit != 'true'
-        run: |
-          unzip -n chromedriver_linux64.zip
-          sudo mv chromedriver /usr/local/bin/
-          sudo chmod +x /usr/local/bin/chromedriver
+    - name: Run scripts
+      run: |
+        python ./tools/script.py urls
+        python ./tools/bludweb.py webs 150
+        python ./tools/remove_duplicates.py urls
+        python ./tools/fetch_urls.py urls
 
-      - name: Install dependencies
-        run: |
-           pip install selenium
-           pip install requests
-           pip install jinja2
+    - name: Cut web
+      run: |
+        chmod +x ./tools/cut.sh
+        ./tools/cut.sh
 
-      - name: Delay random minutes
-        run: |
-          delay=$((RANDOM % 5 + 1))
-          sleep "$delay"
+    - name: Run simulate_browsing script
+      env:
+        FILENAME: 'urls'
+      run: |
+        export DISPLAY=:99
+        Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+        python ./tools/simulate_browsing.py $FILENAME
 
-      - name: Run script
-        run: python ./tools/script.py urls
+    - name: Configure Git
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
 
-      - name: Build web
-        run: python ./tools/bludweb.py webs 150
-        
-      - name: remove_duplicates
-        run: python ./tools/remove_duplicates.py urls
-
-      - name: Fetch web
-        run: python ./tools/fetch_urls.py urls
-
-      - name: cut web
-        run: |
-         chmod +x ./tools/cut.sh
-         ./tools/cut.sh
-
-      - name: Run Python script
-        env:
-          FILENAME: 'urls'  # 替换为您的 URL 地址文件名
-        run: |
-          export DISPLAY=:99
-          Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-          python ./tools/simulate_browsing.py $FILENAME
-
-      - name: Configure Git
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-
-      - name: Commit and push changes
-        continue-on-error: true
-        run: |
-          git add .
-          git diff-index --quiet HEAD || git commit -m "Update failed URLs" -q
-          git pull origin HEAD --rebase
-          git push origin HEAD
+    - name: Commit and push changes
+      continue-on-error: true
+      run: |
+        git add .
+        git diff-index --quiet HEAD || git commit -m "Update failed URLs" -q
+        git pull origin HEAD --rebase
+        git push origin HEAD
