@@ -2,7 +2,7 @@ name: LinuxDo Automation
 
 on:
   schedule:
-    - cron: "0 */2 * * *" # 每三小时运行一次
+    - cron: "0 */2 * * *" # 每两小时运行一次
   workflow_dispatch: # 手动触发
 
 jobs:
@@ -13,14 +13,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set environment variables from secrets
-      run: |
-        echo "LINUXDO_USERNAME=${{ secrets.LINUXDO_USERNAME }}" >> $GITHUB_ENV
-        echo "LINUXDO_PASSWORD=${{ secrets.LINUXDO_PASSWORD }}" >> $GITHUB_ENV
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
 
     - name: Install dependencies
       run: |
-        python3 -m pip install --upgrade pip
+        python -m pip install --upgrade pip
         pip install selenium
 
     - name: Delay random minutes
@@ -30,8 +30,7 @@ jobs:
         sleep "${delay}m"
 
     - name: Run Linux_do.py script
-      run: |
-        python3 tools/Linux_do.py
       env:
         LINUXDO_USERNAME: ${{ secrets.LINUXDO_USERNAME }}
         LINUXDO_PASSWORD: ${{ secrets.LINUXDO_PASSWORD }}
+      run: python tools/Linux_do.py
