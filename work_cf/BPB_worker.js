@@ -19,7 +19,7 @@ let proxyIP = proxyIPs[Math.floor(Math.random() * proxyIPs.length)];
 
 let dohURL = 'https://cloudflare-dns.com/dns-query';
 
-let panelVersion = '2.4.7';
+let panelVersion = '5.2.0';
 
 if (!isValidUUID(userID)) {
     throw new Error('uuid is not valid');
