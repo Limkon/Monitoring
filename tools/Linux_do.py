@@ -354,10 +354,7 @@ class LinuxDoBrowser:
 
                 # 登录
                 if not self.login():
-                    logging.error(f"{self.username} 登录失败，但继续后面的操作")
-                    self.click_topic()
-                    self.print_connect_info()
-                    self.logout()
+                    logging.error(f"{self.username} 登录失败")
                     continue
 
                 # 浏览帖子
@@ -539,7 +536,7 @@ class LinuxDoBrowser:
             )
             profile_tab_button.click()
 
-            logout_button = WebDriverWait(self.driver,20).until(
+            logout_button = WebDriverWait(self.driver, 20).until(
                 EC.element_to_be_clickable(
                     (By.CSS_SELECTOR, "li.logout button.profile-tab-btn")
                 )
