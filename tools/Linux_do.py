@@ -67,6 +67,7 @@ if user_count != len(PASSWORD):
 
 logging.info(f"共找到 {user_count} 个账户")
 
+
 def load_send():
     cur_path = path.abspath(path.dirname(__file__))
     if path.exists(cur_path + "/notify.py"):
@@ -77,6 +78,7 @@ def load_send():
             return False
     else:
         return False
+
 
 class LinuxDoBrowser:
     def __init__(self) -> None:
@@ -210,13 +212,14 @@ class LinuxDoBrowser:
                     EC.presence_of_element_located((By.CSS_SELECTOR, "#current-user"))
                 )
                 logging.info("登录成功")
-                
+                return True
             except TimeoutException:
                 error_element = self.driver.find_elements(By.CSS_SELECTOR, "#modal-alert.alert-error")
                 if error_element:
                     logging.error(f"登录失败：{error_element[0].text}")
                 else:
                     logging.error("登录失败：无法验证登录状态")
+                return False
 
         except Exception as e:
             logging.error(f"登录过程发生错误：{str(e)}")
@@ -226,7 +229,7 @@ class LinuxDoBrowser:
                 logging.info("已保存错误截图到 login_error.png")
             except:
                 pass
-        return True
+            return False
 
     def load_all_topics(self):
         end_time = time.time() + SCROLL_DURATION
@@ -351,7 +354,10 @@ class LinuxDoBrowser:
 
                 # 登录
                 if not self.login():
-                    logging.error(f"{self.username} 登录失败")
+                    logging.error(f"{self.username} 登录失败，但继续后面的操作")
+                    self.click_topic()
+                    self.print_connect_info()
+                    self.logout()
                     continue
 
                 # 浏览帖子
@@ -523,7 +529,7 @@ class LinuxDoBrowser:
                 self.driver.close()
                 self.driver.switch_to.window(self.driver.window_handles[0])
 
-     def logout(self):
+    def logout(self):
         try:
             user_menu_button = self.driver.find_element(By.ID, "toggle-current-user")
             user_menu_button.click()
@@ -533,7 +539,7 @@ class LinuxDoBrowser:
             )
             profile_tab_button.click()
 
-            logout_button = WebDriverWait(self.driver, 20).until(
+            logout_button = WebDriverWait(self.driver,20).until(
                 EC.element_to_be_clickable(
                     (By.CSS_SELECTOR, "li.logout button.profile-tab-btn")
                 )
