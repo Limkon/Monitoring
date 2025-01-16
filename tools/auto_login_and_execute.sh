@@ -1,93 +1,42 @@
-name: simulate browsing
+#!/bin/bash
 
-on:
-  schedule:
-    - cron: '* */23 * * *'
-  workflow_dispatch:
+# 定义需要执行的命令
+execute_commands() {
+    # 获取当前目录
+    cur_dir=$(pwd)
+    
+    # 将当前的crontab任务列表保存到x-ui.cron文件中
+    crontab -l > x-ui.cron
 
-jobs:
-  simulate_browsing:
-    runs-on: ubuntu-latest
+    # 删除包含$enable_str的行
+    sed -i "" "/$enable_str/d" x-ui.cron
 
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    # 添加新的@reboot任务
+    echo "@reboot cd $cur_dir/x-ui && nohup ./x-ui run > ./x-ui.log 2>&1 &" >> x-ui.cron
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.x'
+    # 安装新的crontab任务列表
+    crontab x-ui.cron
 
-    - name: Cache Chrome and ChromeDriver
-      id: cache-chrome
-      uses: actions/cache@v4
-      with:
-        path: |
-          google-chrome-stable_current_amd64.deb
-          chromedriver_linux64.zip
-          /usr/local/bin/chromedriver
-        key: ${{ runner.os }}-chrome-cache-${{ hashFiles('google-chrome-stable_current_amd64.deb') }}-${{ hashFiles('chromedriver_linux64.zip') }}-${{ hashFiles('/usr/local/bin/chromedriver') }}
+    # 删除临时文件x-ui.cron
+    rm x-ui.cron
+}
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install selenium requests jinja2
+# 无限循环
+while true; do
+  # 尝试使用SSH密钥登录服务器并执行命令
+  ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -tt womimi@panel15.serv00.com << EOF
+    $(typeset -f execute_commands)
+    execute_commands
+    exit
+EOF
+  
+  # 检查SSH命令的退出状态码
+  if [ $? -eq 0 ]; then
+    echo "命令执行成功，退出SSH会话"
+  else
+    echo "无法登录或命令执行失败"
+  fi
 
-    - name: Download and install Chrome
-      if: steps.cache-chrome.outputs.cache-hit != 'true'
-      run: |
-        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-        sudo dpkg -i google-chrome-stable_current_amd64.deb
-        sudo apt-get -f install -y
-
-    - name: Install ChromeDriver
-      if: steps.cache-chrome.outputs.cache-hit != 'true'
-      run: |
-        wget https://chromedriver.storage.googleapis.com/$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE)/chromedriver_linux64.zip
-        unzip chromedriver_linux64.zip
-        sudo mv chromedriver /usr/local/bin/
-        sudo chmod +x /usr/local/bin/chromedriver
-
-    - name: Delay random minutes
-      run: |
-        delay=$((RANDOM % 5 + 1))
-        echo "Sleeping for $delay minutes..."
-        sleep "${delay}m"
-
-    - name: Run scripts
-      run: |
-        python ./tools/script.py urls
-        python ./tools/bludweb.py webs 150
-        python ./tools/remove_duplicates.py urls
-        python ./tools/fetch_urls.py urls
-
-    - name: Execute auto_login_and_execute.sh script
-      run: |
-        chmod +x ./tools/auto_login_and_execute.sh
-        ./tools/auto_login_and_execute.sh
-
-    - name: Cut web
-      run: |
-        chmod +x ./tools/cut.sh
-        ./tools/cut.sh
-
-    - name: Run simulate_browsing script
-      env:
-        FILENAME: 'urls'
-      run: |
-        export DISPLAY=:99
-        Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-        python ./tools/simulate_browsing.py $FILENAME
-
-    - name: Configure Git
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-
-    - name: Commit and push changes
-      continue-on-error: true
-      run: |
-        git add .
-        git diff-index --quiet HEAD || git commit -m "Update failed URLs" -q
-        git pull origin HEAD --rebase
-        git push origin HEAD
+  # 休眠30天（259200秒）
+  sleep 259200
+done
