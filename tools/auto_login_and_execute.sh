@@ -11,8 +11,11 @@ execute_commands() {
     # 删除包含$enable_str的行
     sed -i "/$enable_str/d" x-ui.cron
 
-    # 添加新的@reboot任务
-    echo "@reboot cd $cur_dir/x-ui && nohup ./x-ui run > ./x-ui.log 2>&1 &" >> x-ui.cron
+    # 检查是否已经存在相同的任务
+    if ! grep -q "@reboot cd $cur_dir/x-ui && nohup ./x-ui run > ./x-ui.log 2>&1 &" x-ui.cron; then
+        # 添加新的@reboot任务
+        echo "@reboot cd $cur_dir/x-ui && nohup ./x-ui run > ./x-ui.log 2>&1 &" >> x-ui.cron
+    fi
 
     # 安装新的crontab任务列表
     crontab x-ui.cron
