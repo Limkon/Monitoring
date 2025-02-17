@@ -6,7 +6,7 @@ import re
 import random
 
 # 配置参数
-QUERY = "机场节点"      # 搜索关键词
+QUERY = "免费节点"      # 搜索关键词
 NUM_RESULTS = 50       # 搜索结果数量
 OUTPUT_FILE = "nodes.txt"
 HEADERS = {
