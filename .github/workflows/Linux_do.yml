@@ -24,11 +24,11 @@ jobs:
         pip install selenium
         pip install aiohttp beautifulsoup4
 
-    - name: Delay random minutes
-      run: |
-        delay=$((RANDOM % 1 + 1))
-        echo "Sleeping for $delay minutes..."
-        sleep "${delay}m"
+    #- name: Delay random minutes
+     # run: |
+     #   delay=$((RANDOM % 1 + 1))
+     #   echo "Sleeping for $delay minutes..."
+      #  sleep "${delay}m"
 
     - name: Run Linux_do.py script
       run: python tools/Linux_do.py
