@@ -28,7 +28,7 @@ PATTERNS = {
 async def google_search(session, query, num_results):
     """
     使用 Google 搜索关键词，返回搜索结果中提取的 URL 列表。
-    注意：Google 可能存在反爬虫机制，如有需要可配置代理。
+    在请求后打印返回页面前 500 个字符用于调试。
     """
     search_url = "https://www.google.com/search"
     params = {
@@ -37,33 +37,42 @@ async def google_search(session, query, num_results):
     }
     try:
         async with session.get(search_url, headers=HEADERS, params=params, timeout=10) as response:
-            if response.status != 200:
-                print("Google 搜索请求失败，状态码：", response.status)
-                return []
+            print(f"Google 搜索请求状态码: {response.status}")
             text = await response.text()
+            print("Google 搜索返回页面前 500 个字符:\n", text[:500])
     except Exception as e:
         print("请求 Google 搜索异常：", e)
         return []
     
+    if response.status != 200:
+        print("Google 搜索请求失败，状态码：", response.status)
+        return []
+    
     soup = BeautifulSoup(text, "html.parser")
     links = []
-    # Google 搜索结果中的链接通常包含在 <a> 标签中，并以 /url?q= 开头
+    # 提取 <a> 标签中包含的链接（通常以 /url?q= 开头）
     for a in soup.find_all("a"):
         href = a.get("href")
         if href and "/url?q=" in href:
             url = href.split("/url?q=")[1].split("&")[0]
             links.append(url)
     # 去重后返回
-    return list(dict.fromkeys(links))
+    unique_links = list(dict.fromkeys(links))
+    print(f"从 Google 搜索中提取到 {len(unique_links)} 个链接")
+    return unique_links
 
 async def fetch_page(session, url):
     """
-    异步访问一个 URL 并返回页面内容；异常时返回空字符串
+    异步访问一个 URL 并返回页面内容；异常时返回空字符串。
+    同时打印请求状态码和部分页面内容用于调试。
     """
     try:
         async with session.get(url, headers=HEADERS, timeout=10) as response:
+            print(f"访问 {url} 返回状态码: {response.status}")
             if response.status == 200:
-                return await response.text()
+                text = await response.text()
+                print(f"页面 {url} 前 300 个字符:\n{text[:300]}")
+                return text
             else:
                 print(f"访问 {url} 失败，状态码：{response.status}")
                 return ""
@@ -85,7 +94,7 @@ def extract_nodes(text):
 async def main():
     connector = aiohttp.TCPConnector(limit=10)  # 限制并发连接数
     async with aiohttp.ClientSession(connector=connector) as session:
-        print("正在使用 Google 搜索关键词：", QUERY)
+        print("开始使用 Google 搜索关键词：", QUERY)
         urls = await google_search(session, QUERY, NUM_RESULTS)
         print(f"共获得 {len(urls)} 个链接")
 
@@ -105,6 +114,8 @@ async def main():
                     all_nodes.update(nodes)
                 else:
                     print(f"[{idx}] 没有提取到节点信息")
+            else:
+                print(f"[{idx}] 页面内容为空")
         
         if all_nodes:
             with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
