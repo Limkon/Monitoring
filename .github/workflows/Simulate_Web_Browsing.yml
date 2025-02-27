@@ -2,7 +2,7 @@ name: simulate browsing
 
 on:
   schedule:
-    - cron: '* */23 * * *'
+    - cron: '* */12 * * *'
   workflow_dispatch:
 
 jobs:
@@ -50,7 +50,7 @@ jobs:
 
     - name: Delay random minutes
       run: |
-        delay=$((RANDOM %1 + 1))
+        delay=$((RANDOM % 1 + 1))
         echo "Sleeping for $delay minutes..."
         sleep "${delay}m"
 
@@ -84,10 +84,17 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
 
+    - name: Ensure .gitignore exists and ignores large files
+      run: |
+        echo "google-chrome-stable_current_amd64.deb" >> .gitignore
+        echo "chromedriver_linux64.zip" >> .gitignore
+        echo "*.deb" >> .gitignore
+        echo "*.zip" >> .gitignore
+
     - name: Commit and push changes
       continue-on-error: true
       run: |
-        git add .
+        git add .gitignore tools/ urls webs  # 只添加需要提交的文件和目录
         git diff-index --quiet HEAD || git commit -m "Update failed URLs" -q
         git pull origin HEAD --rebase
         git push origin HEAD
