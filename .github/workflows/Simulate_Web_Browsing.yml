@@ -50,7 +50,7 @@ jobs:
 
     - name: Delay random minutes
       run: |
-        delay=$((RANDOM % 1 + 1))
+        delay=$((RANDOM % 1 + 0))
         echo "Sleeping for $delay minutes..."
         sleep "${delay}m"
 
@@ -98,11 +98,11 @@ jobs:
         BRANCH=$(git rev-parse --abbrev-ref HEAD)
         echo "Current branch is: $BRANCH"
         
-        # 添加需要提交的文件
-        git add .gitignore tools/ urls webs
+        # 添加需要提交的文件，包括 README.md 和 webs 目录
+        git add README.md webs
         
         # 检查并提交已暂存的更改
-        git diff-index --quiet HEAD || git commit -m "Update failed URLs" -q
+        git diff-index --quiet HEAD || git commit -m "Update README.md and webs directory" -q
         
         # 暂存未跟踪或未暂存的更改
         git stash --include-untracked
