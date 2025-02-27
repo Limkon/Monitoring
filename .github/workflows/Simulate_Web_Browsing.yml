@@ -94,6 +94,10 @@ jobs:
     - name: Commit and push changes
       continue-on-error: true
       run: |
+        # 获取当前分支名称
+        BRANCH=$(git rev-parse --abbrev-ref HEAD)
+        echo "Current branch is: $BRANCH"
+        
         # 添加需要提交的文件
         git add .gitignore tools/ urls webs
         
@@ -103,14 +107,14 @@ jobs:
         # 暂存未跟踪或未暂存的更改
         git stash --include-untracked
         
-        # 拉取并应用 rebase
-        git pull origin main --rebase
+        # 拉取并应用 rebase，使用动态分支名称
+        git pull origin "$BRANCH" --rebase
         
         # 恢复暂存的更改（如果需要）
         git stash pop || echo "No stashed changes to apply"
         
         # 推送更改
-        git push origin main
+        git push origin "$BRANCH"
       shell: /usr/bin/bash -e {0}
       env:
         pythonLocation: /opt/hostedtoolcache/Python/3.13.2/x64
