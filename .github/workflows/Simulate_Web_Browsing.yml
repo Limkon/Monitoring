@@ -2,7 +2,7 @@ name: simulate browsing
 
 on:
   schedule:
-    - cron: '* */12 * * *'
+    - cron: '* */23 * * *'
   workflow_dispatch:
 
 jobs:
@@ -94,10 +94,31 @@ jobs:
     - name: Commit and push changes
       continue-on-error: true
       run: |
-        git add .gitignore tools/ urls webs  # 只添加需要提交的文件和目录
+        # 添加需要提交的文件
+        git add .gitignore tools/ urls webs
+        
+        # 检查并提交已暂存的更改
         git diff-index --quiet HEAD || git commit -m "Update failed URLs" -q
-        git pull origin HEAD --rebase
-        git push origin HEAD
+        
+        # 暂存未跟踪或未暂存的更改
+        git stash --include-untracked
+        
+        # 拉取并应用 rebase
+        git pull origin main --rebase
+        
+        # 恢复暂存的更改（如果需要）
+        git stash pop || echo "No stashed changes to apply"
+        
+        # 推送更改
+        git push origin main
+      shell: /usr/bin/bash -e {0}
+      env:
+        pythonLocation: /opt/hostedtoolcache/Python/3.13.2/x64
+        PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.13.2/x64/lib/pkgconfig
+        Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.2/x64
+        Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.2/x64
+        Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.2/x64
+        LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.13.2/x64/lib
 
     - name: Clean up large files
       run: |
