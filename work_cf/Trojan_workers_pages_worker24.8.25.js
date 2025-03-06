@@ -3,7 +3,7 @@ import { connect } from "cloudflare:sockets";
  
 let Pswd = "771571215";
 const proxyIPs = ["proxy.xxxxxxxx.tk"]; //ts.hpc.tw edgetunnel.anycast.eu.org bestproxy.onecf.eu.org cdn-all.xn--b6gac.eu.org cdn.xn--b6gac.eu.org proxy.xxxxxxxx.tk
-let cn_hostnames = [''];
+let cn_hostnames = ['m3u8-player.com'];
 let CDNIP = 'www.visa.com.sg'
 // http_ip
 let IP1 = 'www.visa.com'
