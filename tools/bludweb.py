@@ -2,7 +2,8 @@ import os
 import random
 import string
 import sys
-from jinja2 import Template, TemplateNotFound
+import datetime
+from jinja2 import Template
 
 def count_files_in_directory(directory):
     # 统计目录中的文件数
@@ -11,11 +12,15 @@ def count_files_in_directory(directory):
 
 def generate_random_data():
     # 随机生成一些数据，用于在代码模板中使用
+    now = datetime.datetime.now()
     return {
         'title': ''.join(random.choices(string.ascii_uppercase, k=10)),
         'heading': 'Random Heading',
         'content': 'This is some random content.',
-        'color': f'#{random.randint(0, 255):02X}{random.randint(0, 255):02X}{random.randint(0, 255):02X}'
+        'color': f'#{random.randint(0, 255):02X}{random.randint(0, 255):02X}{random.randint(0, 255):02X}',
+        'created_at': now.isoformat(),
+        'updated_at': now.isoformat(),
+        'generated_on': now.strftime('%Y-%m-%d')
     }
 
 def generate_random_filename():
@@ -42,10 +47,45 @@ def generate_code_file(directory, code_type):
             'js': "console.log('Hello, World!');",
             'html': "<html><head><title>{{ data.title }}</title></head><body><h1>{{ data.heading }}</h1><p>{{ data.content }}</p></body></html>",
             'css': "body { background-color: {{ data.color }}; }",
-            'py': "print('Hello, World!')",
-            'json': '{"title": "{{ data.title }}", "heading": "{{ data.heading }}", "content": "{{ data.content }}"}',
-            'yaml': "title: {{ data.title }}\nheading: {{ data.heading }}\ncontent: {{ data.content }}",
-            'md': "# {{ data.heading }}\n{{ data.content }}"
+            'py': """# {{ data.title }}
+import random
+import datetime
+
+def main():
+    """
+    Main function to print heading and content.
+    """
+    print("{{ data.heading }}")
+    print("{{ data.content }}")
+
+if __name__ == "__main__":
+    main()
+""",
+            'json': """{
+    "title": "{{ data.title }}",
+    "heading": "{{ data.heading }}",
+    "content": "{{ data.content }}",
+    "metadata": {
+        "created_at": "{{ data.created_at }}",
+        "updated_at": "{{ data.updated_at }}"
+    }
+}""",
+            'yaml': """---
+title: {{ data.title }}
+heading: {{ data.heading }}
+content: {{ data.content }}
+metadata:
+  created_at: {{ data.created_at }}
+  updated_at: {{ data.updated_at }}
+""",
+            'md': """# {{ data.heading }}
+
+{{ data.content }}
+
+---
+
+*Generated on {{ data.generated_on }}*
+"""
         }
         template_content = default_templates.get(code_type, '')
 
