@@ -52,9 +52,9 @@ import random
 import datetime
 
 def main():
-    """
+    \"\"\"
     Main function to print heading and content.
-    """
+    \"\"\"
     print("{{ data.heading }}")
     print("{{ data.content }}")
 
