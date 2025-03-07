@@ -2,7 +2,7 @@ import os
 import random
 import string
 import sys
-from jinja2 import Template
+from jinja2 import Template, TemplateNotFound
 
 def count_files_in_directory(directory):
     # 统计目录中的文件数
@@ -32,14 +32,29 @@ def generate_code_file(directory, code_type):
     template_file = f"templates/{code_type}.jinja2"
     output_file = f"{directory}/{generate_random_filename()}.{code_type}"
     os.makedirs(os.path.dirname(output_file), exist_ok=True)  # 创建目录
-    with open(template_file, 'r') as file:
-        template_content = file.read()
-        template = Template(template_content)
-        data = generate_random_data()  # 生成随机数据
-        code = template.render(data=data)  # 使用随机数据渲染模板
-        with open(output_file, 'w') as output:
-            output.write(code)
-            print(f"生成文件：{os.path.basename(output_file)}")  # 添加这行以显示生成的文件名
+
+    try:
+        with open(template_file, 'r') as file:
+            template_content = file.read()
+    except FileNotFoundError:
+        # 如果模板文件不存在，使用默认内容
+        default_templates = {
+            'js': "console.log('Hello, World!');",
+            'html': "<html><head><title>{{ data.title }}</title></head><body><h1>{{ data.heading }}</h1><p>{{ data.content }}</p></body></html>",
+            'css': "body { background-color: {{ data.color }}; }",
+            'py': "print('Hello, World!')",
+            'json': '{"title": "{{ data.title }}", "heading": "{{ data.heading }}", "content": "{{ data.content }}"}',
+            'yaml': "title: {{ data.title }}\nheading: {{ data.heading }}\ncontent: {{ data.content }}",
+            'md': "# {{ data.heading }}\n{{ data.content }}"
+        }
+        template_content = default_templates.get(code_type, '')
+
+    template = Template(template_content)
+    data = generate_random_data()  # 生成随机数据
+    code = template.render(data=data)  # 使用随机数据渲染模板
+    with open(output_file, 'w') as output:
+        output.write(code)
+        print(f"生成文件：{os.path.basename(output_file)}")  # 添加这行以显示生成的文件名
 
 def remove_directory_contents(directory):
     # 递归删除目录及其内容
@@ -64,8 +79,8 @@ if not os.path.exists(target_directory):
     os.makedirs(target_directory)
     print(f"目录 {target_directory} 创建成功")
 
-# 随机选择一个类型（js、html 或 css）来生成代码文件
-code_type = random.choice(["js", "html", "css"])
+# 随机选择一个类型（js、html、css、py、json、yaml、md）来生成代码文件
+code_type = random.choice(["js", "html", "css", "py", "json", "yaml", "md"])
 generate_code_file(target_directory, code_type)
 
 # 统计文件数并清空目录及其内容
