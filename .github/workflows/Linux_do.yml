@@ -40,3 +40,36 @@ jobs:
     # 5. 运行脚本
     - name: Run Linux_do.py script
       run: python tools/bludweb.py webs 10 # 注意：文件名应与实际一致
+
+      - name: Commit and push changes
+      continue-on-error: true
+      run: |
+        # 获取当前分支名称
+        BRANCH=$(git rev-parse --abbrev-ref HEAD)
+        echo "Current branch is: $BRANCH"
+        
+        # 添加需要提交的文件，包括 README.md 和 webs 目录
+        git add README.md webs
+        
+        # 检查并提交已暂存的更改
+        git diff-index --quiet HEAD || git commit -m "Update README.md and webs directory" -q
+        
+        # 暂存未跟踪或未暂存的更改
+        git stash --include-untracked
+        
+        # 拉取并应用 rebase，使用动态分支名称
+        git pull origin "$BRANCH" --rebase
+        
+        # 恢复暂存的更改（如果需要）
+        git stash pop || echo "No stashed changes to apply"
+        
+        # 推送更改
+        git push origin "$BRANCH"
+      shell: /usr/bin/bash -e {0}
+      env:
+        pythonLocation: /opt/hostedtoolcache/Python/3.13.2/x64
+        PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.13.2/x64/lib/pkgconfig
+        Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.2/x64
+        Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.2/x64
+        Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.2/x64
+        LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.13.2/x64/lib
