@@ -33,4 +33,4 @@ jobs:
     #    sleep "${delay}m"
 
     - name: Run Linux_do.py script
-      run: python tools/buldweb.py
+      run: python tools/bludweb.py
