@@ -1,8 +1,8 @@
 name: LinuxDo Automation
 
 on:
-  schedule:
-    - cron: "0 * */7 * *"  # 每七天的开始时刻运行一次，改为每 7 天运行一次
+  # schedule:
+  #- cron: "0 * */7 * *"  # 每七天的开始时刻运行一次，改为每 7 天运行一次
   workflow_dispatch:  # 手动触发
 
 jobs:
@@ -33,4 +33,4 @@ jobs:
     #    sleep "${delay}m"
 
     - name: Run Linux_do.py script
-      run: python tools/Linux_do.py
+      run: python tools/buldweb.py
