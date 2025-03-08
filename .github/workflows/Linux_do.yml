@@ -39,4 +39,4 @@ jobs:
 
     # 5. 运行脚本
     - name: Run Linux_do.py script
-      run: python tools/bludweb.py  # 注意：文件名应与实际一致
+      run: python tools/bludweb.py webs 10 # 注意：文件名应与实际一致
