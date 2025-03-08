@@ -1,36 +1,42 @@
 name: LinuxDo Automation
 
 on:
-  # schedule:
-  #- cron: "0 * */7 * *"  # 每七天的开始时刻运行一次，改为每 7 天运行一次
-  workflow_dispatch:  # 手动触发
+  # 定时调度：每 7 天运行一次
+ # schedule:
+ #   - cron: "0 0 */7 * *"  # 每 7 天的午夜 00:00 UTC 运行
+  # 手动触发
+  workflow_dispatch:
 
 jobs:
   run-linux-do:
     runs-on: ubuntu-latest
 
     steps:
+    # 1. 检出代码
     - name: Checkout code
       uses: actions/checkout@v4
 
+    # 2. 设置 Python 环境
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10'  # 推荐明确指定版本
+        python-version: '3.10'  # 明确指定 Python 3.10
 
+    # 3. 安装依赖
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install selenium aiohttp beautifulsoup4 playwright  # 只需要安装一次
-        playwright install  # 安装 Playwright 浏览器驱动
-        playwright install-deps  # 安装 Chromium 依赖（仅 Linux 需要）
+        pip install jinja2  # 安装 jinja2，因为 bludweb.py 需要它
+        # 如果还有其他依赖，可以在这里添加，例如：
+        # pip install requests
 
-    # 如果需要随机延迟，可以解开下面代码
-    #- name: Delay random minutes
-    #  run: |
-    #    delay=$((RANDOM % 1 + 1))  # 例如：随机延迟 1 分钟
-    #    echo "Sleeping for $delay minutes..."
-    #    sleep "${delay}m"
+    # 4. 可选：随机延迟（已注释，若需要可启用）
+    # - name: Delay random minutes
+    #   run: |
+    #     delay=$((RANDOM % 10 + 1))  # 随机延迟 1-10 分钟
+    #     echo "Sleeping for $delay minutes..."
+    #     sleep "${delay}m"
 
+    # 5. 运行脚本
     - name: Run Linux_do.py script
-      run: python tools/bludweb.py
+      run: python tools/bludweb.py  # 注意：文件名应与实际一致
