@@ -2,7 +2,7 @@ name: simulate browsing
 
 on:
   schedule:
-    - cron: '* */23 * * *'
+    - cron: '* */7 * * *'
   workflow_dispatch:
 
 jobs:
@@ -50,7 +50,7 @@ jobs:
 
     - name: Delay random minutes
       run: |
-        delay=$((RANDOM % 1 + 0))
+        delay=$((RANDOM % 1 + 2))
         echo "Sleeping for $delay minutes..."
         sleep "${delay}m"
 
