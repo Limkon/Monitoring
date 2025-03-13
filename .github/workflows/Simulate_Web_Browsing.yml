@@ -84,8 +84,8 @@ jobs:
       run: |
         BRANCH=$(git rev-parse --abbrev-ref HEAD)
         echo "Current branch is: $BRANCH"
-        git add README.md webs
-        git diff-index --quiet HEAD || git commit -m "Update README.md and webs directory" -q
+        git add README.md
+        git diff-index --quiet HEAD || git commit -m "Update README.md" -q
         git stash --include-untracked
         git pull origin "$BRANCH" --rebase
         git stash pop || echo "No stashed changes to apply"
