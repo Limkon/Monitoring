@@ -2,10 +2,10 @@ name: LinuxDo Automation
 
 on:
   # 定时调度：每 7 天运行一次（已注释）
-  # schedule:
-  #   - cron: "0 0 */7 * *"  # 每 7 天的午夜 00:00 UTC 运行
+    schedule:
+      - cron: "0 0 */7 * *"  # 每 7 天的午夜 00:00 UTC 运行
   # 手动触发
-  workflow_dispatch:
+    workflow_dispatch:
 
 jobs:
   run-linux-do:
