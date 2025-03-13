@@ -48,12 +48,6 @@ jobs:
         sudo mv chromedriver /usr/local/bin/
         sudo chmod +x /usr/local/bin/chromedriver
 
-    - name: Delay random minutes
-      run: |
-        delay=$((RANDOM % 1 + 2))
-        echo "Sleeping for $delay minutes..."
-        sleep "${delay}m"
-
     - name: Run scripts
       run: |
         python ./tools/script.py urls
@@ -88,26 +82,13 @@ jobs:
     - name: Commit and push changes
       continue-on-error: true
       run: |
-        # 获取当前分支名称
         BRANCH=$(git rev-parse --abbrev-ref HEAD)
         echo "Current branch is: $BRANCH"
-        
-        # 添加需要提交的文件，包括 README.md 和 webs 目录
         git add README.md webs
-        
-        # 检查并提交已暂存的更改
         git diff-index --quiet HEAD || git commit -m "Update README.md and webs directory" -q
-        
-        # 暂存未跟踪或未暂存的更改
         git stash --include-untracked
-        
-        # 拉取并应用 rebase，使用动态分支名称
         git pull origin "$BRANCH" --rebase
-        
-        # 恢复暂存的更改（如果需要）
         git stash pop || echo "No stashed changes to apply"
-        
-        # 推送更改
         git push origin "$BRANCH"
       shell: /usr/bin/bash -e {0}
       env:
