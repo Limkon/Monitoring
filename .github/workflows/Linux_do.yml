@@ -1,4 +1,4 @@
-name: LinuxDo Automation
+name: Keep Active
 
 on:
   # 定时调度：每 7 天运行一次（已注释）
@@ -50,7 +50,7 @@ jobs:
         echo "Current branch is: $BRANCH"
 
         # 添加所有更改（包括 webs 目录）
-        git add webs README.md || echo "Nothing to add"
+        git add webs || echo "Nothing to add"
 
         # 检查是否有更改需要提交
         if git diff-index --quiet HEAD; then
