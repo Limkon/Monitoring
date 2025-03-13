@@ -57,7 +57,6 @@ jobs:
     - name: Run scripts
       run: |
         python ./tools/script.py urls
-        python ./tools/bludweb.py webs 150
         python ./tools/remove_duplicates.py urls
         python ./tools/fetch_urls.py urls
     
