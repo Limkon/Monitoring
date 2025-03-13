@@ -60,12 +60,7 @@ jobs:
         python ./tools/bludweb.py webs 150
         python ./tools/remove_duplicates.py urls
         python ./tools/fetch_urls.py urls
-
-    - name: Execute auto_login_and_execute.sh script
-      run: |
-        chmod +x ./tools/auto_login_and_execute.sh
-        ./tools/auto_login_and_execute.sh
-
+    
     - name: Cut web
       run: |
         chmod +x ./tools/cut.sh
