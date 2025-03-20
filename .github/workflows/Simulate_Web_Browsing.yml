@@ -20,40 +20,30 @@ jobs:
 
       - name: Install Chrome and ChromeDriver
         run: |
-          # 更新包列表
           sudo apt-get update
-
-          # 安装 Chrome
           sudo apt-get install -y google-chrome-stable
-
-          # 获取 Chrome 版本
           CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+\.\d+' || echo "latest")
           echo "Chrome version: $CHROME_VERSION"
-
-          # 清理旧的 ChromeDriver
+          CHROME_MAJOR_VERSION=$(echo "$CHROME_VERSION" | cut -d'.' -f1)
           sudo rm -f /usr/local/bin/chromedriver
-
-          # 获取匹配的 ChromeDriver 版本
           if [ "$CHROME_VERSION" = "latest" ]; then
             echo "无法获取 Chrome 版本，使用最新 ChromeDriver"
             CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
           else
-            CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION%.*}" || echo "latest")
+            CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_MAJOR_VERSION" || echo "latest")
             if [ "$CHROMEDRIVER_VERSION" = "latest" ]; then
+              echo "未找到匹配的 ChromeDriver 版本，回退到最新版本"
               CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
             fi
           fi
           echo "ChromeDriver version: $CHROMEDRIVER_VERSION"
-
-          # 下载并安装 ChromeDriver
           wget -q -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip"
           sudo unzip /tmp/chromedriver.zip -d /usr/local/bin/
           sudo chmod +x /usr/local/bin/chromedriver
           rm /tmp/chromedriver.zip
-
-          # 验证版本
           google-chrome --version
           chromedriver --version
+        shell: bash
 
       - name: Install Python dependencies
         run: |
