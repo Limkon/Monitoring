@@ -2,7 +2,7 @@ name: simulate browsing
 
 on:
   schedule:
-    - cron: '* */22 * * *'
+    - cron: '0 */22 * * *'  # 每22小时运行一次
   workflow_dispatch:
 
 jobs:
@@ -43,11 +43,12 @@ jobs:
     - name: Install ChromeDriver
       if: steps.cache-chrome.outputs.cache-hit != 'true'
       run: |
-        wget https://chromedriver.storage.googleapis.com/$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE)/chromedriver_linux64.zip
+        LATEST_RELEASE=$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE)
+        wget https://chromedriver.storage.googleapis.com/${LATEST_RELEASE}/chromedriver_linux64.zip
         unzip chromedriver_linux64.zip
         sudo mv chromedriver /usr/local/bin/
         sudo chmod +x /usr/local/bin/chromedriver
- 
+
     - name: Run simulate_browsing script
       run: |
         python ./tools/simulate_browsing.py urls
