@@ -47,7 +47,7 @@ jobs:
           pip install selenium
 
       - name: Run URL processing script
-        run: python script.py urls.txt
+        run: python script.py urls
 
       - name: Print environment variables
         run: env | grep URL_
