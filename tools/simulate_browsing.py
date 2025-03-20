@@ -89,10 +89,16 @@ def process_url(url):
         os.environ[output_name] = url
 
 # 获取命令行参数
-if len(sys.argv) != 3:
-    print("Usage: python script.py <filename> <url>")
+if len(sys.argv) != 2:
+    print("Usage: python script.py <filename>")
 else:
     filename = sys.argv[1]  # 获取文件名参数
-    url = sys.argv[2]  # 获取URL参数
     remove_duplicates_and_empty_lines_from_file(filename)  # 调用去重函数，传入文件名参数
-    process_url(url)  # 调用模拟浏览函数，传入URL参数
+
+    with open(filename, 'r') as file:
+        urls = file.readlines()
+
+    for url in urls:
+        url = url.strip()
+        if url:
+            process_url(url)  # 调用模拟浏览函数，传入URL参数
