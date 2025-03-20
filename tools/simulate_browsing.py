@@ -1,9 +1,35 @@
+import os
+import sys
+import tempfile
+import shutil
+import re
 import time
 import random
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException
-import os
+
+def remove_duplicates_and_empty_lines_from_file(filename):
+    lines_seen = set()  # 用于跟踪已经出现过的行
+    output_lines = []  # 用于存储去重后的行
+
+    with open(filename, 'r') as file:
+        for line in file:
+            line = line.strip()  # 去除行首尾的空白字符
+            line = re.sub(r'^[^a-zA-Z0-9]+|[^a-zA-Z0-9]+$', '', line)  # 去除行首尾的非字母数字字符
+
+            if line:  # 检查是否是空行，如果不是空行才进行去重操作
+                if line not in lines_seen:  # 如果行不在已出现的行集合中
+                    lines_seen.add(line)  # 将行添加到已出现的行集合中
+                    output_lines.append(line)  # 将行添加到输出列表中
+
+    temp_filename = tempfile.mktemp()  # 创建一个临时文件
+    with open(temp_filename, 'w') as file:
+        file.write('\n'.join(output_lines))  # 将去重后的结果写入临时文件中
+
+    shutil.move(temp_filename, filename)  # 将临时文件移动到原始文件的位置，覆盖原始文件
+
+    print("去重、去空行和去除非字母数字字符操作完成并已将结果保存到原始文件中。")
 
 def process_url(url):
     driver = webdriver.Chrome()
@@ -61,3 +87,12 @@ def process_url(url):
 
         output_name = f"URL_{url}"
         os.environ[output_name] = url
+
+# 获取命令行参数
+if len(sys.argv) != 3:
+    print("Usage: python script.py <filename> <url>")
+else:
+    filename = sys.argv[1]  # 获取文件名参数
+    url = sys.argv[2]  # 获取URL参数
+    remove_duplicates_and_empty_lines_from_file(filename)  # 调用去重函数，传入文件名参数
+    process_url(url)  # 调用模拟浏览函数，传入URL参数
