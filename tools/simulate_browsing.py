@@ -6,33 +6,40 @@ import re
 import time
 import random
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException
+import traceback
 
 def remove_duplicates_and_empty_lines_from_file(filename):
-    lines_seen = set()  # 用于跟踪已经出现过的行
-    output_lines = []  # 用于存储去重后的行
+    lines_seen = set()
+    output_lines = []
 
     with open(filename, 'r') as file:
         for line in file:
-            line = line.strip()  # 去除行首尾的空白字符
-            line = re.sub(r'^[^a-zA-Z0-9]+|[^a-zA-Z0-9]+$', '', line)  # 去除行首尾的非字母数字字符
+            line = line.strip()
+            line = re.sub(r'^[^a-zA-Z0-9]+|[^a-zA-Z0-9]+$', '', line)
+            if line and line not in lines_seen:
+                lines_seen.add(line)
+                output_lines.append(line)
 
-            if line:  # 检查是否是空行，如果不是空行才进行去重操作
-                if line not in lines_seen:  # 如果行不在已出现的行集合中
-                    lines_seen.add(line)  # 将行添加到已出现的行集合中
-                    output_lines.append(line)  # 将行添加到输出列表中
-
-    temp_filename = tempfile.mktemp()  # 创建一个临时文件
+    temp_filename = tempfile.mktemp()
     with open(temp_filename, 'w') as file:
-        file.write('\n'.join(output_lines))  # 将去重后的结果写入临时文件中
+        file.write('\n'.join(output_lines))
 
-    shutil.move(temp_filename, filename)  # 将临时文件移动到原始文件的位置，覆盖原始文件
-
+    shutil.move(temp_filename, filename)
     print("去重、去空行和去除非字母数字字符操作完成并已将结果保存到原始文件中。")
 
 def process_url(url):
-    driver = webdriver.Chrome()  # 如果需要指定ChromeDriver路径，请使用参数executable_path
+    # 配置 Chrome 选项
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")  # 无头模式，适合 CI 环境
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+
+    # 使用 ChromeDriver（需在 GitHub Actions 中安装）
+    driver = webdriver.Chrome(options=chrome_options)
 
     try:
         driver.get(url)
@@ -80,22 +87,24 @@ def process_url(url):
 
     except Exception as e:
         print(f"执行操作时出现异常: {str(e)}")
-        import traceback
         traceback.print_exc()
 
     finally:
         driver.quit()
         print("浏览器已关闭")
 
-        output_name = f"URL_{url}"
-        os.environ[output_name] = url
+        # 在 GitHub Actions 中设置环境变量
+        output_name = f"URL_{url.replace('https://', '').replace('/', '_')}"
+        with open(os.environ["GITHUB_ENV"], "a") as env_file:
+            env_file.write(f"{output_name}={url}\n")
 
-# 获取命令行参数
-if len(sys.argv) != 2:
-    print("Usage: python script.py <filename>")
-else:
-    filename = sys.argv[1]  # 获取文件名参数
-    remove_duplicates_and_empty_lines_from_file(filename)  # 调用去重函数，传入文件名参数
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python script.py <filename>")
+        sys.exit(1)
+
+    filename = sys.argv[1]
+    remove_duplicates_and_empty_lines_from_file(filename)
 
     with open(filename, 'r') as file:
         urls = file.readlines()
@@ -103,4 +112,4 @@ else:
     for url in urls:
         url = url.strip()
         if url:
-            process_url(url)  # 调用模拟浏览函数，传入URL参数
+            process_url(url)
