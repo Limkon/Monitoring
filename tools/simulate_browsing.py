@@ -32,7 +32,7 @@ def remove_duplicates_and_empty_lines_from_file(filename):
     print("去重、去空行和去除非字母数字字符操作完成并已将结果保存到原始文件中。")
 
 def process_url(url):
-    driver = webdriver.Chrome()
+    driver = webdriver.Chrome()  # 如果需要指定ChromeDriver路径，请使用参数executable_path
 
     try:
         driver.get(url)
@@ -80,6 +80,8 @@ def process_url(url):
 
     except Exception as e:
         print(f"执行操作时出现异常: {str(e)}")
+        import traceback
+        traceback.print_exc()
 
     finally:
         driver.quit()
