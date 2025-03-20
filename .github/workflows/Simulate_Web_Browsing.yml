@@ -49,12 +49,8 @@ jobs:
         sudo chmod +x /usr/local/bin/chromedriver
  
     - name: Run simulate_browsing script
-      env:
-        FILENAME: 'urls'
       run: |
-        export DISPLAY=:99
-        Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-        python ./tools/simulate_browsing.py $FILENAME
+        python ./tools/simulate_browsing.py urls
 
     - name: Configure Git
       run: |
