@@ -18,35 +18,24 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: Cache Chrome and ChromeDriver
-      id: cache-chrome
-      uses: actions/cache@v4
-      with:
-        path: |
-          google-chrome-stable_current_amd64.deb
-          chromedriver_linux64.zip
-          /usr/local/bin/chromedriver
-        key: ${{ runner.os }}-chrome-cache-${{ hashFiles('google-chrome-stable_current_amd64.deb') }}-${{ hashFiles('chromedriver_linux64.zip') }}-${{ hashFiles('/usr/local/bin/chromedriver') }}
-
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         python -m pip install selenium requests jinja2
 
     - name: Download and install Chrome
-      if: steps.cache-chrome.outputs.cache-hit != 'true'
       run: |
         wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
         sudo dpkg -i google-chrome-stable_current_amd64.deb
         sudo apt-get -f install -y
 
     - name: Install ChromeDriver
-      if: steps.cache-chrome.outputs.cache-hit != 'true'
       run: |
-        LATEST_RELEASE=$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE)
-        wget https://chromedriver.storage.googleapis.com/${LATEST_RELEASE}/chromedriver_linux64.zip
+        CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+\.\d+')
+        CHROMEDRIVER_VERSION=$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION)
+        wget https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip
         unzip chromedriver_linux64.zip
-        sudo mv chromedriver /usr/local/bin/
+        sudo mv chromedriver /usr/local/bin/chromedriver
         sudo chmod +x /usr/local/bin/chromedriver
 
     - name: Run simulate_browsing script
