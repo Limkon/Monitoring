@@ -47,18 +47,7 @@ jobs:
         unzip chromedriver_linux64.zip
         sudo mv chromedriver /usr/local/bin/
         sudo chmod +x /usr/local/bin/chromedriver
-
-    - name: Run scripts
-      run: |
-        python ./tools/script.py urls
-        python ./tools/remove_duplicates.py urls
-        python ./tools/fetch_urls.py urls
-    
-    - name: Cut web
-      run: |
-        chmod +x ./tools/cut.sh
-        ./tools/cut.sh
-
+ 
     - name: Run simulate_browsing script
       env:
         FILENAME: 'urls'
