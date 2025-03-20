@@ -54,6 +54,27 @@ def update_readme(results, readme_file="README.md"):
         f.write(content)
     print(f"Updated {readme_file} with latest website status.")
 
+def remove_duplicates_and_update_file(filename):
+    """从文件中读取 URL，去重后更新回原始文件"""
+    with open(filename, 'r') as file:
+        urls = [url.strip() for url in file.readlines() if url.strip()]
+
+    if not urls:
+        print("No valid URLs found in the file.")
+        return []
+
+    # 去重
+    unique_urls = list(dict.fromkeys(urls))
+    if len(unique_urls) < len(urls):
+        print(f"Removed {len(urls) - len(unique_urls)} duplicate URLs.")
+
+    # 更新原始文件
+    with open(filename, 'w') as file:
+        file.write('\n'.join(unique_urls) + '\n')
+    print(f"Updated {filename} with deduplicated URLs.")
+
+    return unique_urls
+
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: python monitor_websites.py <filename>")
@@ -61,17 +82,15 @@ if __name__ == "__main__":
 
     filename = sys.argv[1]
 
-    # 读取 URL 文件
-    with open(filename, 'r') as file:
-        urls = [url.strip() for url in file.readlines() if url.strip()]
+    # 去重并更新原始文件
+    unique_urls = remove_duplicates_and_update_file(filename)
 
-    if not urls:
-        print("No valid URLs found in the file.")
+    if not unique_urls:
         sys.exit(1)
 
     # 检查每个网站的状态
     results = []
-    for url in urls:
+    for url in unique_urls:
         result = check_website_status(url)
         results.append(result)
 
