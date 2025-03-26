@@ -1,0 +1,55 @@
+name: Monitor and Obfuscate JS
+
+on:
+  push:
+    branches:
+      - main
+ #schedule:
+ #  - cron: "0 * * * *"  # 每小时运行一次
+
+jobs:
+  obfuscate-js:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "latest"
+
+      - name: Install JavaScript Obfuscator
+        run: npm install -g javascript-obfuscator
+
+      - name: Create output directory
+        run: mkdir -p output
+
+      - name: Obfuscate JavaScript files
+        run: |
+          mkdir -p output
+          for file in input/*.js; do
+            if [ -f "$file" ]; then
+              filename=$(basename "$file")
+              javascript-obfuscator "$file" --output "output/$filename" \
+                --compact true \
+                --control-flow-flattening true \
+                --dead-code-injection true \
+                --identifier-names-generator hexadecimal \
+                --rename-globals true \
+                --string-array true \
+                --string-array-encoding 'rc4' \
+                --string-array-threshold 1 \
+                --transform-object-keys true \
+                --unicode-escape-sequence true
+              echo "✅ Obfuscated: $filename"
+            fi
+          done
+
+      - name: Commit and Push Changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "🔒 Obfuscated new JavaScript files"
+          branch: main
+          commit_author: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
