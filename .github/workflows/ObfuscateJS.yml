@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 获取完整 Git 历史，避免分支识别错误
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -45,13 +47,13 @@ jobs:
                 --string-array-threshold 1 \
                 --transform-object-keys true \
                 --unicode-escape-sequence true
-              echo "✅ Obfuscated: $filename"
+              echo "✅ Obfuscated $file -> output/$filename"
             fi
           done
 
-      - name: Commit and Push Changes
+      - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "🔒 Obfuscated new JavaScript files"
-          branch: main
-          commit_author: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
+          branch: ${{ github.ref_name }}  # 自动检测当前分支
+          commit_message: "Auto-obfuscated JavaScript files"
+          push_options: --set-upstream origin ${{ github.ref_name }}
