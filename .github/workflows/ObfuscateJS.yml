@@ -4,8 +4,9 @@ on:
   push:
     branches:
       - main
-  # 允许手动触发
-  workflow_dispatch:
+    paths:
+      - "input/**/*.js"  # 仅监控 input 文件夹内的 JS 文件变动
+  workflow_dispatch:  # 允许手动运行
 
 jobs:
   obfuscate-js:
@@ -15,7 +16,7 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # 获取完整 Git 历史，避免分支识别错误
+          fetch-depth: 0  # 获取完整 Git 历史，确保 Git 操作稳定
 
       - name: Get current branch
         run: echo "CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_ENV
@@ -54,9 +55,20 @@ jobs:
             echo "⚠️ No JavaScript files found in input/ directory. Skipping obfuscation."
           fi
 
+      - name: Check if there are changes
+        run: |
+          git add output/
+          if git diff --staged --quiet; then
+            echo "⚠️ No changes detected in output directory. Skipping commit."
+            echo "SKIP_COMMIT=true" >> $GITHUB_ENV
+          else
+            echo "✅ Changes detected, proceeding with commit."
+            echo "SKIP_COMMIT=false" >> $GITHUB_ENV
+
       - name: Commit and push changes
+        if: env.SKIP_COMMIT == 'false'
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          branch: ${{ env.CURRENT_BRANCH }}  # 直接获取当前分支名
+          branch: ${{ env.CURRENT_BRANCH }}
           commit_message: "Auto-obfuscated JavaScript files"
           push_options: --force
