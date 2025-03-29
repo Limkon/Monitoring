@@ -50,32 +50,40 @@ def update_readme(results, readme_file="README.md"):
 
     content = header + table_header + "\n".join(rows) + "\n"
     
-    with open(readme_file, "w") as f:
+    with open(readme_file, "w", encoding="utf-8") as f:
         f.write(content)
-    print(f"Updated {readme_file} with latest website status.")
+    print(f"✅ Updated {readme_file} with latest website status.")
 
 def remove_duplicates_and_update_file(filename):
-    """从文件中读取 URL，去重、去除空白行，并重新保存"""
-    with open(filename, 'r') as file:
-        urls = [url.strip() for url in file.readlines()]  # 先去掉两侧空格
-    
-    # 过滤掉空行
-    urls = [url for url in urls if url]
+    """去除 URL 里的重复项和空行，并更新文件"""
+    try:
+        with open(filename, 'r', encoding='utf-8') as file:
+            urls = [line.strip() for line in file.readlines()]
 
-    if not urls:
-        print(f"⚠️ No valid URLs found in {filename}. Exiting.")
+        # 去除空行
+        urls = [url for url in urls if url]
+
+        if not urls:
+            print(f"⚠️ No valid URLs found in {filename}. Exiting.")
+            return []
+
+        # 去重（保持原始顺序）
+        unique_urls = list(dict.fromkeys(urls))
+
+        # 检查是否有修改
+        if unique_urls != urls:
+            print(f"🔄 Updating {filename}: Removing {len(urls) - len(unique_urls)} duplicates and blank lines...")
+            with open(filename, 'w', encoding='utf-8') as file:
+                file.write('\n'.join(unique_urls) + '\n')
+            print(f"✅ {filename} has been updated successfully.")
+        else:
+            print(f"✅ No changes needed for {filename}. Already clean.")
+
+        return unique_urls
+
+    except Exception as e:
+        print(f"❌ Error processing {filename}: {e}")
         return []
-
-    # 去重（保持原始顺序）
-    unique_urls = list(dict.fromkeys(urls))
-
-    # 重新保存文件（确保去重和无空行）
-    with open(filename, 'w') as file:
-        file.write('\n'.join(unique_urls) + '\n')
-
-    print(f"✅ Updated {filename}: Removed {len(urls) - len(unique_urls)} duplicate URLs and saved without blank lines.")
-
-    return unique_urls
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
@@ -84,17 +92,17 @@ if __name__ == "__main__":
 
     filename = sys.argv[1]
 
-    # 去重+去空行+更新文件
+    # 1️⃣ 去重并去空行，更新 URL 文件
     unique_urls = remove_duplicates_and_update_file(filename)
 
     if not unique_urls:
         sys.exit(1)
 
-    # 检查每个网站的状态
+    # 2️⃣ 检查每个网站的状态
     results = []
     for url in unique_urls:
         result = check_website_status(url)
         results.append(result)
 
-    # 更新 README.md
+    # 3️⃣ 更新 README.md
     update_readme(results)
