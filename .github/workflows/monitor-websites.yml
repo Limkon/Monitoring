@@ -26,10 +26,10 @@ jobs:
       - name: Run website monitoring script
         run: python tools/monitor_websites.py urls
 
-      - name: Commit and push README.md
+      - name: Commit and push updates
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add README.md
-          git commit -m "Update README.md with latest website status" || echo "No changes to commit"
-          git push
+          
+          git add README.md urls  # 确保同时提交 README.md 和 urls 文件
+          git diff --cached --quiet || (git commit -m "Update website status and URLs" && git push)
