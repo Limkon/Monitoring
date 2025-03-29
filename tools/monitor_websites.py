@@ -55,23 +55,23 @@ def update_readme(results, readme_file="README.md"):
     print(f"Updated {readme_file} with latest website status.")
 
 def remove_duplicates_and_update_file(filename):
-    """从文件中读取 URL，去重后更新回原始文件"""
+    """从文件中读取 URL，去重、去除空白行后更新回原始文件"""
     with open(filename, 'r') as file:
-        urls = [url.strip() for url in file.readlines() if url.strip()]
+        urls = [url.strip() for url in file.readlines() if url.strip()]  # 去除空白行和前后空格
 
     if not urls:
         print("No valid URLs found in the file.")
         return []
 
     # 去重
-    unique_urls = list(dict.fromkeys(urls))
+    unique_urls = list(dict.fromkeys(urls))  # dict.fromkeys() 保持顺序去重
     if len(unique_urls) < len(urls):
         print(f"Removed {len(urls) - len(unique_urls)} duplicate URLs.")
 
     # 更新原始文件
     with open(filename, 'w') as file:
         file.write('\n'.join(unique_urls) + '\n')
-    print(f"Updated {filename} with deduplicated URLs.")
+    print(f"Updated {filename} with deduplicated URLs and removed blank lines.")
 
     return unique_urls
 
