@@ -36,10 +36,10 @@ def process_url(url):
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--window-size=1920,1200")
-    chrome_options.add_argument("--ignore-certificate-errors")  # 忽略证书错误
+    chrome_options.add_argument("--ignore-certificate-errors")
     chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--allow-insecure-localhost")  # 允许不安全的本地连接
-    chrome_options.add_argument("--ignore-ssl-errors")  # 额外忽略 SSL 错误
+    chrome_options.add_argument("--allow-insecure-localhost")
+    chrome_options.add_argument("--ignore-ssl-errors")
 
     driver = webdriver.Chrome(options=chrome_options)
     driver.implicitly_wait(5)
@@ -51,22 +51,37 @@ def process_url(url):
             url = 'https://' + url
         print(f"尝试加载 URL: {url}")
 
-        # 加载 URL 并处理 SSL 错误
+        # 加载 URL 并忽略 SSL 错误
+        ssl_error = False
         try:
             driver.get(url)
             print(f"成功打开网页: {url}")
         except WebDriverException as e:
             if "net::ERR_SSL_PROTOCOL_ERROR" in str(e):
-                print(f"SSL 协议错误，无法加载 {url}: {e}")
-                return  # 跳过此 URL
+                print(f"SSL 协议错误，但尝试继续操作 {url}: {e}")
+                ssl_error = True
             else:
-                print(f"其他 WebDriver 错误: {e}")
-                raise
+                print(f"其他 WebDriver 错误，无法加载 {url}: {e}")
+                return  # 其他错误直接跳过
+
+        # 检查页面是否可用
+        try:
+            ready_state = driver.execute_script("return document.readyState;")
+            if ready_state == "complete" or not ssl_error:
+                print(f"页面状态: {ready_state}, 继续操作")
+            else:
+                print(f"页面状态: {ready_state}, 可能无法操作，但尝试继续")
+        except Exception:
+            print("无法检查页面状态，尝试继续操作")
 
         # 获取实际窗口尺寸
-        window_width = driver.execute_script("return window.innerWidth;")
-        window_height = driver.execute_script("return window.innerHeight;")
-        print(f"窗口尺寸: {window_width}x{window_height}")
+        try:
+            window_width = driver.execute_script("return window.innerWidth;")
+            window_height = driver.execute_script("return window.innerHeight;")
+            print(f"窗口尺寸: {window_width}x{window_height}")
+        except Exception:
+            window_width, window_height = 1920, 1200  # 默认值
+            print("无法获取窗口尺寸，使用默认值 1920x1200")
 
         for _ in range(3):
             operation = random.randint(1, 3)
@@ -121,14 +136,20 @@ def process_url(url):
                     continue
 
             else:  # 模拟滚动网页
-                driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                driver.execute_script("window.scrollTo(0, 0);")
-                print("模拟滚动到页面底部和顶部")
-                time.sleep(1)
+                try:
+                    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                    driver.execute_script("window.scrollTo(0, 0);")
+                    print("模拟滚动到页面底部和顶部")
+                    time.sleep(1)
+                except Exception as e:
+                    print(f"滚动失败: {e}")
 
-        driver.refresh()
-        print("刷新网页")
-        time.sleep(1)
+        try:
+            driver.refresh()
+            print("刷新网页")
+            time.sleep(1)
+        except Exception as e:
+            print(f"刷新失败: {e}")
 
     except InvalidArgumentException as e:
         print(f"无效的 URL 参数: {url}, 错误: {e}")
