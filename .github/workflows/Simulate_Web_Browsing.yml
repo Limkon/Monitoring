@@ -38,13 +38,21 @@ jobs:
           CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+\.\d+')
           CHROME_MAJOR_VERSION=$(echo "$CHROME_VERSION" | cut -d'.' -f1)
           echo "Chrome Version: $CHROME_VERSION"
-          DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_MAJOR_VERSION" || echo "latest")
-          if [ "$DRIVER_VERSION" = "latest" ]; then
-            echo "No specific ChromeDriver version found for Chrome $CHROME_MAJOR_VERSION, falling back to latest."
+          DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_MAJOR_VERSION")
+          if echo "$DRIVER_VERSION" | grep -q "NoSuchKey"; then
+            echo "No ChromeDriver found for Chrome $CHROME_MAJOR_VERSION, falling back to latest version."
             DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
           fi
+          if echo "$DRIVER_VERSION" | grep -q "NoSuchKey" || [ -z "$DRIVER_VERSION" ]; then
+            echo "Latest ChromeDriver not available, trying previous major version."
+            PREV_MAJOR_VERSION=$((CHROME_MAJOR_VERSION - 1))
+            DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$PREV_MAJOR_VERSION")
+          fi
           echo "Matching ChromeDriver Version: $DRIVER_VERSION"
-          wget -O chromedriver_linux64.zip "https://chromedriver.storage.googleapis.com/$DRIVER_VERSION/chromedriver_linux64.zip"
+          wget -q -O chromedriver_linux64.zip "https://chromedriver.storage.googleapis.com/$DRIVER_VERSION/chromedriver_linux64.zip" || {
+            echo "❌ Failed to download ChromeDriver for version $DRIVER_VERSION. Aborting."
+            exit 1
+          }
           unzip -t chromedriver_linux64.zip || (echo "❌ ZIP file is corrupted!" && rm -f chromedriver_linux64.zip && exit 1)
           unzip chromedriver_linux64.zip
           sudo mv chromedriver /usr/local/bin/
@@ -97,10 +105,4 @@ jobs:
           git add README.md webs urls
           git diff-index --quiet HEAD || git commit -m "Update README.md, webs, and urls" -q
           git stash --include-untracked
-          git pull origin "$BRANCH" --rebase
-          git stash pop || echo "No stashed changes to apply"
-          git push origin "$BRANCH"
-
-      - name: Clean up large files
-        run: |
-          find . -size +50M -delete
+          git pull origin "$BRANCH" --
