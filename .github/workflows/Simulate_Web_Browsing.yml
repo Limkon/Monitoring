@@ -40,18 +40,12 @@ jobs:
       - name: Install Chrome and ChromeDriver (if not cached)
         if: steps.cache-chrome.outputs.cache-hit != 'true'
         run: |
-          # 创建本地安装目录
           mkdir -p ./chrome/opt/google/chrome ./chrome/chromedriver
-
-          # 安装 Chrome
           wget -O google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo dpkg -i google-chrome.deb || sudo apt-get -f install -y
           rm -f google-chrome.deb
           google-chrome --version
-          # 复制 Chrome 到本地目录
           cp -r /opt/google/chrome/* ./chrome/opt/google/chrome/
-
-          # 安装 ChromeDriver
           CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+\.\d+')
           CHROME_MAJOR_VERSION=$(echo "$CHROME_VERSION" | cut -d'.' -f1)
           echo "Chrome Version: $CHROME_VERSION"
@@ -114,19 +108,31 @@ jobs:
           echo "chromedriver_linux64.zip" >> .gitignore
           echo "*.deb" >> .gitignore
           echo "*.zip" >> .gitignore
-          echo "chrome/" >> .gitignore  # 忽略本地缓存目录
+          echo "chrome/" >> .gitignore
 
       - name: Commit and push changes
-        continue-on-error: true
         run: |
+          # 禁用 set -e，确保所有命令执行
+          set +e
           BRANCH=$(git rev-parse --abbrev-ref HEAD)
           echo "Current branch is: $BRANCH"
-          git add README.md webs urls
-          git diff-index --quiet HEAD || git commit -m "Update README.md, webs, and urls" -q
-          git stash --include-untracked
-          git pull origin "$BRANCH" --rebase
-          git stash pop || echo "No stashed changes to apply"
-          git push origin "$BRANCH"
+          echo "Git status before staging:"
+          git status
+          # 暂存所有修改文件
+          git add README.md webs urls infinity .gitignore
+          echo "Git status after staging:"
+          git status
+          # 提交更改
+          if ! git diff-index --quiet HEAD --cached; then
+            git commit -m "Update files from simulate_browsing"
+            echo "Changes committed"
+          else
+            echo "No changes to commit"
+          fi
+          # 拉取并推送
+          git pull origin "$BRANCH" --rebase || echo "Pull failed, continuing"
+          git push origin "$BRANCH" || echo "Push failed, continuing"
+        continue-on-error: true
 
       - name: Clean up large files
         run: |
