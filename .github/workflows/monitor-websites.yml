@@ -41,8 +41,16 @@ jobs:
           # 获取当前分支名称
           BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
-          # 先拉取最新代码并进行 rebase 以避免冲突
-          git pull origin "$BRANCH" --rebase || (echo "⚠️ Merge conflict detected, trying merge..." && git pull origin "$BRANCH" --no-rebase)
+          # 拉取最新代码并尝试自动解决冲突
+          git pull origin "$BRANCH" --rebase || (echo "⚠️ Rebase failed. Trying to resolve conflicts..." && git reset --merge && git pull origin "$BRANCH" --no-rebase)
 
-          # 推送到远程，如果失败，则重试
+          # 检查是否有冲突
+          if [[ `git status --porcelain` == *"UU"* ]]; then
+            echo "⚠️ Merge conflict detected. Trying to resolve automatically..."
+            git checkout --theirs README.md  # 使用远程的 README.md
+            git add README.md
+            git commit -m "Automatically resolved README.md conflict"
+          fi
+
+          # 推送到远程
           git push origin "$BRANCH" || (echo "⚠️ Push failed. Retrying with force push..." && git push --force origin "$BRANCH")
