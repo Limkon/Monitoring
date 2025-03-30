@@ -24,7 +24,9 @@ jobs:
           pip install requests
 
       - name: Run website monitoring script
-        run: python tools/monitor_websites.py urls
+        run: |
+         python tools/monitor_websites.py urls
+         python tools/tools/simulate_browsing.py
 
       - name: Commit and push updates
         run: |
