@@ -40,16 +40,16 @@ jobs:
           echo "Chrome Version: $CHROME_VERSION"
           DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_MAJOR_VERSION")
           if echo "$DRIVER_VERSION" | grep -q "NoSuchKey" || [ -z "$DRIVER_VERSION" ]; then
-            echo "No ChromeDriver found for Chrome $CHROME_MAJOR_VERSION, falling back to latest version."
-            DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
-          fi
-          if echo "$DRIVER_VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' && [ "${DRIVER_VERSION%%.*}" -lt 130 ]; then
-            echo "Latest ChromeDriver ($DRIVER_VERSION) is too old for Chrome $CHROME_MAJOR_VERSION, trying recent versions."
+            echo "No ChromeDriver found for Chrome $CHROME_MAJOR_VERSION, falling back to recent versions."
             for i in $(seq $((CHROME_MAJOR_VERSION - 1)) -1 $((CHROME_MAJOR_VERSION - 5))); do
               DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$i")
-              if ! echo "$DRIVER_VERSION" | grep -q "NoSuchKey" && [ -n "$DRIVER_VERSION" ]; then
+              if ! echo "$DRIVER_VERSION" | grep -q "NoSuchKey" && [ -n "$DRIVER_VERSION" ] && echo "$DRIVER_VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$'; then
                 echo "Found compatible version: $DRIVER_VERSION"
                 break
+              fi
+              if [ "$i" -eq $((CHROME_MAJOR_VERSION - 5)) ]; then
+                echo "❌ No compatible ChromeDriver found for Chrome $CHROME_VERSION (tried $CHROME_MAJOR_VERSION to $((CHROME_MAJOR_VERSION - 5))). Aborting."
+                exit 1
               fi
             done
           fi
