@@ -74,7 +74,7 @@ jobs:
            
       - name: Run simulate_browsing script
         env:
-         FILENAME: "urls"
+         FILENAME: "infinity"
         run: |
          export DISPLAY=:99
          Xvfb :99 -screen 0 1920x1200x24 > /dev/null 2>&1 &
