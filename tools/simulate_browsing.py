@@ -36,7 +36,7 @@ def process_url(url):
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--window-size=1920,1080")
+    chrome_options.add_argument("--window-size=1920,1200")  # 增加高度以避免边界问题
 
     driver = webdriver.Chrome(options=chrome_options)
 
@@ -44,13 +44,16 @@ def process_url(url):
         # 验证并修复 URL
         url = url.strip()
         if not re.match(r'^https?://', url):
-            url = 'https://' + url  # 如果缺少协议，添加默认 https
+            url = 'https://' + url
         print(f"尝试加载 URL: {url}")
 
         driver.get(url)
         print(f"成功打开网页: {url}")
 
-        # 获取窗口尺寸
+        # 等待页面加载
+        time.sleep(2)  # 确保动态内容加载
+
+        # 获取实际窗口尺寸
         window_width = driver.execute_script("return window.innerWidth;")
         window_height = driver.execute_script("return window.innerHeight;")
         print(f"窗口尺寸: {window_width}x{window_height}")
@@ -61,15 +64,28 @@ def process_url(url):
             if operation == 1:  # 模拟点击
                 try:
                     element = driver.find_element("tag name", "body")
+                    
+                    # 获取 body 的实际尺寸和位置
                     body_size = element.size
                     body_location = element.location
-
-                    x = random.randint(0, min(body_size['width'], window_width) - 1)
-                    y = random.randint(0, min(body_size['height'], window_height) - 1)
+                    print(f"Body size: {body_size}, location: {body_location}")
                     
+                    # 限制坐标在窗口内
+                    x = random.randint(0, window_width - 1)
+                    y = random.randint(0, window_height - 1)
+                    
+                    # 计算相对于 body 的偏移量
+                    offset_x = x - body_location['x']
+                    offset_y = y - body_location['y']
+                    
+                    # 确保偏移量在 body 范围内
+                    offset_x = max(0, min(offset_x, body_size['width'] - 1))
+                    offset_y = max(0, min(offset_y, body_size['height'] - 1))
+                    
+                    # 滚动到 body
                     driver.execute_script("arguments[0].scrollIntoView(true);", element)
-                    ActionChains(driver).move_to_element_with_offset(element, x, y).click().perform()
-                    print(f"模拟点击成功：坐标({x}, {y})")
+                    ActionChains(driver).move_to_element_with_offset(element, offset_x, offset_y).click().perform()
+                    print(f"模拟点击成功：坐标({x}, {y}), 偏移量({offset_x}, {offset_y})")
                     time.sleep(1)
                 except (NoSuchElementException, MoveTargetOutOfBoundsException) as e:
                     print(f"点击失败: {e}")
