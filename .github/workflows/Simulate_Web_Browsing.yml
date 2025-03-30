@@ -2,7 +2,7 @@ name: Simulate Browsing
 
 on:
   schedule:
-    - cron: "0 */10 * * *"  # 每 10 小时运行一次（注意：之前的注释“每 23 小时”与 cron 不符，已更正）
+    - cron: "0 */10 * * *"  # 每 10 小时运行一次
   workflow_dispatch:
 
 jobs:
@@ -31,21 +31,25 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            /usr/bin/google-chrome
-            /usr/bin/google-chrome-stable
-            /usr/local/bin/chromedriver
-          key: chrome-chromedriver-${{ runner.os }}-chrome-134  # 缓存键，可根据版本更新
+            ./chrome/opt/google/chrome
+            ./chrome/chromedriver
+          key: chrome-chromedriver-${{ runner.os }}-chrome-134
           restore-keys: |
             chrome-chromedriver-${{ runner.os }}-
 
       - name: Install Chrome and ChromeDriver (if not cached)
         if: steps.cache-chrome.outputs.cache-hit != 'true'
         run: |
+          # 创建本地安装目录
+          mkdir -p ./chrome/opt/google/chrome ./chrome/chromedriver
+
           # 安装 Chrome
           wget -O google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo dpkg -i google-chrome.deb || sudo apt-get -f install -y
           rm -f google-chrome.deb
           google-chrome --version
+          # 复制 Chrome 到本地目录
+          cp -r /opt/google/chrome/* ./chrome/opt/google/chrome/
 
           # 安装 ChromeDriver
           CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+\.\d+')
@@ -80,15 +84,15 @@ jobs:
             exit 1
           }
           unzip -o chromedriver_linux64.zip
-          sudo mv chromedriver-linux64/chromedriver /usr/local/bin/
-          sudo chmod +x /usr/local/bin/chromedriver
+          mv chromedriver-linux64/chromedriver ./chrome/chromedriver/
+          chmod +x ./chrome/chromedriver/chromedriver
           rm -rf chromedriver_linux64.zip chromedriver-linux64
-          chromedriver --version
+          ./chrome/chromedriver/chromedriver --version
 
       - name: Verify Chrome and ChromeDriver
         run: |
-          google-chrome --version || echo "Chrome not found"
-          chromedriver --version || echo "ChromeDriver not found"
+          ./chrome/opt/google/chrome/google-chrome --version || echo "Chrome not found"
+          ./chrome/chromedriver/chromedriver --version || echo "ChromeDriver not found"
 
       - name: Run simulate_browsing script
         env:
@@ -96,6 +100,7 @@ jobs:
         run: |
           export DISPLAY=:99
           Xvfb :99 -screen 0 1920x1200x24 > /dev/null 2>&1 &
+          export PATH=$PATH:$(pwd)/chrome/opt/google/chrome:$(pwd)/chrome/chromedriver
           python ./tools/simulate_browsing.py $FILENAME
 
       - name: Configure Git
@@ -109,6 +114,7 @@ jobs:
           echo "chromedriver_linux64.zip" >> .gitignore
           echo "*.deb" >> .gitignore
           echo "*.zip" >> .gitignore
+          echo "chrome/" >> .gitignore  # 忽略本地缓存目录
 
       - name: Commit and push changes
         continue-on-error: true
