@@ -2,7 +2,7 @@ name: Simulate Browsing
 
 on:
   schedule:
-    - cron: "0 */10 * * *"  # 每 23 小时运行一次
+    - cron: "0 */10 * * *"  # 每 10 小时运行一次（注意：之前的注释“每 23 小时”与 cron 不符，已更正）
   workflow_dispatch:
 
 jobs:
@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: "3.x"
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install selenium requests jinja2
@@ -26,15 +26,28 @@ jobs:
       - name: Check available disk space
         run: df -h
 
-      - name: Download and install Chrome
+      - name: Cache Chrome and ChromeDriver
+        id: cache-chrome
+        uses: actions/cache@v3
+        with:
+          path: |
+            /usr/bin/google-chrome
+            /usr/bin/google-chrome-stable
+            /usr/local/bin/chromedriver
+          key: chrome-chromedriver-${{ runner.os }}-chrome-134  # 缓存键，可根据版本更新
+          restore-keys: |
+            chrome-chromedriver-${{ runner.os }}-
+
+      - name: Install Chrome and ChromeDriver (if not cached)
+        if: steps.cache-chrome.outputs.cache-hit != 'true'
         run: |
+          # 安装 Chrome
           wget -O google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo dpkg -i google-chrome.deb || sudo apt-get -f install -y
           rm -f google-chrome.deb
           google-chrome --version
 
-      - name: Install ChromeDriver (Auto-matching Chrome version)
-        run: |
+          # 安装 ChromeDriver
           CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+\.\d+')
           CHROME_MAJOR_VERSION=$(echo "$CHROME_VERSION" | cut -d'.' -f1)
           echo "Chrome Version: $CHROME_VERSION"
@@ -71,14 +84,19 @@ jobs:
           sudo chmod +x /usr/local/bin/chromedriver
           rm -rf chromedriver_linux64.zip chromedriver-linux64
           chromedriver --version
-           
+
+      - name: Verify Chrome and ChromeDriver
+        run: |
+          google-chrome --version || echo "Chrome not found"
+          chromedriver --version || echo "ChromeDriver not found"
+
       - name: Run simulate_browsing script
         env:
-         FILENAME: "infinity"
+          FILENAME: "infinity"
         run: |
-         export DISPLAY=:99
-         Xvfb :99 -screen 0 1920x1200x24 > /dev/null 2>&1 &
-         python ./tools/simulate_browsing.py $FILENAME
+          export DISPLAY=:99
+          Xvfb :99 -screen 0 1920x1200x24 > /dev/null 2>&1 &
+          python ./tools/simulate_browsing.py $FILENAME
 
       - name: Configure Git
         run: |
