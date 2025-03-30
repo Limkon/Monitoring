@@ -74,11 +74,11 @@ jobs:
            
       - name: Run simulate_browsing script
         env:
-          FILENAME: "urls"
+         FILENAME: "urls"
         run: |
-          export DISPLAY=:99
-          Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-          python ./tools/simulate_browsing.py $FILENAME
+         export DISPLAY=:99
+         Xvfb :99 -screen 0 1920x1200x24 > /dev/null 2>&1 &
+         python ./tools/simulate_browsing.py $FILENAME
 
       - name: Configure Git
         run: |
