@@ -1,0 +1,129 @@
+name: simulate browsing
+
+on:
+  schedule:
+    - cron: '* */23 * * *'
+  workflow_dispatch:
+
+jobs:
+  simulate_browsing:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Cache Chrome and ChromeDriver
+      id: cache-chrome
+      uses: actions/cache@v4
+      with:
+        path: |
+          google-chrome-stable_current_amd64.deb
+          chromedriver_linux64.zip
+          /usr/local/bin/chromedriver
+        key: ${{ runner.os }}-chrome-cache-${{ hashFiles('google-chrome-stable_current_amd64.deb') }}-${{ hashFiles('chromedriver_linux64.zip') }}-${{ hashFiles('/usr/local/bin/chromedriver') }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install selenium requests jinja2
+
+    - name: Download and install Chrome
+      if: steps.cache-chrome.outputs.cache-hit != 'true'
+      run: |
+        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        sudo dpkg -i google-chrome-stable_current_amd64.deb
+        sudo apt-get -f install -y
+
+    - name: Install ChromeDriver
+      if: steps.cache-chrome.outputs.cache-hit != 'true'
+      run: |
+        wget https://chromedriver.storage.googleapis.com/$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE)/chromedriver_linux64.zip
+        unzip chromedriver_linux64.zip
+        sudo mv chromedriver /usr/local/bin/
+        sudo chmod +x /usr/local/bin/chromedriver
+
+    - name: Delay random minutes
+      run: |
+        delay=$((RANDOM % 1 + 0))
+        echo "Sleeping for $delay minutes..."
+        sleep "${delay}m"
+
+    - name: Run scripts
+      run: |
+        python ./tools/script.py urls
+        python ./tools/bludweb.py webs 150
+        python ./tools/remove_duplicates.py urls
+        python ./tools/fetch_urls.py urls
+
+    - name: Execute auto_login_and_execute.sh script
+      run: |
+        chmod +x ./tools/auto_login_and_execute.sh
+        ./tools/auto_login_and_execute.sh
+
+    - name: Cut web
+      run: |
+        chmod +x ./tools/cut.sh
+        ./tools/cut.sh
+
+    - name: Run simulate_browsing script
+      env:
+        FILENAME: 'urls'
+      run: |
+        export DISPLAY=:99
+        Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+        python ./tools/simulate_browsing.py $FILENAME
+
+    - name: Configure Git
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+
+    - name: Ensure .gitignore exists and ignores large files
+      run: |
+        echo "google-chrome-stable_current_amd64.deb" >> .gitignore
+        echo "chromedriver_linux64.zip" >> .gitignore
+        echo "*.deb" >> .gitignore
+        echo "*.zip" >> .gitignore
+
+    - name: Commit and push changes
+      continue-on-error: true
+      run: |
+        # 获取当前分支名称
+        BRANCH=$(git rev-parse --abbrev-ref HEAD)
+        echo "Current branch is: $BRANCH"
+        
+        # 添加需要提交的文件，包括 README.md 和 webs 目录
+        git add README.md webs
+        
+        # 检查并提交已暂存的更改
+        git diff-index --quiet HEAD || git commit -m "Update README.md and webs directory" -q
+        
+        # 暂存未跟踪或未暂存的更改
+        git stash --include-untracked
+        
+        # 拉取并应用 rebase，使用动态分支名称
+        git pull origin "$BRANCH" --rebase
+        
+        # 恢复暂存的更改（如果需要）
+        git stash pop || echo "No stashed changes to apply"
+        
+        # 推送更改
+        git push origin "$BRANCH"
+      shell: /usr/bin/bash -e {0}
+      env:
+        pythonLocation: /opt/hostedtoolcache/Python/3.13.2/x64
+        PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.13.2/x64/lib/pkgconfig
+        Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.2/x64
+        Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.2/x64
+        Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.2/x64
+        LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.13.2/x64/lib
+
+    - name: Clean up large files
+      run: |
+        find . -size +50M -delete
