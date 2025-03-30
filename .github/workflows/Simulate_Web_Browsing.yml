@@ -2,7 +2,7 @@ name: Simulate Browsing
 
 on:
   schedule:
-    - cron: "0 */23 * * *"  # 每 23 小时运行一次
+    - cron: "0 */10 * * *"  # 每 23 小时运行一次
   workflow_dispatch:
 
 jobs:
