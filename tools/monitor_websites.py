@@ -63,7 +63,7 @@ def update_readme(results, readme_file="README.md"):
     print(f"✅ Updated {readme_file} with latest website status.")
 
 def remove_duplicates_and_update_file(filename):
-    """去除 URL 里的重复项、空行，并确保 URL 规范化"""
+    """去除重复、空行，并补全 URL 协议"""
     try:
         with open(filename, 'r', encoding='utf-8') as file:
             urls = [line.strip() for line in file.readlines()]
@@ -75,19 +75,27 @@ def remove_duplicates_and_update_file(filename):
             print(f"⚠️ No valid URLs found in {filename}. Exiting.")
             return []
 
-        # 规范化 URL 并去重（保持原始顺序）
-        normalized_urls = list(dict.fromkeys(normalize_url(url) for url in urls))
+        # 先补全协议（保持原始顺序）
+        fixed_urls = [normalize_url(url) for url in urls]
 
-        # 检查是否有修改
-        if normalized_urls != urls:
-            print(f"🔄 Updating {filename}: Fixing URLs, removing {len(urls) - len(normalized_urls)} duplicates and blank lines...")
+        # 去重（保持原始顺序）
+        unique_urls = []
+        seen = set()
+        for url in fixed_urls:
+            if url not in seen:
+                seen.add(url)
+                unique_urls.append(url)
+
+        # 仅当有修改时才更新文件
+        if unique_urls != urls:
+            print(f"🔄 Updating {filename}: Fixing URLs, removing {len(urls) - len(unique_urls)} duplicates and blank lines...")
             with open(filename, 'w', encoding='utf-8') as file:
-                file.write('\n'.join(normalized_urls) + '\n')
+                file.write('\n'.join(unique_urls) + '\n')
             print(f"✅ {filename} has been updated successfully.")
         else:
             print(f"✅ No changes needed for {filename}. Already clean.")
 
-        return normalized_urls
+        return unique_urls
 
     except Exception as e:
         print(f"❌ Error processing {filename}: {e}")
