@@ -35,7 +35,7 @@ jobs:
 
     - name: Install ChromeDriver (Auto-matching Chrome version)
       run: |
-        CHROME_VERSION=$(google-chrome --version | grep -oP '[0-9]+' | head -1)
+        CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+\.\d+')
         DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION")
 
         echo "Chrome Version: $CHROME_VERSION"
