@@ -8,7 +8,7 @@ import random
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.action_chains import ActionChains
-from selenium.common.exceptions import NoSuchElementException, MoveTargetOutOfBoundsException, InvalidArgumentException
+from selenium.common.exceptions import NoSuchElementException, MoveTargetOutOfBoundsException, InvalidArgumentException, WebDriverException
 import traceback
 
 def remove_duplicates_and_empty_lines_from_file(filename):
@@ -36,9 +36,13 @@ def process_url(url):
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--window-size=1920,1200")
+    chrome_options.add_argument("--ignore-certificate-errors")  # 忽略证书错误
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--allow-insecure-localhost")  # 允许不安全的本地连接
+    chrome_options.add_argument("--ignore-ssl-errors")  # 额外忽略 SSL 错误
 
     driver = webdriver.Chrome(options=chrome_options)
-    driver.implicitly_wait(5)  # 设置隐式等待，最多等待 5 秒
+    driver.implicitly_wait(5)
 
     try:
         # 验证并修复 URL
@@ -47,15 +51,23 @@ def process_url(url):
             url = 'https://' + url
         print(f"尝试加载 URL: {url}")
 
-        driver.get(url)
-        print(f"成功打开网页: {url}")
+        # 加载 URL 并处理 SSL 错误
+        try:
+            driver.get(url)
+            print(f"成功打开网页: {url}")
+        except WebDriverException as e:
+            if "net::ERR_SSL_PROTOCOL_ERROR" in str(e):
+                print(f"SSL 协议错误，无法加载 {url}: {e}")
+                return  # 跳过此 URL
+            else:
+                print(f"其他 WebDriver 错误: {e}")
+                raise
 
         # 获取实际窗口尺寸
         window_width = driver.execute_script("return window.innerWidth;")
         window_height = driver.execute_script("return window.innerHeight;")
         print(f"窗口尺寸: {window_width}x{window_height}")
 
-        # 减少操作次数到 3 次
         for _ in range(3):
             operation = random.randint(1, 3)
 
@@ -77,7 +89,7 @@ def process_url(url):
                     driver.execute_script("arguments[0].scrollIntoView(true);", element)
                     ActionChains(driver).move_to_element_with_offset(element, offset_x, offset_y).click().perform()
                     print(f"模拟点击成功：坐标({x}, {y}), 偏移量({offset_x}, {offset_y})")
-                    time.sleep(0.5)  # 减少等待时间
+                    time.sleep(0.5)
                 except (NoSuchElementException, MoveTargetOutOfBoundsException) as e:
                     print(f"点击失败: {e}")
                     continue
@@ -88,7 +100,6 @@ def process_url(url):
                     current_x = window_width // 2
                     current_y = window_height // 2
                     
-                    # 减少移动次数到 3 次
                     for _ in range(3):
                         x_offset = random.randint(-50, 50)
                         y_offset = random.randint(-50, 50)
@@ -103,7 +114,7 @@ def process_url(url):
                         actions.move_by_offset(x_offset, y_offset)
                         print(f"模拟鼠标移动成功：偏移量({x_offset}, {y_offset})")
                         current_x, current_y = new_x, new_y
-                        time.sleep(0.5)  # 减少等待时间
+                        time.sleep(0.5)
                     actions.perform()
                 except MoveTargetOutOfBoundsException as e:
                     print(f"鼠标移动失败: {e}")
@@ -113,11 +124,11 @@ def process_url(url):
                 driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 driver.execute_script("window.scrollTo(0, 0);")
                 print("模拟滚动到页面底部和顶部")
-                time.sleep(1)  # 减少等待时间
+                time.sleep(1)
 
         driver.refresh()
         print("刷新网页")
-        time.sleep(1)  # 减少刷新后的等待时间
+        time.sleep(1)
 
     except InvalidArgumentException as e:
         print(f"无效的 URL 参数: {url}, 错误: {e}")
