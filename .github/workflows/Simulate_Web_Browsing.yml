@@ -2,8 +2,8 @@ name: simulate browsing
 
 on:
   schedule:
-    - cron: '* */23 * * *'
-  workflow_dispatch:
+    - cron: '* */23 * * *'  # 每 23 小时运行一次
+  workflow_dispatch:  # 允许手动触发
 
 jobs:
   simulate_browsing:
@@ -23,34 +23,36 @@ jobs:
       uses: actions/cache@v4
       with:
         path: |
-          google-chrome-stable_current_amd64.deb
-          chromedriver_linux64.zip
+          /usr/bin/google-chrome
           /usr/local/bin/chromedriver
-        key: ${{ runner.os }}-chrome-cache-${{ hashFiles('google-chrome-stable_current_amd64.deb') }}-${{ hashFiles('chromedriver_linux64.zip') }}-${{ hashFiles('/usr/local/bin/chromedriver') }}
+        key: ${{ runner.os }}-chrome-${{ hashFiles('google-chrome-stable_current_amd64.deb') }}
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install selenium requests jinja2
+        pip install selenium requests jinja2
 
-    - name: Download and install Chrome
+    - name: Download and install Chrome (if not cached)
       if: steps.cache-chrome.outputs.cache-hit != 'true'
       run: |
-        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-        sudo dpkg -i google-chrome-stable_current_amd64.deb
-        sudo apt-get -f install -y
+        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O chrome.deb
+        sudo dpkg -i chrome.deb || sudo apt-get -f install -y
+        rm chrome.deb
 
-    - name: Install ChromeDriver
+    - name: Install ChromeDriver (matching installed Chrome)
       if: steps.cache-chrome.outputs.cache-hit != 'true'
       run: |
-        wget https://chromedriver.storage.googleapis.com/$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE)/chromedriver_linux64.zip
+        CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | cut -d '.' -f 1)
+        DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION")
+        wget "https://chromedriver.storage.googleapis.com/$DRIVER_VERSION/chromedriver_linux64.zip"
         unzip chromedriver_linux64.zip
         sudo mv chromedriver /usr/local/bin/
         sudo chmod +x /usr/local/bin/chromedriver
+        rm chromedriver_linux64.zip
 
     - name: Delay random minutes
       run: |
-        delay=$((RANDOM % 1 + 0))
+        delay=$((RANDOM % 5 + 1))  # 随机等待 1-5 分钟
         echo "Sleeping for $delay minutes..."
         sleep "${delay}m"
 
@@ -97,32 +99,19 @@ jobs:
         # 获取当前分支名称
         BRANCH=$(git rev-parse --abbrev-ref HEAD)
         echo "Current branch is: $BRANCH"
+
+        # 确保所有变更文件被跟踪
+        git add -A
         
-        # 添加需要提交的文件，包括 README.md 和 webs 目录
-        git add README.md webs
-        
-        # 检查并提交已暂存的更改
-        git diff-index --quiet HEAD || git commit -m "Update README.md and webs directory" -q
-        
-        # 暂存未跟踪或未暂存的更改
-        git stash --include-untracked
-        
-        # 拉取并应用 rebase，使用动态分支名称
-        git pull origin "$BRANCH" --rebase
-        
-        # 恢复暂存的更改（如果需要）
-        git stash pop || echo "No stashed changes to apply"
-        
-        # 推送更改
-        git push origin "$BRANCH"
+        # 检查是否有更改
+        if git diff --cached --quiet; then
+          echo "No changes to commit."
+        else
+          git commit -m "Update README.md and webs directory"
+          git pull origin "$BRANCH" --rebase
+          git push origin "$BRANCH"
+        fi
       shell: /usr/bin/bash -e {0}
-      env:
-        pythonLocation: /opt/hostedtoolcache/Python/3.13.2/x64
-        PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.13.2/x64/lib/pkgconfig
-        Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.2/x64
-        Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.2/x64
-        Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.2/x64
-        LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.13.2/x64/lib
 
     - name: Clean up large files
       run: |
