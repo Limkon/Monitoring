@@ -38,12 +38,12 @@ jobs:
           CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+\.\d+')
           CHROME_MAJOR_VERSION=$(echo "$CHROME_VERSION" | cut -d'.' -f1)
           echo "Chrome Version: $CHROME_VERSION"
-          DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_MAJOR_VERSION")
-          if echo "$DRIVER_VERSION" | grep -q "NoSuchKey" || [ -z "$DRIVER_VERSION" ]; then
-            echo "No ChromeDriver found for Chrome $CHROME_MAJOR_VERSION, falling back to recent versions."
+          DRIVER_VERSION=$(curl -sS "https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_$CHROME_MAJOR_VERSION")
+          if echo "$DRIVER_VERSION" | grep -q "404" || [ -z "$DRIVER_VERSION" ]; then
+            echo "No ChromeDriver found for Chrome $CHROME_MAJOR_VERSION in Chrome for Testing, falling back to recent versions."
             for i in $(seq $((CHROME_MAJOR_VERSION - 1)) -1 125); do
-              DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$i")
-              if ! echo "$DRIVER_VERSION" | grep -q "NoSuchKey" && [ -n "$DRIVER_VERSION" ] && echo "$DRIVER_VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$'; then
+              DRIVER_VERSION=$(curl -sS "https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_$i")
+              if ! echo "$DRIVER_VERSION" | grep -q "404" && [ -n "$DRIVER_VERSION" ] && echo "$DRIVER_VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$'; then
                 echo "Found compatible version: $DRIVER_VERSION"
                 break
               fi
@@ -54,9 +54,12 @@ jobs:
             done
           fi
           echo "Matching ChromeDriver Version: $DRIVER_VERSION"
-          wget -q -O chromedriver_linux64.zip "https://chromedriver.storage.googleapis.com/$DRIVER_VERSION/chromedriver_linux64.zip" || {
-            echo "❌ Failed to download ChromeDriver for version $DRIVER_VERSION. Aborting."
-            exit 1
+          wget -q -O chromedriver_linux64.zip "https://storage.googleapis.com/chrome-for-testing-public/$DRIVER_VERSION/linux64/chromedriver-linux64.zip" || {
+            echo "❌ Failed to download ChromeDriver for version $DRIVER_VERSION from Chrome for Testing. Trying legacy source..."
+            wget -q -O chromedriver_linux64.zip "https://chromedriver.storage.googleapis.com/$DRIVER_VERSION/chromedriver_linux64.zip" || {
+              echo "❌ Failed to download ChromeDriver for version $DRIVER_VERSION from both sources. Aborting."
+              exit 1
+            }
           }
           unzip -t chromedriver_linux64.zip || {
             echo "❌ ZIP file is corrupted! Aborting."
@@ -64,9 +67,9 @@ jobs:
             exit 1
           }
           unzip -o chromedriver_linux64.zip
-          sudo mv chromedriver /usr/local/bin/
+          sudo mv chromedriver-linux64/chromedriver /usr/local/bin/
           sudo chmod +x /usr/local/bin/chromedriver
-          rm -f chromedriver_linux64.zip LICENSE.chromedriver
+          rm -rf chromedriver_linux64.zip chromedriver-linux64
           chromedriver --version
 
       - name: Run scripts
