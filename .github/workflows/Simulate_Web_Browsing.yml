@@ -1,8 +1,8 @@
-name: simulate browsing
+name: Simulate Browsing
 
 on:
   schedule:
-    - cron: '* */23 * * *'
+    - cron: "0 */23 * * *"  # 每 23 小时运行一次
   workflow_dispatch:
 
 jobs:
@@ -10,101 +10,97 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.x'
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install selenium requests jinja2
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install selenium requests jinja2
 
-    - name: Check available disk space
-      run: df -h
+      - name: Check available disk space
+        run: df -h
 
-    - name: Download and install Chrome
-      run: |
-        wget -O google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-        sudo dpkg -i google-chrome.deb || sudo apt-get -f install -y
-        rm -f google-chrome.deb
-        google-chrome --version
+      - name: Download and install Chrome
+        run: |
+          wget -O google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          sudo dpkg -i google-chrome.deb || sudo apt-get -f install -y
+          rm -f google-chrome.deb
+          google-chrome --version
 
-    - name: Install ChromeDriver (Auto-matching Chrome version)
-      run: |
-        CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+\.\d+')
-        DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION")
+      - name: Install ChromeDriver (Auto-matching Chrome version)
+        run: |
+          CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+\.\d+')
+          CHROME_MAJOR_VERSION=$(echo "$CHROME_VERSION" | cut -d'.' -f1)
+          echo "Chrome Version: $CHROME_VERSION"
+          DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_MAJOR_VERSION" || echo "latest")
+          if [ "$DRIVER_VERSION" = "latest" ]; then
+            echo "No specific ChromeDriver version found for Chrome $CHROME_MAJOR_VERSION, falling back to latest."
+            DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
+          fi
+          echo "Matching ChromeDriver Version: $DRIVER_VERSION"
+          wget -O chromedriver_linux64.zip "https://chromedriver.storage.googleapis.com/$DRIVER_VERSION/chromedriver_linux64.zip"
+          unzip -t chromedriver_linux64.zip || (echo "❌ ZIP file is corrupted!" && rm -f chromedriver_linux64.zip && exit 1)
+          unzip chromedriver_linux64.zip
+          sudo mv chromedriver /usr/local/bin/
+          sudo chmod +x /usr/local/bin/chromedriver
+          rm -f chromedriver_linux64.zip
+          chromedriver --version
 
-        echo "Chrome Version: $CHROME_VERSION"
-        echo "Matching ChromeDriver Version: $DRIVER_VERSION"
+      - name: Run scripts
+        run: |
+          python ./tools/script.py urls
+          python ./tools/bludweb.py webs 150
+          python ./tools/remove_duplicates.py urls
+          python ./tools/fetch_urls.py urls
 
-        wget -O chromedriver_linux64.zip "https://chromedriver.storage.googleapis.com/$DRIVER_VERSION/chromedriver_linux64.zip"
+      - name: Execute auto_login_and_execute.sh
+        run: |
+          chmod +x ./tools/auto_login_and_execute.sh
+          ./tools/auto_login_and_execute.sh
 
-        echo "Verifying ZIP file..."
-        unzip -t chromedriver_linux64.zip || (echo "❌ ZIP file is corrupted! Retrying..." && rm -f chromedriver_linux64.zip && exit 1)
+      - name: Cut web
+        run: |
+          chmod +x ./tools/cut.sh
+          ./tools/cut.sh
 
-        echo "Extracting ChromeDriver..."
-        unzip chromedriver_linux64.zip
-        sudo mv chromedriver /usr/local/bin/
-        sudo chmod +x /usr/local/bin/chromedriver
-        rm -f chromedriver_linux64.zip
-        chromedriver --version
+      - name: Run simulate_browsing script
+        env:
+          FILENAME: "urls"
+        run: |
+          export DISPLAY=:99
+          Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+          python ./tools/simulate_browsing.py $FILENAME
 
-    - name: Run scripts
-      run: |
-        python ./tools/script.py urls
-        python ./tools/bludweb.py webs 150
-        python ./tools/remove_duplicates.py urls
-        python ./tools/fetch_urls.py urls
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
 
-    - name: Execute auto_login_and_execute.sh script
-      run: |
-        chmod +x ./tools/auto_login_and_execute.sh
-        ./tools/auto_login_and_execute.sh
+      - name: Ensure .gitignore exists
+        run: |
+          echo "google-chrome.deb" >> .gitignore
+          echo "chromedriver_linux64.zip" >> .gitignore
+          echo "*.deb" >> .gitignore
+          echo "*.zip" >> .gitignore
 
-    - name: Cut web
-      run: |
-        chmod +x ./tools/cut.sh
-        ./tools/cut.sh
+      - name: Commit and push changes
+        continue-on-error: true
+        run: |
+          BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          echo "Current branch is: $BRANCH"
+          git add README.md webs urls
+          git diff-index --quiet HEAD || git commit -m "Update README.md, webs, and urls" -q
+          git stash --include-untracked
+          git pull origin "$BRANCH" --rebase
+          git stash pop || echo "No stashed changes to apply"
+          git push origin "$BRANCH"
 
-    - name: Run simulate_browsing script
-      env:
-        FILENAME: 'urls'
-      run: |
-        export DISPLAY=:99
-        Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-        python ./tools/simulate_browsing.py $FILENAME
-
-    - name: Configure Git
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-
-    - name: Ensure .gitignore exists and ignores large files
-      run: |
-        echo "google-chrome.deb" >> .gitignore
-        echo "chromedriver_linux64.zip" >> .gitignore
-        echo "*.deb" >> .gitignore
-        echo "*.zip" >> .gitignore
-
-    - name: Commit and push changes
-      continue-on-error: true
-      run: |
-        BRANCH=$(git rev-parse --abbrev-ref HEAD)
-        echo "Current branch is: $BRANCH"
-
-        git add README.md webs
-        git diff-index --quiet HEAD || git commit -m "Update README.md and webs directory" -q
-
-        git stash --include-untracked
-        git pull origin "$BRANCH" --rebase
-        git stash pop || echo "No stashed changes to apply"
-
-        git push origin "$BRANCH"
-
-    - name: Clean up large files
-      run: |
-        find . -size +50M -delete
+      - name: Clean up large files
+        run: |
+          find . -size +50M -delete
