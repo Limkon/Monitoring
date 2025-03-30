@@ -2,8 +2,8 @@ name: simulate browsing
 
 on:
   schedule:
-    - cron: '* */23 * * *'  # 每 23 小时运行一次
-  workflow_dispatch:  # 允许手动运行
+    - cron: '* */23 * * *'
+  workflow_dispatch:
 
 jobs:
   simulate_browsing:
@@ -18,46 +18,40 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: Cache Chrome and ChromeDriver
-      id: cache-chrome
-      uses: actions/cache@v4
-      with:
-        path: |
-          google-chrome-stable_current_amd64.deb
-          chromedriver_linux64.zip
-          /usr/local/bin/chromedriver
-        key: ${{ runner.os }}-chrome-cache
-
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         python -m pip install selenium requests jinja2
 
+    - name: Check available disk space
+      run: df -h
+
     - name: Download and install Chrome
-      if: steps.cache-chrome.outputs.cache-hit != 'true'
       run: |
-        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-        sudo dpkg -i google-chrome-stable_current_amd64.deb
-        sudo apt-get -f install -y
+        wget -O google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        sudo dpkg -i google-chrome.deb || sudo apt-get -f install -y
+        rm -f google-chrome.deb
+        google-chrome --version
 
     - name: Install ChromeDriver (Auto-matching Chrome version)
-      if: steps.cache-chrome.outputs.cache-hit != 'true'
       run: |
-        CHROME_VERSION=$(google-chrome --version | grep -oP '[0-9]+' | head -1)  # 获取 Chrome 主要版本号
-        DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")  # 获取最新稳定版 ChromeDriver
-        echo "Detected Chrome Version: $CHROME_VERSION"
-        echo "Using ChromeDriver Version: $DRIVER_VERSION"
-        wget "https://chromedriver.storage.googleapis.com/$DRIVER_VERSION/chromedriver_linux64.zip"
+        CHROME_VERSION=$(google-chrome --version | grep -oP '[0-9]+' | head -1)
+        DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION")
+
+        echo "Chrome Version: $CHROME_VERSION"
+        echo "Matching ChromeDriver Version: $DRIVER_VERSION"
+
+        wget -O chromedriver_linux64.zip "https://chromedriver.storage.googleapis.com/$DRIVER_VERSION/chromedriver_linux64.zip"
+
+        echo "Verifying ZIP file..."
+        unzip -t chromedriver_linux64.zip || (echo "❌ ZIP file is corrupted! Retrying..." && rm -f chromedriver_linux64.zip && exit 1)
+
+        echo "Extracting ChromeDriver..."
         unzip chromedriver_linux64.zip
         sudo mv chromedriver /usr/local/bin/
         sudo chmod +x /usr/local/bin/chromedriver
-        rm chromedriver_linux64.zip
-
-    - name: Delay random minutes
-      run: |
-        delay=$((RANDOM % 1 + 0))
-        echo "Sleeping for $delay minutes..."
-        sleep "${delay}m"
+        rm -f chromedriver_linux64.zip
+        chromedriver --version
 
     - name: Run scripts
       run: |
@@ -91,7 +85,7 @@ jobs:
 
     - name: Ensure .gitignore exists and ignores large files
       run: |
-        echo "google-chrome-stable_current_amd64.deb" >> .gitignore
+        echo "google-chrome.deb" >> .gitignore
         echo "chromedriver_linux64.zip" >> .gitignore
         echo "*.deb" >> .gitignore
         echo "*.zip" >> .gitignore
@@ -99,35 +93,17 @@ jobs:
     - name: Commit and push changes
       continue-on-error: true
       run: |
-        # 获取当前分支名称
         BRANCH=$(git rev-parse --abbrev-ref HEAD)
         echo "Current branch is: $BRANCH"
-        
-        # 添加需要提交的文件，包括 README.md 和 webs 目录
+
         git add README.md webs
-        
-        # 检查并提交已暂存的更改
         git diff-index --quiet HEAD || git commit -m "Update README.md and webs directory" -q
-        
-        # 暂存未跟踪或未暂存的更改
+
         git stash --include-untracked
-        
-        # 拉取并应用 rebase，使用动态分支名称
         git pull origin "$BRANCH" --rebase
-        
-        # 恢复暂存的更改（如果需要）
         git stash pop || echo "No stashed changes to apply"
-        
-        # 推送更改
+
         git push origin "$BRANCH"
-      shell: /usr/bin/bash -e {0}
-      env:
-        pythonLocation: /opt/hostedtoolcache/Python/3.13.2/x64
-        PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.13.2/x64/lib/pkgconfig
-        Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.2/x64
-        Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.2/x64
-        Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.2/x64
-        LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.13.2/x64/lib
 
     - name: Clean up large files
       run: |
