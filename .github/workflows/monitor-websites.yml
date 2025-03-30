@@ -34,4 +34,15 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
           git add README.md urls  # 确保同时提交 README.md 和 urls 文件
-          git diff --cached --quiet || (git commit -m "Update website status and URLs" && git push)
+          
+          # 如果有更改，则提交
+          git diff --cached --quiet || git commit -m "Update website status and URLs"
+
+          # 获取当前分支名称
+          BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+          # 先拉取最新代码并进行 rebase 以避免冲突
+          git pull origin "$BRANCH" --rebase || (echo "⚠️ Merge conflict detected, trying merge..." && git pull origin "$BRANCH" --no-rebase)
+
+          # 推送到远程，如果失败，则重试
+          git push origin "$BRANCH" || (echo "⚠️ Push failed. Retrying with force push..." && git push --force origin "$BRANCH")
