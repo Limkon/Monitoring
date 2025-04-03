@@ -12,6 +12,14 @@ def normalize_url(url):
         return "https://" + url
     return url
 
+def looks_like_url(url):
+    """检查字符串是否看起来像 URL"""
+    try:
+        parsed_url = urlparse(url)
+        return bool(parsed_url.netloc) and bool(parsed_url.scheme or parsed_url.path)
+    except Exception:
+        return False
+
 def check_website_status(url):
     """检查网站状态并返回结果"""
     try:
@@ -63,13 +71,13 @@ def update_readme(results, readme_file="README.md"):
     print(f"✅ Updated {readme_file} with latest website status.")
 
 def remove_duplicates_and_update_file(filename):
-    """去除重复、空行，并补全 URL 协议"""
+    """去除重复、空行，删除不符合 URL 格式的行，并补全 URL 协议"""
     try:
         with open(filename, 'r', encoding='utf-8') as file:
             urls = [line.strip() for line in file.readlines()]
 
-        # 去除空行
-        urls = [url for url in urls if url]
+        # 去除空行和不符合 URL 格式的行
+        urls = [url for url in urls if url and looks_like_url(url)]
 
         if not urls:
             print(f"⚠️ No valid URLs found in {filename}. Exiting.")
