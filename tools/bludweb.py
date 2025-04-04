@@ -140,6 +140,23 @@ def remove_directory_contents(directory):
         debug_print(f"清空目录出错: {e}")
         raise
 
+def git_push_to_repo(token, repo_owner, repo_name, branch="main"):
+    """将更改推送到远程仓库"""
+    try:
+        os.system("git config user.name github-actions")
+        os.system("git config user.email github-actions@github.com")
+        os.system("git add .")
+        os.system('git commit -m "Auto-generated code pushed" || echo "Nothing to commit"')
+
+        repo_url = f"https://{token}@github.com/{repo_owner}/{repo_name}.git"
+        push_result = os.system(f"git push {repo_url} {branch}")
+        if push_result != 0:
+            print("⚠️ 推送失败，请检查权限或仓库状态。")
+        else:
+            print("✅ 成功推送到远程仓库。")
+    except Exception as e:
+        print(f"推送出错: {e}")
+
 def main():
     """主函数，处理命令行参数并执行逻辑"""
     if len(sys.argv) < 3:
@@ -165,6 +182,16 @@ def main():
 
     if num_files > threshold:
         remove_directory_contents(target_directory)
+
+    # === 自动推送部分 ===
+    personal_token = os.getenv("GITHUB_PAT")
+    repo_owner = os.getenv("GITHUB_USER")  # 推荐作为环境变量传入
+    repo_name = os.getenv("GITHUB_REPO")
+
+    if personal_token and repo_owner and repo_name:
+        git_push_to_repo(personal_token, repo_owner, repo_name)
+    else:
+        print("❌ 缺少 GITHUB_PAT 或 GITHUB_USER 或 GITHUB_REPO，跳过推送。")
 
 if __name__ == "__main__":
     main()
