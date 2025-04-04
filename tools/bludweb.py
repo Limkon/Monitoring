@@ -184,9 +184,9 @@ def main():
         remove_directory_contents(target_directory)
 
     # === 自动推送部分 ===
-    personal_token = os.getenv("GITHUB_PAT")
-    repo_owner = os.getenv("GITHUB_USER")  # 推荐作为环境变量传入
-    repo_name = os.getenv("GITHUB_REPO")
+    personal_token = os.getenv("PAT")
+    repo_owner = os.getenv("USER")  # 推荐作为环境变量传入
+    repo_name = os.getenv("REPO")
 
     if personal_token and repo_owner and repo_name:
         git_push_to_repo(personal_token, repo_owner, repo_name)
