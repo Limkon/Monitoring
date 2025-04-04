@@ -1,0 +1,65 @@
+name: Keep Active
+
+on:
+  schedule:
+    - cron: "0 0 */15 * *"  # 每 7 天的午夜 00:00 UTC 运行
+  workflow_dispatch:       # 允许手动触发
+
+jobs:
+  run-automation:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. 检出代码
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # 2. 设置 Python 环境（用于 bludweb.py）
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    # 3. 安装 Python 依赖
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install jinja2
+
+    # 4. 运行 Python 脚本 bludweb.py
+    - name: Run bludweb.py script
+      run: python templates/bludweb.py webs 99
+
+    # 5. 检查生成的文件（调试用）
+    - name: List generated files
+      run: |
+        ls -la webs || echo "webs directory not found or empty"
+        cat webs/* || echo "No files to display in webs directory"
+
+     # 6. 提交并推送更改
+    - name: Commit and push changes
+      run: |
+        # 配置 Git 用户信息
+        git config --global user.name "GitHub Action"
+        git config --global user.email "action@github.com"
+
+        # 获取当前分支名称
+        BRANCH=$(git rev-parse --abbrev-ref HEAD)
+        echo "Current branch is: $BRANCH"
+
+        # 仅添加 webs 目录的改动
+        git add webs || echo "No changes in webs directory"
+
+        # 检查是否有更改
+        if git diff --cached --quiet; then
+          echo "No changes to commit"
+          exit 0  # 正常退出，不报错
+        fi
+
+        # 提交更改
+        git commit -m "Update webs directory [ci skip]" -q
+        git pull origin "$BRANCH" --rebase || (echo "Rebase failed" && exit 1)
+        git push origin "$BRANCH"
+        echo "Changes committed and pushed successfully"
+      shell: bash
+
