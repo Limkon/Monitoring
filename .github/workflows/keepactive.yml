@@ -2,21 +2,23 @@ name: Keep Active
 
 on:
   schedule:
-    - cron: "0 0 */15 * *"
+    - cron: "0 0 */15 * *"  # 每15天运行一次
   workflow_dispatch:
 
 env:
   PAT: ${{ secrets.PAT }}
   USER: ${{ secrets.USER }}
-  REPO: ${{ secrets.REPO }}
+  REPO: ${{ secrets.REPO }}  # 远程目标仓库
 
 jobs:
   run-automation:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
+    - name: Checkout current repo
       uses: actions/checkout@v4
+      with:
+        persist-credentials: false
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -25,46 +27,40 @@ jobs:
 
     - name: Install Python dependencies
       run: |
-        python -m pip install --upgrade pip
+        pip install --upgrade pip
         pip install jinja2 python-dotenv
 
-    - name: Run bludweb.py script
+    - name: Run bludweb.py to generate 'webs' directory
       run: python templates/bludweb.py webs 99
+      env:
+        PAT: ${{ secrets.PAT }}
+        USER: ${{ secrets.USER }}
+        REPO: ${{ secrets.REPO }}
 
-    - name: List generated files
+    - name: Clone target repo
+      env:
+        TOKEN: ${{ secrets.PAT }}
+        USER: ${{ secrets.USER }}
+        REPO: ${{ secrets.REPO }}
       run: |
-        ls -la webs || echo "webs directory not found"
-        cat webs/* || echo "No files in webs directory"
+        echo "📥 克隆目标仓库：${USER}/${REPO}"
+        git clone https://x-access-token:${TOKEN}@github.com/${USER}/${REPO}.git target-repo
 
-    - name: Commit and push changes
+    - name: Copy webs directory into target repo (overwrite only webs/)
       run: |
-        git config --global user.name "GitHub Action"
-        git config --global user.email "action@github.com"
+        echo "🧩 拷贝 webs/ 到目标仓库中"
+        rm -rf target-repo/webs  # 清空目标仓库的 webs/ 子目录
+        mkdir -p target-repo/webs
+        cp -r webs/* target-repo/webs/
 
-        BRANCH=$(git rev-parse --abbrev-ref HEAD)
-        echo "Current branch is: $BRANCH"
+    - name: Commit and push changes to target repo
+      working-directory: target-repo
+      env:
+        TOKEN: ${{ secrets.PAT }}
+      run: |
+        git config user.name "github-actions"
+        git config user.email "github-actions@github.com"
 
-        if [ -d "webs" ]; then
-          git add webs
-        else
-          echo "webs directory does not exist, skipping."
-          exit 0
-        fi
-
-        if git diff --cached --quiet; then
-          echo "No changes to commit"
-          exit 0
-        fi
-
-        git commit -m "Update webs directory [ci skip]" -q
-
-        git pull --rebase || {
-          echo "Rebase failed. Attempting normal pull..."
-          git pull --no-rebase || {
-            echo "Both pull attempts failed."
-            exit 1
-          }
-        }
-
-        git push origin "$BRANCH"
-      shell: bash
+        git add webs
+        git commit -m "🚀 Update webs/ folder by GitHub Actions on $(date +'%F %T')" || echo "Nothing to commit"
+        git push origin main
