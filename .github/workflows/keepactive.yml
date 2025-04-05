@@ -8,7 +8,7 @@ on:
 env:
   PAT: ${{ secrets.PAT }}
   USER: ${{ secrets.USER }}
-  REPO: ${{ secrets.REPO }}  # 远程目标仓库
+  REPO: ${{ secrets.REPO }}  
 
 jobs:
   run-automation:
@@ -29,21 +29,6 @@ jobs:
       run: |
         pip install --upgrade pip
         pip install jinja2 python-dotenv
-
-    - name: Clean webs directory if too many files
-      run: |
-        if [ -d "webs" ]; then
-          count=$(find webs -type f | wc -l)
-          echo "🧮 当前 webs 文件数: $count"
-          if [ "$count" -gt 5 ]; then
-            echo "⚠️ 文件数超过 100，删除 webs 目录"
-            rm -rf webs
-          else
-            echo "✅ 文件数正常，无需清理"
-          fi
-        else
-          echo "📁 webs 目录不存在，无需处理"
-        fi
 
     - name: Run bludweb.py to generate 'webs' directory
       run: python templates/bludweb.py webs 99
@@ -72,11 +57,27 @@ jobs:
         echo "📥 克隆目标仓库：${USER}/${REPO}"
         git clone https://x-access-token:${TOKEN}@github.com/${USER}/${REPO}.git target-repo
 
-    - name: Copy webs directory into target repo (overwrite only webs/)
+    - name: Count files in target repo webs directory
+      id: count_files
       run: |
-        echo "🧩 拷贝 webs/ 到目标仓库中"
-        rm -rf target-repo/webs  # 清空目标仓库的 webs/ 子目录
-        mkdir -p target-repo/webs
+        echo "🔍 统计 target-repo/webs 中的文件数："
+        count=$(git -C target-repo ls-tree -r --name-only HEAD webs | wc -l)
+        echo "📦 远程 webs 目录文件数: $count"
+        echo "count=$count" >> $GITHUB_OUTPUT
+
+    - name: Conditionally copy webs into target repo
+      run: |
+        count=${{ steps.count_files.outputs.count }}
+        echo "📊 判断是否需要清空：已有 $count 个文件"
+        if [ "$count" -gt 100 ]; then
+          echo "⚠️ 文件数超过 100，清空并复制新的 webs/"
+          rm -rf target-repo/webs
+          mkdir -p target-repo/webs
+        else
+          echo "✅ 文件数正常，将在原有基础上追加"
+          mkdir -p target-repo/webs
+        fi
+
         cp -r webs/* target-repo/webs/
 
     - name: Commit and push changes to target repo
