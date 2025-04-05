@@ -2,7 +2,7 @@ name: Keep Active
 
 on:
   schedule:
-    - cron: "0 0 */15 * *"  # 每15天运行一次
+    - cron: "0 0 */5 * *"  # 每15天运行一次
   workflow_dispatch:
 
 env:
@@ -30,14 +30,14 @@ jobs:
         pip install --upgrade pip
         pip install jinja2 python-dotenv
 
-    - name: Check and clean A 仓库中的 webs/ 如果文件数超过 5
+    - name: Check and clean A 仓库中的 webs/ 如果文件数超过 50
       run: |
         echo "🔍 检查 A 仓库 webs/ 目录文件数"
         mkdir -p webs
         FILE_COUNT=$(find webs -type f -not -path '*/\.*' | wc -l || echo 0)
         echo "📊 当前 webs 文件数: $FILE_COUNT"
-        if [ "$FILE_COUNT" -gt 5 ]; then
-          echo "🧹 超过 5 个文件，清空 webs 目录"
+        if [ "$FILE_COUNT" -gt 50 ]; then
+          echo "🧹 超过 50 个文件，清空 webs 目录"
           rm -rf webs/*
         else
           echo "✅ 文件数不超过 5，无需清空"
