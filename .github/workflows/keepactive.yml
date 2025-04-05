@@ -31,7 +31,7 @@ jobs:
         pip install jinja2 python-dotenv
 
     - name: Run bludweb.py to generate 'webs' directory
-      run: python templates/bludweb.py webs 99
+      run: python templates/bludweb.py webs 9
       env:
         PAT: ${{ secrets.PAT }}
         USER: ${{ secrets.USER }}
