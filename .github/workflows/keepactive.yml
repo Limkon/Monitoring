@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
 
 env:
-  PAT: ${{ secrets.PAT }}
+  PAT: ${{ secrets.PAT }}  # 用于推送到 B 仓库
   USER: ${{ secrets.USER }}
-  REPO: ${{ secrets.REPO }}
+  REPO: ${{ secrets.REPO }}  # B 仓库名
 
 jobs:
   run-automation:
@@ -18,7 +18,7 @@ jobs:
     - name: Checkout current repo (A 仓库)
       uses: actions/checkout@v4
       with:
-        persist-credentials: false  # 防止复用默认 token，使用 PAT 推送
+        persist-credentials: true  # 使用默认的 GITHUB_TOKEN 推送到 A 仓库
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -57,7 +57,7 @@ jobs:
         git config user.email "github-actions@github.com"
         git add webs
         git commit -m "🔄 更新 A 仓库 webs/ 目录：$(date +'%F %T')" || echo "Nothing to commit"
-        git push https://x-access-token:${{ secrets.PAT }}@github.com/${{ github.repository }}.git HEAD:main
+        git push origin HEAD:main  # 使用默认的 GITHUB_TOKEN 推送
 
     - name: Clone target B 仓库
       env:
@@ -83,4 +83,4 @@ jobs:
         git config user.email "github-actions@github.com"
         git add webs
         git commit -m "🚀 同步 webs/ 到 B 仓库：$(date +'%F %T')" || echo "Nothing to commit"
-        git push origin main
+        git push origin main  # 使用 PAT 推送到 B 仓库
