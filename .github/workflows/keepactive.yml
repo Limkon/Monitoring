@@ -30,6 +30,21 @@ jobs:
         pip install --upgrade pip
         pip install jinja2 python-dotenv
 
+    - name: Clean webs directory if too many files
+      run: |
+        if [ -d "webs" ]; then
+          count=$(find webs -type f | wc -l)
+          echo "🧮 当前 webs 文件数: $count"
+          if [ "$count" -gt 100 ]; then
+            echo "⚠️ 文件数超过 100，删除 webs 目录"
+            rm -rf webs
+          else
+            echo "✅ 文件数正常，无需清理"
+          fi
+        else
+          echo "📁 webs 目录不存在，无需处理"
+        fi
+
     - name: Run bludweb.py to generate 'webs' directory
       run: python templates/bludweb.py webs 99
       env:
