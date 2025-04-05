@@ -37,14 +37,21 @@ jobs:
         USER: ${{ secrets.USER }}
         REPO: ${{ secrets.REPO }}
 
-    - name: Commit and push changes
-      env:
-        TOKEN: ${{ secrets.PAT }}
+    - name: Check for changes and push updates
       run: |
-        git remote set-url origin https://${{ secrets.PAT }}@github.com/${{ secrets.USER }}/${{ secrets.REPO }}.git
-        git pull --rebase origin main
-
-        git add webs
-        git commit -m "🚀 Update webs/ folder by GitHub Actions on $(date +'%F %T')" || echo "Nothing to commit"
-
-        git push origin main
+        git fetch origin main
+        
+        # 检查是否有修改
+        if git diff --exit-code; then
+          echo "No changes detected, skipping commit."
+        else
+          git add webs
+          git commit -m "🚀 Update webs/ folder by GitHub Actions on $(date +'%F %T')"
+          git push origin main
+        fi
+      env:
+        GIT_AUTHOR_NAME: GitHub Actions
+        GIT_AUTHOR_EMAIL: github-actions@users.noreply.github.com
+        GIT_COMMITTER_NAME: GitHub Actions
+        GIT_COMMITTER_EMAIL: github-actions@users.noreply.github.com
+        TOKEN: ${{ secrets.PAT }}
