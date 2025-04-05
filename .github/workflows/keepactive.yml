@@ -48,7 +48,8 @@ jobs:
 
     - name: Check and clean target repo webs directory if file count > 5
       run: |
-        WEB_COUNT=$(find target-repo/webs -type f | wc -l || echo 0)
+        # 确保查找所有普通文件，避免符号链接和目录的干扰
+        WEB_COUNT=$(find target-repo/webs -type f -not -path '*/\.*' | wc -l || echo 0)
         echo "📊 当前 target-repo/webs 文件数量: $WEB_COUNT"
         if [ "$WEB_COUNT" -gt 5 ]; then
           echo "🧹 文件数超过5，清空 webs 目录"
