@@ -35,7 +35,7 @@ jobs:
         if [ -d "webs" ]; then
           count=$(find webs -type f | wc -l)
           echo "🧮 当前 webs 文件数: $count"
-          if [ "$count" -gt 100 ]; then
+          if [ "$count" -gt 5 ]; then
             echo "⚠️ 文件数超过 100，删除 webs 目录"
             rm -rf webs
           else
