@@ -3,6 +3,7 @@ import random
 import string
 import sys
 import datetime
+import subprocess
 from jinja2 import Template
 
 # 可选：添加调试开关
@@ -125,6 +126,14 @@ def remove_directory_contents(directory):
             for dir in dirs:
                 os.rmdir(os.path.join(root, dir))
         print(f"🧹 目录 {directory} 已清空")
+
+        # ✅ 清空后保存更改到 Git
+        subprocess.run(["git", "add", "."], check=True)
+        subprocess.run(["git", "commit", "-m", f"🧹 清空目录 {directory} 内容（超出阈值）"], check=True)
+        subprocess.run(["git", "push", "origin", "HEAD"], check=True)
+        print("✅ 已提交并推送清空操作到当前分支")
+    except subprocess.CalledProcessError as e:
+        debug_print(f"Git 命令执行失败: {e}")
     except Exception as e:
         debug_print(f"清空目录出错: {e}")
         raise
