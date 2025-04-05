@@ -1,17 +1,25 @@
 import os
 import random
 import string
-import sys
 import datetime
+import argparse
 import subprocess
 from jinja2 import Template
 
-# 可选：添加调试开关
 DEBUG = True
 
 def debug_print(*args):
     if DEBUG:
-        print("[DEBUG]", *args)
+        print("\033[94m[DEBUG]", *args, "\033[0m")
+
+def log_info(msg):
+    print(f"\033[92m{msg}\033[0m")
+
+def log_warn(msg):
+    print(f"\033[93m{msg}\033[0m")
+
+def log_error(msg):
+    print(f"\033[91m{msg}\033[0m")
 
 def ensure_directory_exists(directory):
     if not os.path.exists(directory):
@@ -40,7 +48,9 @@ def generate_random_data():
         'color': f'#{random.randint(0, 255):02X}{random.randint(0, 255):02X}{random.randint(0, 255):02X}',
         'created_at': now.isoformat(),
         'updated_at': now.isoformat(),
-        'generated_on': now.strftime('%Y-%m-%d')
+        'generated_on': now.strftime('%Y-%m-%d'),
+        'version': '1.0',
+        'identifier': random_suffix
     }
 
 def generate_random_filename(length=10):
@@ -69,6 +79,8 @@ if __name__ == "__main__":
     "title": "{{ data.title }}",
     "heading": "{{ data.heading }}",
     "content": "{{ data.content }}",
+    "version": "{{ data.version }}",
+    "identifier": "{{ data.identifier }}",
     "metadata": {
         "created_at": "{{ data.created_at }}",
         "updated_at": "{{ data.updated_at }}"
@@ -78,6 +90,8 @@ if __name__ == "__main__":
 title: {{ data.title }}
 heading: {{ data.heading }}
 content: {{ data.content }}
+version: {{ data.version }}
+identifier: {{ data.identifier }}
 metadata:
   created_at: {{ data.created_at }}
   updated_at: {{ data.updated_at }}
@@ -113,7 +127,7 @@ metadata:
     try:
         with open(output_file, 'w', encoding='utf-8') as output:
             output.write(code)
-        print(f"✅ 生成文件: {os.path.basename(output_file)}")
+        log_info(f"✅ 生成文件: {os.path.basename(output_file)}")
     except Exception as e:
         debug_print(f"写入文件出错: {e}")
         raise
@@ -122,33 +136,32 @@ def remove_directory_contents(directory):
     try:
         for root, dirs, files in os.walk(directory, topdown=False):
             for file in files:
-                os.remove(os.path.join(root, file))
+                if file not in ['.gitkeep', '.gitignore']:
+                    os.remove(os.path.join(root, file))
             for dir in dirs:
                 os.rmdir(os.path.join(root, dir))
-        print(f"🧹 目录 {directory} 已清空")
+        log_warn(f"🧹 目录 {directory} 已清空")
 
-        # ✅ 清空后保存更改到 Git
         subprocess.run(["git", "add", "."], check=True)
         subprocess.run(["git", "commit", "-m", f"🧹 清空目录 {directory} 内容（超出阈值）"], check=True)
         subprocess.run(["git", "push", "origin", "HEAD"], check=True)
-        print("✅ 已提交并推送清空操作到当前分支")
+        log_info("✅ 已提交并推送清空操作到当前分支")
     except subprocess.CalledProcessError as e:
         debug_print(f"Git 命令执行失败: {e}")
     except Exception as e:
         debug_print(f"清空目录出错: {e}")
         raise
 
-def main():
-    if len(sys.argv) < 3:
-        print("❗ 用法：python script.py 目录 文件数阈值")
-        sys.exit(1)
+def parse_args():
+    parser = argparse.ArgumentParser(description="生成随机模板文件，并在超过阈值时清空目录")
+    parser.add_argument("directory", help="目标目录")
+    parser.add_argument("threshold", type=int, help="最大文件数阈值")
+    return parser.parse_args()
 
-    target_directory = sys.argv[1]
-    try:
-        threshold = int(sys.argv[2])
-    except ValueError:
-        print("❗ 文件数阈值必须是整数")
-        sys.exit(1)
+def main():
+    args = parse_args()
+    target_directory = args.directory
+    threshold = args.threshold
 
     ensure_directory_exists(target_directory)
 
