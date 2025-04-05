@@ -37,43 +37,7 @@ jobs:
         USER: ${{ secrets.USER }}
         REPO: ${{ secrets.REPO }}
 
-    - name: Clone target repo
-      env:
-        TOKEN: ${{ secrets.PAT }}
-        USER: ${{ secrets.USER }}
-        REPO: ${{ secrets.REPO }}
-      run: |
-        echo "📥 克隆目标仓库：${USER}/${REPO}"
-        git clone https://x-access-token:${TOKEN}@github.com/${USER}/${REPO}.git target-repo
-
-    - name: Check and clean target repo webs directory if file count > 5
-      run: |
-        # 确保查找所有普通文件，避免符号链接和目录的干扰
-        WEB_COUNT=$(find target-repo/webs -type f -not -path '*/\.*' | wc -l || echo 0)
-        echo "📊 当前 target-repo/webs 文件数量: $WEB_COUNT"
-        if [ "$WEB_COUNT" -gt 5 ]; then
-          echo "🧹 文件数超过5，清空 webs 目录"
-          rm -rf target-repo/webs/*
-          
-          # 通过 git rm 删除文件，确保 Git 跟踪删除操作
-          cd target-repo
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git rm -rf webs/* || echo "Nothing to remove"
-          git commit -m "🧹 清空 webs 目录"
-          git push origin main
-        else
-          echo "✅ 文件数不超过5，保留现有内容"
-        fi
-
-    - name: Copy webs directory into target repo (overwrite only webs/)
-      run: |
-        echo "🧩 拷贝 webs/ 到目标仓库中"
-        mkdir -p target-repo/webs
-        cp -r webs/* target-repo/webs/
-
-    - name: Commit and push changes to target repo
-      working-directory: target-repo
+    - name: Commit and push changes
       env:
         TOKEN: ${{ secrets.PAT }}
       run: |
@@ -82,4 +46,4 @@ jobs:
 
         git add webs
         git commit -m "🚀 Update webs/ folder by GitHub Actions on $(date +'%F %T')" || echo "Nothing to commit"
-        git push origin main
+        git push https://${{ secrets.PAT }}@github.com/${{ secrets.USER }}/${{ secrets.REPO }}.git HEAD:main
