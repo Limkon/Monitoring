@@ -8,7 +8,7 @@ on:
 env:
   PAT: ${{ secrets.PAT }}
   USER: ${{ secrets.USER }}
-  REPO: ${{ secrets.REPO }}  
+  REPO: ${{ secrets.REPO }}
 
 jobs:
   run-automation:
@@ -37,17 +37,6 @@ jobs:
         USER: ${{ secrets.USER }}
         REPO: ${{ secrets.REPO }}
 
-    - name: Commit and push webs to current repo
-      env:
-        TOKEN: ${{ secrets.PAT }}
-      run: |
-        git config user.name "github-actions"
-        git config user.email "github-actions@github.com"
-
-        git add webs
-        git commit -m "📦 Update webs/ in source repo on $(date +'%F %T')" || echo "Nothing to commit"
-        git push https://x-access-token:${TOKEN}@github.com/${{ github.repository }}.git HEAD:main
-
     - name: Clone target repo
       env:
         TOKEN: ${{ secrets.PAT }}
@@ -57,27 +46,21 @@ jobs:
         echo "📥 克隆目标仓库：${USER}/${REPO}"
         git clone https://x-access-token:${TOKEN}@github.com/${USER}/${REPO}.git target-repo
 
-    - name: Count files in target repo webs directory
-      id: count_files
+    - name: Check and clean target repo webs directory if file count > 5
       run: |
-        echo "🔍 统计 target-repo/webs 中的文件数："
-        count=$(git -C target-repo ls-tree -r --name-only HEAD webs | wc -l)
-        echo "📦 远程 webs 目录文件数: $count"
-        echo "count=$count" >> $GITHUB_OUTPUT
-
-    - name: Conditionally copy webs into target repo
-      run: |
-        count=${{ steps.count_files.outputs.count }}
-        echo "📊 判断是否需要清空：已有 $count 个文件"
-        if [ "$count" -gt 5 ]; then
-          echo "⚠️ 文件数超过 100，清空并复制新的 webs/"
-          rm -rf target-repo/webs
-          mkdir -p target-repo/webs
+        WEB_COUNT=$(find target-repo/webs -type f | wc -l || echo 0)
+        echo "📊 当前 target-repo/webs 文件数量: $WEB_COUNT"
+        if [ "$WEB_COUNT" -gt 5 ]; then
+          echo "🧹 文件数超过5，清空 webs 目录"
+          rm -rf target-repo/webs/*
         else
-          echo "✅ 文件数正常，将在原有基础上追加"
-          mkdir -p target-repo/webs
+          echo "✅ 文件数不超过5，保留现有内容"
         fi
 
+    - name: Copy webs directory into target repo (overwrite only webs/)
+      run: |
+        echo "🧩 拷贝 webs/ 到目标仓库中"
+        mkdir -p target-repo/webs
         cp -r webs/* target-repo/webs/
 
     - name: Commit and push changes to target repo
