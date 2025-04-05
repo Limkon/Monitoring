@@ -2,7 +2,7 @@ name: Keep Active
 
 on:
   schedule:
-    - cron: "0 0 */5 * *"  # 每15天运行一次
+    - cron: "0 0 */15 * *"  # 每15天运行一次
   workflow_dispatch:
 
 env:
@@ -37,28 +37,25 @@ jobs:
         USER: ${{ secrets.USER }}
         REPO: ${{ secrets.REPO }}
 
-    - name: Set Git user identity
+    - name: Commit and push changes safely
       run: |
+        # 配置 Git 身份
         git config --global user.email "github-actions@users.noreply.github.com"
         git config --global user.name "GitHub Actions"
 
-    - name: Check for uncommitted changes and commit
-      run: |
-        # 检查是否有未提交的更改
-        git diff --exit-code || (
-          git add .
-          git commit -m "🚀 Auto-commit untracked changes before pulling"
-        )
-
-    - name: Pull and rebase remote changes
-      run: |
+        # 设置远程地址（带上 PAT）
         git remote set-url origin https://${{ secrets.PAT }}@github.com/${{ secrets.USER }}/${{ secrets.REPO }}.git
+
+        # Step 1: 临时提交所有更改（避免 pull --rebase 报错）
+        git add .
+        git commit -m "🛠 Temp commit to allow pull --rebase" || echo "Nothing to commit"
+
+        # Step 2: 拉取远程更改（解决冲突）
         git pull --rebase origin main
 
-    - name: Push changes to remote repository
-      run: |
+        # Step 3: 添加目标更改（webs 目录）
         git add webs
-        git commit -m "🚀 Update webs/ folder by GitHub Actions on $(date +'%F %T')"
+        git commit -m "🚀 Update webs/ folder by GitHub Actions on $(date +'%F %T')" || echo "Nothing to commit"
+
+        # Step 4: 推送
         git push origin main
-      env:
-        TOKEN: ${{ secrets.PAT }}
