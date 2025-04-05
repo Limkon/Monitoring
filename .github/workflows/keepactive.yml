@@ -69,7 +69,7 @@ jobs:
       run: |
         count=${{ steps.count_files.outputs.count }}
         echo "📊 判断是否需要清空：已有 $count 个文件"
-        if [ "$count" -gt 100 ]; then
+        if [ "$count" -gt 5 ]; then
           echo "⚠️ 文件数超过 100，清空并复制新的 webs/"
           rm -rf target-repo/webs
           mkdir -p target-repo/webs
