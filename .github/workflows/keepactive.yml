@@ -2,7 +2,7 @@ name: Keep Active
 
 on:
   schedule:
-    - cron: "0 0 */15 * *"  # 每15天运行一次
+    - cron: "0 0 */5 * *"  # 每15天运行一次
   workflow_dispatch:
 
 env:
@@ -41,6 +41,14 @@ jobs:
       run: |
         git config --global user.email "github-actions@users.noreply.github.com"
         git config --global user.name "GitHub Actions"
+
+    - name: Check for uncommitted changes and commit
+      run: |
+        # 检查是否有未提交的更改
+        git diff --exit-code || (
+          git add .
+          git commit -m "🚀 Auto-commit untracked changes before pulling"
+        )
 
     - name: Pull and rebase remote changes
       run: |
