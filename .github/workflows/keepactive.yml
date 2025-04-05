@@ -54,6 +54,12 @@ jobs:
         if [ "$WEB_COUNT" -gt 5 ]; then
           echo "🧹 文件数超过5，清空 webs 目录"
           rm -rf target-repo/webs/*
+          
+          # 通过 git rm 删除文件，确保 Git 跟踪删除操作
+          cd target-repo
+          git rm -rf webs/* || echo "Nothing to remove"
+          git commit -m "🧹 清空 webs 目录"
+          git push origin main
         else
           echo "✅ 文件数不超过5，保留现有内容"
         fi
