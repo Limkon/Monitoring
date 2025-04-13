@@ -124,14 +124,23 @@ if __name__ == "__main__":
 
     # 2️⃣ 检查每个网站的状态
     results = []
+    valid_urls = []
     for url in unique_urls:
         result = check_website_status(url)
         results.append(result)
+        # 仅保留非404的URL
+        if result.get('status_code') != 404:
+            valid_urls.append(url)
+        else:
+            print(f"🗑️ Removing {url} from {filename} due to 404 status.")
 
     # 3️⃣ 更新 README.md
     update_readme(results)
 
-    # 4️⃣ 重新保存处理后的 URLs
-    with open(filename, 'w', encoding='utf-8') as file:
-        file.write('\n'.join(unique_urls) + '\n')
-    print(f"✅ Updated {filename} with cleaned URLs.")
+    # 4️⃣ 保存非404的 URLs
+    if valid_urls != unique_urls:
+        with open(filename, 'w', encoding='utf-8') as file:
+            file.write('\n'.join(valid_urls) + '\n')
+        print(f"✅ Updated {filename} by removing {len(unique_urls) - len(valid_urls)} URLs with 404 status.")
+    else:
+        print(f"✅ No URLs with 404 status found in {filename}. No changes made.")
