@@ -29,15 +29,15 @@ jobs:
         # 你可以根据需要修改这里的命名和处理逻辑
         mv page_content.html xio
 
-    - name: Commit and push the .xio file
+    - name: Commit and push the xio file
       run: |
         git config --global user.name "GitHub Actions"
         git config --global user.email "actions@github.com"
-        git add page_content.xio
-        git commit -m "Update page content to .xio file"
+        git add xio
+        git commit -m "Update page xio file"
         git push
 
     - name: Clean up
       run: |
         # 清理临时文件
-        rm -f page_content.xio
+        rm -f xio
