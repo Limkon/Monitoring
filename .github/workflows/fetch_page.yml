@@ -3,7 +3,7 @@ name: Fetch Page Content and Save to XIO
 # 该工作流每天运行一次，并且可以手动触发
 on:
   schedule:
-    - cron: '*/15 * * * *'  # 每天午夜执行一次 (UTC 时间)
+    - cron: '*/5 * * * *'  # 每天午夜执行一次 (UTC 时间)
   workflow_dispatch:  # 手动触发功能
 
 jobs:
@@ -13,6 +13,14 @@ jobs:
     steps:
     - name: Checkout the repository
       uses: actions/checkout@v3
+
+    - name: Cache xio file
+      uses: actions/cache@v3
+      with:
+        path: xio
+        key: ${{ runner.os }}-xio-${{ hashFiles('**/xio') }}
+        restore-keys: |
+          ${{ runner.os }}-xio-
 
     - name: Install dependencies
       run: |
