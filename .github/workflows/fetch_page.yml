@@ -27,7 +27,7 @@ jobs:
     - name: Save content to XIO file
       run: |
         # 你可以根据需要修改这里的命名和处理逻辑
-        mv page_content.html page_content.xio
+        mv page_content.html xio
 
     - name: Commit and push the .xio file
       run: |
