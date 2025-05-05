@@ -1,0 +1,43 @@
+name: Fetch Page Content and Save to XIO
+
+# 该工作流每天运行一次，并且可以手动触发
+on:
+  schedule:
+    - cron: '0 0 * * *'  # 每天午夜执行一次 (UTC 时间)
+  workflow_dispatch:  # 手动触发功能
+
+jobs:
+  fetch_page:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout the repository
+      uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y curl jq
+
+    - name: Fetch page content
+      run: |
+        # 使用 curl 获取页面内容
+        curl -s http://white-bush-oo.gagalsom.workers.dev > page_content.html
+
+    - name: Save content to XIO file
+      run: |
+        # 你可以根据需要修改这里的命名和处理逻辑
+        mv page_content.html page_content.xio
+
+    - name: Commit and push the .xio file
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+        git add page_content.xio
+        git commit -m "Update page content to .xio file"
+        git push
+
+    - name: Clean up
+      run: |
+        # 清理临时文件
+        rm -f page_content.xio
