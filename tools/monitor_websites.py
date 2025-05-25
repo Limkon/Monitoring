@@ -14,7 +14,7 @@ README_FILENAME = "README.md"
 USER_AGENT = "WebsiteStatusMonitor/1.0 (+https://github.com/your_username/your_repo)" # 请替换为您的信息
 MAX_WORKERS = 10
 
-# --- 函数定义 (normalize_url, looks_like_url, check_website_status, get_status_priority 保持不变) ---
+# --- 函数定义 ---
 def normalize_url(url):
     parsed_url = urlparse(url.strip())
     if not parsed_url.scheme:
@@ -75,32 +75,10 @@ def get_status_priority(status_str: str) -> int:
     if status_str.startswith("✅"): return 5
     return 6
 
-def _generate_markdown_table_for_column(result_list: list, column_title: str) -> str:
-    if not result_list: return ""
-    table_content = f"### {column_title}\n\n"
-    table_header = "| <small>URL</small> | <small>状态</small> | <small>状态码</small> | <small>响应时间</small> | <small>最后检查 (UTC)</small> |\n"
-    table_alignment = "|:-----|:-------|:----------|:---------------|:--------------------|\n"
-    table_content += table_header + table_alignment
-    rows_md = []
-    for result in result_list:
-        status_code_display = f"<small>{result.get('status_code', 'N/A')}</small>"
-        response_time_display = f"<small>{result['response_time']}</small>"
-        timestamp_display = f"<small>{result['timestamp']}</small>"
-        status_display = f"<small>{result.get('status', '❓')}</small>"
-        url_display_raw = result['url']
-        url_markdown = f"[{url_display_raw}]({url_display_raw})"
-        if 'final_url' in result and result['final_url'] != result['url']:
-            url_markdown += f"<br><sub>↳ 最终: [{result['final_url']}]({result['final_url']})</sub>"
-        url_display_final = f"<small>{url_markdown}</small>"
-        row = f"| {url_display_final} | {status_display} | {status_code_display} | {response_time_display} | {timestamp_display} |"
-        rows_md.append(row)
-    table_content += "\n".join(rows_md) + "\n"
-    return table_content
+# _generate_markdown_table_for_column 函数被移除，其逻辑整合到 update_readme
 
-# vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-# 这是修改后的 update_readme 函数
-# vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 def update_readme(results: list, readme_file: str = README_FILENAME):
+    """将状态结果更新到 README.md，实现排序和缩小字体（单列表格）"""
     if not results:
         print("⚠️ 没有结果可以更新到README。")
         content = f"# 网站状态监控\n\n最后检查时间: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}\n\n"
@@ -112,51 +90,47 @@ def update_readme(results: list, readme_file: str = README_FILENAME):
         except IOError as e: print(f"❌ 写入空的 {readme_file} 时发生错误: {e}")
         return
 
+    # 1. 排序结果：不正常的在前，优先级相同时按URL字母顺序排序
     results.sort(key=lambda r: (get_status_priority(r.get('status', '❓')), r['url']))
 
+    # 准备README的整体内容
     readme_content = f"# 网站状态监控\n\n最后检查时间: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}\n\n"
     
-    num_results = len(results)
-    mid_point = math.ceil(num_results / 2.0)
-    results_col1 = results[:int(mid_point)]
-    results_col2 = results[int(mid_point):]
+    # 生成单个Markdown表格
+    # 表头，所有内容用 <small> 包裹
+    table_header = "| <small>URL</small> | <small>状态</small> | <small>状态码</small> | <small>响应时间</small> | <small>最后检查 (UTC)</small> |\n"
+    table_alignment = "|:-----|:-------|:----------|:---------------|:--------------------|\n" # 指定对齐方式
+    readme_content += table_header + table_alignment
 
-    markdown_table1 = _generate_markdown_table_for_column(results_col1, "监控列表 (1)")
-    markdown_table2 = _generate_markdown_table_for_column(results_col2, "监控列表 (2)") if results_col2 else ""
+    rows_md = []
+    for result in results:
+        # 表格数据也用 <small> 包裹
+        status_code_display = f"<small>{result.get('status_code', 'N/A')}</small>"
+        response_time_display = f"<small>{result['response_time']}</small>"
+        timestamp_display = f"<small>{result['timestamp']}</small>"
+        status_display = f"<small>{result.get('status', '❓')}</small>"
 
-    # 使用HTML表格实现两栏布局
-    # style="border: none; table-layout: fixed;" 可选，table-layout: fixed 有助于等宽
-    # border-collapse: collapse; 避免双边框
-    readme_content += '<table width="100%" style="border: none !important; border-collapse: collapse !important;">\n'
-    readme_content += '  <tr style="border: none !important;">\n'
+        url_display_raw = result['url']
+        # 创建可点击的URL链接
+        url_markdown = f"[{url_display_raw}]({url_display_raw})"
+        if 'final_url' in result and result['final_url'] != result['url']:
+            # 如果发生重定向，使用 <br> 换行并用 <sub> 显示最终URL，使其更小
+            url_markdown += f"<br><sub>↳ 最终: [{result['final_url']}]({result['final_url']})</sub>"
+        
+        url_display_final = f"<small>{url_markdown}</small>"
+
+        row = f"| {url_display_final} | {status_display} | {status_code_display} | {response_time_display} | {timestamp_display} |"
+        rows_md.append(row)
     
-    # 第一栏单元格
-    # padding用于单元格之间的间距
-    readme_content += '    <td width="50%" valign="top" style="border: none !important; padding-right: 10px;">\n'
-    readme_content += '\n\n\n' # 空行确保Markdown解析
-    readme_content += markdown_table1
-    readme_content += '\n\n\n'
-    readme_content += '    </td>\n'
-
-    # 第二栏单元格
-    readme_content += '    <td width="50%" valign="top" style="border: none !important; padding-left: 10px;">\n'
-    if results_col2:
-        readme_content += '\n\n\n'
-        readme_content += markdown_table2
-        readme_content += '\n\n\n'
-    else:
-        readme_content += "\n"
-    readme_content += '    </td>\n'
-    
-    readme_content += '  </tr>\n'
-    readme_content += '</table>\n'
-
+    readme_content += "\n".join(rows_md) + "\n" # 每个表格后加一个换行
     readme_content += f"\n\n由 {USER_AGENT} 监控\n"
 
     try:
-        with open(readme_file, "w", encoding="utf-8") as f: f.write(readme_content)
-        print(f"✅ 已将最新的网站状态 ({num_results} 个站点，已排序和分栏) 更新到 {readme_file}。")
-    except IOError as e: print(f"❌ 写入 {readme_file} 时发生错误: {e}")
+        with open(readme_file, "w", encoding="utf-8") as f:
+            f.write(readme_content)
+        print(f"✅ 已将最新的网站状态 ({len(results)} 个站点，已排序) 更新到 {readme_file}。")
+    except IOError as e:
+        print(f"❌ 写入 {readme_file} 时发生错误: {e}")
 
 # --- process_url_file 和 主程序逻辑 (__main__) 保持不变 ---
 def process_url_file(filename):
@@ -209,7 +183,7 @@ if __name__ == "__main__":
                 results_map[original_url] = error_result
     ordered_results = [results_map[url] for url in urls_to_check if url in results_map]
     print(f"\n--- 第3步: 更新 {README_FILENAME} ---")
-    update_readme(ordered_results, readme_file=README_FILENAME)
+    update_readme(ordered_results, readme_file=README_FILENAME) # update_readme内部会进行排序
     print(f"\n--- 第4步: 更新URL文件 {url_source_filename} (移除404) ---")
     valid_urls_after_check = []
     removed_404_count = 0
