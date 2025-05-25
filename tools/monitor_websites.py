@@ -2,19 +2,20 @@ import os
 import sys
 import requests
 import time
-from datetime import datetime, timezone # 引入 timezone
+from datetime import datetime, timezone
 from urllib.parse import urlparse
-from concurrent.futures import ThreadPoolExecutor, as_completed # 用于并发
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import traceback # 导入 traceback 模块
 
 # --- 配置常量 ---
 REQUEST_TIMEOUT = 10  # seconds
 README_FILENAME = "README.md"
-USER_AGENT = "WebsiteStatusMonitor/1.0 (+https://github.com/your_username/your_repo)" # 替换为您的信息
-MAX_WORKERS = 10 # 并发检查的最大线程数 (可以根据CPU核心数调整, e.g., os.cpu_count() * 2)
+USER_AGENT = "WebsiteStatusMonitor/1.0 (+https://github.com/your_username/your_repo)" # 请替换为您的信息
+MAX_WORKERS = 10 # 并发检查的最大线程数
 
 def normalize_url(url):
     """检查 URL 是否包含协议，如果没有，则添加 https://"""
-    parsed_url = urlparse(url.strip()) # strip url before parsing
+    parsed_url = urlparse(url.strip())
     if not parsed_url.scheme:
         return "https://" + url.strip()
     return url.strip()
@@ -25,11 +26,9 @@ def looks_like_url(url_str):
         return False
     try:
         parsed_url = urlparse(url_str.strip())
-        # 确保有网络位置 (netloc) 并且有协议 (scheme) 或路径 (path)
-        # 进一步检查 netloc 是否包含点，以排除像 "localhost" 这样的简单词（除非确实需要监控localhost）
         return bool(parsed_url.netloc and '.' in parsed_url.netloc) and \
                bool(parsed_url.scheme or parsed_url.path or parsed_url.netloc)
-    except ValueError: # urlparse can raise ValueError for very malformed URLs
+    except ValueError:
         return False
 
 def check_website_status(url):
@@ -39,188 +38,150 @@ def check_website_status(url):
         "url": url,
         "status_code": None,
         "response_time": "N/A",
-        "timestamp": datetime.now(timezone.utc).isoformat(), # 使用 timezone-aware UTC time
-        "error": None
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "error": None,
+        "status": "❓ 未知状态" # 默认状态
     }
     try:
         start_time = time.time()
-        # 允许重定向，但记录最终的URL（requests默认处理重定向）
         response = requests.get(url, timeout=REQUEST_TIMEOUT, headers=headers, allow_redirects=True)
         end_time = time.time()
         response_time_ms = (end_time - start_time) * 1000
 
         result["status_code"] = response.status_code
         result["response_time"] = f"{response_time_ms:.2f} ms"
-        # 如果发生重定向，response.url 会是最终的URL
         if response.url != url:
-            result["final_url"] = response.url # 记录最终URL
+            result["final_url"] = response.url
 
         if 200 <= response.status_code < 300:
-            result["status"] = "✅ Up"
+            result["status"] = "✅ 正常"
         elif 300 <= response.status_code < 400:
-            result["status"] = f"↪️ Redirect ({response.status_code})"
+            result["status"] = f"↪️ 重定向 ({response.status_code})"
         elif response.status_code == 404:
-            result["status"] = "🚫 Not Found (404)"
+            result["status"] = "🚫 未找到 (404)"
         else:
-            result["status"] = f"⚠️ Down (Status: {response.status_code})"
+            result["status"] = f"⚠️ 异常 (状态: {response.status_code})"
 
-        # 打印时使用原始请求的 URL
-        print(f"{result['status']} - {url} | Code: {result['status_code']} | Time: {result['response_time']}" +
-              (f" | Final URL: {result['final_url']}" if "final_url" in result else ""))
+        # 打印信息时使用原始请求的 URL
+        final_url_info = f" | 最终URL: {result['final_url']}" if "final_url" in result else ""
+        print(f"{result['status']} - {url} | Code: {result['status_code']} | Time: {result['response_time']}{final_url_info}")
         return result
 
     except requests.Timeout:
-        result["status"] = "❌ Down (Timeout)"
-        result["error"] = "Request timed out"
-    except requests.RequestException as e:
-        result["status"] = "❌ Down (Error)"
-        result["error"] = str(e).splitlines()[0] #取错误信息的第一行，避免过长
+        result["status"] = "❌ 太慢 (超时)"
+        result["error"] = "请求超时"
+    except requests.exceptions.SSLError as e_ssl:
+        result["status"] = "❌ SSL错误"
+        result["error"] = f"SSL握手或证书验证失败: {str(e_ssl).splitlines()[0]}"
+    except requests.exceptions.ConnectionError as e_conn:
+        result["status"] = "❌ 连接错误"
+        result["error"] = f"无法连接到服务器: {str(e_conn).splitlines()[0]}"
+    except requests.RequestException as e_req: # 其他 requests 库相关的错误
+        result["status"] = "❌ 请求错误"
+        result["error"] = f"请求期间发生错误: {str(e_req).splitlines()[0]}"
+    except Exception as e_gen: # 捕获此函数内任何其他未预料的错误
+        result["status"] = "❌ 内部处理错误"
+        result["error"] = f"检查状态时发生意外错误: {str(e_gen).splitlines()[0]}"
+        print(f"--- 在 check_website_status 函数中针对URL {url} 发生意外错误 ---")
+        traceback.print_exc() # 在函数内部直接打印追溯，方便定位
+        print(f"--- 意外错误结束 {url} ---")
     
-    print(f"{result['status']} - {url} | Error: {result.get('error', 'Unknown')}")
+    # 如果发生异常，上面的打印语句可能没有执行，这里补上
+    print(f"{result['status']} - {url} | 错误: {result.get('error', '未知错误')}")
     return result
 
 
 def update_readme(results, readme_file=README_FILENAME):
     """将状态结果更新到 README.md"""
     if not results:
-        print("⚠️ No results to update README with.")
+        print("⚠️ 没有结果可以更新到README。")
         return
 
-    # 按原始URL排序（如果结果是字典的话），或者如果传入的是列表就直接用
-    # results.sort(key=lambda r: r['url']) # 可选：如果需要按URL字母顺序排序
-
-    header = f"# Website Status\n\nLast checked: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}\n\n"
-    table_header = "| URL | Status | Status Code | Response Time | Last Checked (UTC) |\n|-----|--------|-------------|---------------|--------------------|\n"
+    header = f"# 网站状态监控\n\n最后检查时间: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}\n\n"
+    table_header = "| URL | 状态 | 状态码 | 响应时间 | 最后检查时间 (UTC) |\n|-----|------|---------|----------|--------------------|\n"
     
     rows = []
     for result in results:
         status_code_display = result.get('status_code', 'N/A')
-        # 处理 final_url，如果存在则显示，并指向原始请求的 URL
         url_display = result['url']
         if 'final_url' in result and result['final_url'] != result['url']:
-            url_display = f"[{result['url']}]({result['url']}) ( 최종: [{result['final_url']}]({result['final_url']}) )" # Markdown link
+            url_display = f"[{result['url']}]({result['url']}) (最终: [{result['final_url']}]({result['final_url']}))"
         else:
              url_display = f"[{result['url']}]({result['url']})"
 
-
-        row = f"| {url_display} | {result['status']} | {status_code_display} | {result['response_time']} | {result['timestamp']} |"
+        row = f"| {url_display} | {result.get('status', '❓')} | {status_code_display} | {result['response_time']} | {result['timestamp']} |"
         rows.append(row)
 
     content = header + table_header + "\n".join(rows) + "\n\n" \
-              f"Monitored with {USER_AGENT}\n"
+              f"由 {USER_AGENT} 监控\n"
     
     try:
         with open(readme_file, "w", encoding="utf-8") as f:
             f.write(content)
-        print(f"✅ Updated {readme_file} with latest website status ({len(results)} sites).")
+        print(f"✅ 已将最新的网站状态 ({len(results)} 个站点) 更新到 {readme_file}。")
     except IOError as e:
-        print(f"❌ Error writing to {readme_file}: {e}")
+        print(f"❌ 写入 {readme_file} 时发生错误: {e}")
 
 def process_url_file(filename):
     """读取、去重、规范化URL，并写回文件（如果发生更改）。返回处理后的URL列表。"""
     try:
         with open(filename, 'r', encoding='utf-8') as file:
-            # strip() each line during read
             initial_urls = [line.strip() for line in file.readlines()]
     except FileNotFoundError:
-        print(f"❌ Error: File {filename} not found.")
+        print(f"❌ 错误: 文件 {filename} 未找到。")
         return []
     except Exception as e:
-        print(f"❌ Error reading {filename}: {e}")
+        print(f"❌ 读取 {filename} 时发生错误: {e}")
         return []
 
-    # 过滤看起来不像URL的行和空行
     valid_format_urls = [url for url in initial_urls if looks_like_url(url)]
-    
-    # 规范化URL (补全协议)
     normalized_urls = [normalize_url(url) for url in valid_format_urls]
-
-    # 去重 (保持原始顺序)
     unique_urls = []
     seen = set()
     for url in normalized_urls:
         if url not in seen:
             seen.add(url)
             unique_urls.append(url)
-
-    # 检查是否有实际内容更改 (不仅仅是行数变化，还要考虑顺序和内容)
-    # 最简单的方式是比较处理后的URL列表和初始有效URL列表（经过同样处理流程）
-    # 或者比较最终的 unique_urls 字符串形式和初始文件内容（去除无效行后）
-    # 这里采用一种直接的方式：如果 unique_urls 和 initial_urls（仅包含有效格式、规范化和去重后）不同，则更新。
     
-    # 为了准确判断是否需要写回，我们可以比较生成的 unique_urls 和文件原始内容处理后的结果
-    # 如果原始文件已经完美，则 initial_urls 处理后应该等于 unique_urls
-    # initial_urls_as_processed_for_comparison = []
-    # seen_initial = set()
-    # for url_orig in [normalize_url(u) for u in initial_urls if looks_like_url(u)]:
-    #     if url_orig not in seen_initial:
-    #         seen_initial.add(url_orig)
-    #         initial_urls_as_processed_for_comparison.append(url_orig)
-
-    # if unique_urls != initial_urls_as_processed_for_comparison:
-
-    # 更简单的方式：比较写入内容和原始读取内容（去除空白行）
-    # 另一种简单方法：如果 unique_urls 的数量或内容与原始有效URL列表（处理前）不同
-    # 或者，直接比较最终生成的 unique_urls 列表和从文件读入并初步处理（strip）的列表。
-    # 如果文件内容与 `\n`.join(unique_urls) + `\n` 不同，则写入。
-    
-    original_content_as_string = "\n".join(initial_urls) # 保存原始完整内容用于比较
-    new_content_as_string = "\n".join(unique_urls)
-
-    # 只有当处理后的内容与原始（经过strip的）内容不同时才更新
-    # 为避免因尾部换行符问题误判，比较列表本身或者处理后的字符串
-    if unique_urls != [normalize_url(u) for u in [s for s in initial_urls if looks_like_url(s)] if u not in seen] or \
-       len(unique_urls) != len([s for s in initial_urls if looks_like_url(s) and normalize_url(s) in seen]): # 检查是否真的有变化
-        # More robust: compare the string to be written with current file content (after basic cleaning for comparison)
-        # For simplicity, if the list of unique URLs is different from what one would get by just reading and stripping, update.
-        # This check might be complex. A simpler heuristic: if counts changed or if the actual strings changed.
-
-        # 重新读取文件，并构建一个“理想的”当前文件内容列表
-        current_file_ideal_lines = []
-        if os.path.exists(filename):
+    current_file_ideal_lines = []
+    if os.path.exists(filename):
+        try:
             with open(filename, 'r', encoding='utf-8') as f_check:
                 current_file_ideal_lines = [line.strip() for line in f_check if line.strip()]
+        except Exception: # 如果读取用于比较的文件失败，就假设需要更新
+            pass 
         
-        # 如果 unique_urls 与当前文件中的有效行列表不同，则更新
-        if unique_urls != current_file_ideal_lines:
-            print(f"🔄 Updating {filename}: Normalizing URLs, removing duplicates/invalid entries...")
-            try:
-                with open(filename, 'w', encoding='utf-8') as file:
-                    file.write('\n'.join(unique_urls) + '\n') #确保末尾有换行
-                print(f"✅ {filename} has been updated successfully with {len(unique_urls)} URLs.")
-            except IOError as e:
-                print(f"❌ Error writing updates to {filename}: {e}")
-                return initial_urls # 返回原始URLs，因为写入失败
-        else:
-            print(f"✅ No structural changes needed for {filename}. Already clean.")
+    if unique_urls != current_file_ideal_lines:
+        print(f"🔄 正在更新 {filename}: 规范化URL，移除重复项/无效条目...")
+        try:
+            with open(filename, 'w', encoding='utf-8') as file:
+                file.write('\n'.join(unique_urls) + '\n')
+            print(f"✅ {filename} 已成功更新，包含 {len(unique_urls)} 个URL。")
+        except IOError as e:
+            print(f"❌ 更新 {filename} 时写入错误: {e}")
+            return initial_urls # 写入失败，返回原始URL避免数据丢失
     else:
-        print(f"✅ No changes needed for {filename}. Already clean.")
+        print(f"✅ {filename} 无需结构性更改，已是最新。")
     return unique_urls
 
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print(f"Usage: python {os.path.basename(__file__)} <url_filename>")
+        print(f"用法: python {os.path.basename(__file__)} <url_filename>")
         sys.exit(1)
 
     url_source_filename = sys.argv[1]
 
-    # 1️⃣ 去重、去空行并规范 URL
-    print(f"--- Step 1: Processing URL file: {url_source_filename} ---")
+    print(f"--- 第1步: 处理URL文件: {url_source_filename} ---")
     urls_to_check = process_url_file(url_source_filename)
 
     if not urls_to_check:
-        print(f"⚠️ No valid URLs to check in {url_source_filename}. Exiting.")
+        print(f"⚠️ 在 {url_source_filename} 中没有有效的URL可供检查。正在退出。")
         sys.exit(1)
-    print(f"Found {len(urls_to_check)} unique and valid URLs to monitor.")
+    print(f"找到 {len(urls_to_check)} 个唯一且有效的URL进行监控。")
 
-    # 2️⃣ 并发检查每个网站的状态
-    print(f"\n--- Step 2: Checking website statuses (max_workers={MAX_WORKERS}) ---")
-    all_results = [] # 存储所有结果，包括错误
-    
-    # 使用 ThreadPoolExecutor 进行并发请求
-    # 为了保持README中URL的顺序与输入文件一致，先获取结果，再按原顺序整理
-    results_map = {} # 使用字典以URL为键存储结果，方便后续按原顺序排序
+    print(f"\n--- 第2步: 检查网站状态 (最大并发数={MAX_WORKERS}) ---")
+    results_map = {}
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         future_to_url = {executor.submit(check_website_status, url): url for url in urls_to_check}
         for future in as_completed(future_to_url):
@@ -228,49 +189,43 @@ if __name__ == "__main__":
             try:
                 result = future.get()
                 results_map[original_url] = result
-            except Exception as exc:
-                print(f"❌ URL {original_url} generated an exception during threaded execution: {exc}")
-                # 创建一个错误结果条目
+            except Exception as exc: # 捕获从 future.get() 抛出的在线程内未处理的异常
+                print(f"❌ URL {original_url} 在线程执行期间产生了一个未能捕获的异常:")
+                traceback.print_exc() # 确保在这里打印完整的追溯信息
                 error_result = {
-                    "url": original_url, "status": "❌ Error (Thread Exception)", "status_code": None,
-                    "response_time": "N/A", "timestamp": datetime.now(timezone.utc).isoformat(), "error": str(exc)
+                    "url": original_url,
+                    "status": "❌ 线程执行错误", # 更新了状态信息
+                    "status_code": None,
+                    "response_time": "N/A",
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "error": f"线程内未捕获的异常: {str(exc)}" # 更新了错误信息
                 }
                 results_map[original_url] = error_result
     
-    # 按 urls_to_check 的原始顺序整理结果
     ordered_results = [results_map[url] for url in urls_to_check if url in results_map]
 
-
-    # 3️⃣ 更新 README.md
-    print(f"\n--- Step 3: Updating {README_FILENAME} ---")
+    print(f"\n--- 第3步: 更新 {README_FILENAME} ---")
     update_readme(ordered_results, readme_file=README_FILENAME)
 
-    # 4️⃣ 筛选出非404的URLs，并更新原始URL文件
-    print(f"\n--- Step 4: Updating URL file {url_source_filename} by removing 404s ---")
+    print(f"\n--- 第4步: 更新URL文件 {url_source_filename} (移除404状态的URL) ---")
     valid_urls_after_check = []
     removed_404_count = 0
-    for result in ordered_results: # 使用有序的结果来决定哪些URL保留
-        # 保留非404的，或者那些虽然出错但不是因为404（例如超时、连接错误）
-        # 如果要严格只保留成功的，可以调整条件为 result.get('status_code') and 200 <= result.get('status_code') < 300
-        if result.get('status_code') != 404 :
-             # 如果URL重定向了，我们应该保留原始的、用户提供的URL（如果它是列表的一部分）
-             # result['url'] 始终是原始请求的URL
+    for result in ordered_results:
+        if result.get('status_code') != 404:
             valid_urls_after_check.append(result['url'])
         else:
-            print(f"🗑️ Marking {result['url']} for removal from {url_source_filename} due to 404 status.")
+            print(f"🗑️ 标记 {result['url']} 因为404状态将从 {url_source_filename} 中移除。")
             removed_404_count +=1
     
-    # 只有当存活的URL列表与检查前的URL列表不同时才重写文件
-    # （即，确实有404的URL被移除了）
     if removed_404_count > 0:
-        print(f"🔄 Updating {url_source_filename}: Removing {removed_404_count} URLs with 404 status.")
+        print(f"🔄 正在更新 {url_source_filename}: 移除 {removed_404_count} 个404状态的URL。")
         try:
             with open(url_source_filename, 'w', encoding='utf-8') as file:
-                file.write('\n'.join(valid_urls_after_check) + '\n') #确保末尾有换行
-            print(f"✅ {url_source_filename} updated. Now contains {len(valid_urls_after_check)} URLs.")
+                file.write('\n'.join(valid_urls_after_check) + '\n')
+            print(f"✅ {url_source_filename} 已更新。现在包含 {len(valid_urls_after_check)} 个URL。")
         except IOError as e:
-            print(f"❌ Error writing updated URL list to {url_source_filename}: {e}")
+            print(f"❌ 将更新后的URL列表写入 {url_source_filename} 时发生错误: {e}")
     else:
-        print(f"✅ No URLs with 404 status found to remove from {url_source_filename}. No changes made to URL list.")
+        print(f"✅ 未发现需要从 {url_source_filename} 中移除的404状态URL。URL列表未作更改。")
     
-    print("\n监测脚本执行完毕。")
+    print("\n监控脚本执行完毕。")
