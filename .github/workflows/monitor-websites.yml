@@ -38,7 +38,7 @@ jobs:
         # 并且您的URL列表文件名为 urls.txt (也位于根目录)
         # 如果路径不同，请相应修改
         run: |
-          python monitor_websites.py urls.txt # 确保文件名和路径正确
+          python ./tools/monitor_websites.py urls.txt # 确保文件名和路径正确
 
       - name: Commit and push updates
         run: |
