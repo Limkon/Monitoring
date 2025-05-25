@@ -11,55 +11,134 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4 # 更新到 v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5 # 更新到 v5
         with:
           python-version: "3.x"
 
       - name: Cache Python dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4 # 更新到 v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-python-${{ hashFiles('**/requirements.txt') }}
+          # 修改 key，使其不依赖 requirements.txt 的哈希值
+          key: ${{ runner.os }}-python-${{ matrix.python-version }}-pip-requests 
           restore-keys: |
+            ${{ runner.os }}-python-${{ matrix.python-version }}-pip-
             ${{ runner.os }}-python-
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install requests # 直接安装 requests 库
 
       - name: Run website monitoring script
+        # 假设您的脚本位于仓库的根目录，并且名为 monitor_websites.py
+        # 并且您的URL列表文件名为 urls.txt (也位于根目录)
+        # 如果路径不同，请相应修改
         run: |
-         python tools/monitor_websites.py urls
-        
-
+          python monitor_websites.py urls.txt # 确保文件名和路径正确
 
       - name: Commit and push updates
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          git add README.md urls  # 确保同时提交 README.md 和 urls 文件
+          # 添加 README.md 和 URL 列表文件 (假设是 urls.txt)
+          # 确保文件名与您的实际文件名一致
+          git add README.md urls.txt 
           
-          # 如果有更改，则提交
-          git diff --cached --quiet || git commit -m "Update website status and URLs"
+          # 检查是否有暂存的更改
+          if ! git diff --cached --quiet; then
+            echo "Changes detected, committing..."
+            git commit -m "Update website status and URLs"
+          else
+            echo "No changes to commit."
+          fi
 
           # 获取当前分支名称
           BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          echo "Current branch is $BRANCH"
 
           # 拉取最新代码并尝试自动解决冲突
-          git pull origin "$BRANCH" --rebase || (echo "⚠️ Rebase failed. Trying to resolve conflicts..." && git reset --merge && git pull origin "$BRANCH" --no-rebase)
+          # 使用 --allow-unrelated-histories 如果是全新的仓库或分支历史不相关
+          # 增加重试机制和更稳健的冲突处理
+          MAX_PULL_RETRIES=3
+          PULL_RETRY_COUNT=0
+          PULL_SUCCESSFUL=false
+          while [ $PULL_RETRY_COUNT -lt $MAX_PULL_RETRIES ]; do
+            echo "Attempting to pull from origin $BRANCH (Attempt $((PULL_RETRY_COUNT+1))/$MAX_PULL_RETRIES)..."
+            if git pull origin "$BRANCH" --rebase; then
+              PULL_SUCCESSFUL=true
+              echo "Pull successful with rebase."
+              break
+            else
+              echo "Rebase failed. Resetting and trying pull without rebase (merge strategy)..."
+              # 发生冲突时，rebase 会失败，需要先 abort
+              if git rebase --abort; then
+                echo "Rebase aborted."
+              fi
+              # 尝试普通合并
+              if git pull origin "$BRANCH"; then
+                PULL_SUCCESSFUL=true
+                echo "Pull successful with merge."
+                break
+              else
+                echo "Pull with merge also failed."
+                PULL_RETRY_COUNT=$((PULL_RETRY_COUNT+1))
+                sleep 5 # 等待一小段时间再重试
+              fi
+            fi
+          done
 
-          # 检查是否有冲突
-          if [[ `git status --porcelain` == *"UU"* ]]; then
-            echo "⚠️ Merge conflict detected. Trying to resolve automatically..."
-            git checkout --theirs README.md  # 使用远程的 README.md
-            git add README.md
-            git commit -m "Automatically resolved README.md conflict"
+          if [ "$PULL_SUCCESSFUL" = false ]; then
+            echo "⚠️ Failed to pull from origin after $MAX_PULL_RETRIES attempts. Skipping push to avoid data loss."
+            # 可以选择在这里失败工作流 exit 1
+          else
+            # 检查是否有合并冲突 (通常在 pull --no-rebase 后可能出现)
+            if git diff --name-only --diff-filter=U | grep -q '.'; then
+              echo "⚠️ Merge conflict detected after pull."
+              # 简单的冲突解决：对于 README.md 和 urls.txt，优先使用本地（Action 生成的）版本
+              # 因为这些文件应该由 Action 完全控制
+              echo "Attempting to resolve conflicts by taking local changes for README.md and urls.txt..."
+              git checkout --ours README.md
+              git checkout --ours urls.txt # 确保文件名正确
+              git add README.md urls.txt
+              git commit -m "Chore: Automatically resolve conflicts by taking local changes"
+              echo "Conflicts resolved by taking local changes."
+            fi
+            
+            # 再次检查是否有未提交的更改（例如冲突解决后）
+            if ! git diff --cached --quiet; then
+               echo "Committing resolved conflicts..."
+               git commit -m "Update website status and URLs (post-conflict resolution)"
+            fi
+
+            echo "Attempting to push to origin $BRANCH..."
+            # 推送到远程，可以考虑增加重试
+            MAX_PUSH_RETRIES=3
+            PUSH_RETRY_COUNT=0
+            PUSH_SUCCESSFUL=false
+            while [ $PUSH_RETRY_COUNT -lt $MAX_PUSH_RETRIES ]; do
+                if git push origin "$BRANCH"; then
+                    PUSH_SUCCESSFUL=true
+                    echo "Push successful."
+                    break
+                else
+                    echo "⚠️ Push failed (Attempt $((PUSH_RETRY_COUNT+1))/$MAX_PUSH_RETRIES). Retrying in 10 seconds..."
+                    PUSH_RETRY_COUNT=$((PUSH_RETRY_COUNT+1))
+                    sleep 10
+                    # 在重试前再次拉取，以防远程又有更新
+                    echo "Pulling again before retrying push..."
+                    git pull origin "$BRANCH" --rebase || git pull origin "$BRANCH"
+                fi
+            done
+
+            if [ "$PUSH_SUCCESSFUL" = false ]; then
+                echo "❌ Push failed after $MAX_PUSH_RETRIES attempts. Consider manual intervention or force push if necessary."
+                # 如果确实需要，可以取消下面这行的注释来强制推送，但请谨慎使用
+                # echo "Attempting force push as a last resort..."
+                # git push --force origin "$BRANCH"
+            fi
           fi
-
-          # 推送到远程
-          git push origin "$BRANCH" || (echo "⚠️ Push failed. Retrying with force push..." && git push --force origin "$BRANCH")
