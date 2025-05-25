@@ -148,7 +148,7 @@ def process_url_file(filename):
         try:
             with open(filename, 'r', encoding='utf-8') as f_check:
                 current_file_ideal_lines = [line.strip() for line in f_check if line.strip()]
-        except Exception: # 如果读取用于比较的文件失败，就假设需要更新
+        except Exception: 
             pass 
         
     if unique_urls != current_file_ideal_lines:
@@ -159,7 +159,7 @@ def process_url_file(filename):
             print(f"✅ {filename} 已成功更新，包含 {len(unique_urls)} 个URL。")
         except IOError as e:
             print(f"❌ 更新 {filename} 时写入错误: {e}")
-            return initial_urls # 写入失败，返回原始URL避免数据丢失
+            return initial_urls 
     else:
         print(f"✅ {filename} 无需结构性更改，已是最新。")
     return unique_urls
@@ -187,18 +187,20 @@ if __name__ == "__main__":
         for future in as_completed(future_to_url):
             original_url = future_to_url[future]
             try:
-                result = future.get()
+                # --- 这是被修正的行 ---
+                result = future.result() # 使用 .result() 而不是 .get()
+                # --- 修正结束 ---
                 results_map[original_url] = result
-            except Exception as exc: # 捕获从 future.get() 抛出的在线程内未处理的异常
+            except Exception as exc: 
                 print(f"❌ URL {original_url} 在线程执行期间产生了一个未能捕获的异常:")
-                traceback.print_exc() # 确保在这里打印完整的追溯信息
+                traceback.print_exc() 
                 error_result = {
                     "url": original_url,
-                    "status": "❌ 线程执行错误", # 更新了状态信息
+                    "status": "❌ 线程执行错误", 
                     "status_code": None,
                     "response_time": "N/A",
                     "timestamp": datetime.now(timezone.utc).isoformat(),
-                    "error": f"线程内未捕获的异常: {str(exc)}" # 更新了错误信息
+                    "error": f"线程内未捕获的异常: {str(exc)}" 
                 }
                 results_map[original_url] = error_result
     
