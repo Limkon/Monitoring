@@ -1,0 +1,31 @@
+{
+ 
+  "UUID": "",
+  "KEY": "",
+  
+   "TIME": "99999",
+  "UPTIME": "0",
+
+
+  "PROXYIP": "",
+  "DNS64": "64:ff9b::/96",
+  "SOCKS5": "",
+  "GO2SOCKS5": "",
+  "BAN": "baidu.com, qq.com",
+
+ 
+  "URL302": "https://www.google.com",
+  "URL": "",
+
+  "SUBNAME": "MyWorkerSub",
+  "ADD": "www.visa.com.tw:443#台湾Visa, [2606:4700::]:443#IPv6官方",
+  "ADDAPI": "https://raw.githubusercontent.com/username/repo/main/ips.txt",
+  "ADDNOTLS": "www.visa.com.sg:80#新加坡非TLS",
+  "ADDNOTLSAPI": "",
+  "ADDCSV": "https://raw.githubusercontent.com/username/repo/main/speed.csv",
+
+  "CFPORTS": "443, 8443, 2053, 2083, 2087, 2096",
+  "DLS": "8",
+  "CSVREMARK": "1",
+  "EX": "false"
+}
