@@ -1,5 +1,5 @@
 {
-  "UUID": "",
+  "UUID": "132579",
   "KEY": "",
   
    "TIME": "",
@@ -18,10 +18,10 @@
 
   "SUBNAME": "",
   "ADD": "",
-  "ADDAPI": "https://raw.githubusercontent.com/username/repo/main/ips.txt",
-  "ADDNOTLS": "www.visa.com.sg:80#新加坡非TLS",
+  "ADDAPI": "",
+  "ADDNOTLS": "",
   "ADDNOTLSAPI": "",
-  "ADDCSV": "https://raw.githubusercontent.com/username/repo/main/speed.csv",
+  "ADDCSV": "",
 
   "CFPORTS": "",
   "DLS": "8",
