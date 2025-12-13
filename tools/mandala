@@ -1,4 +1,0 @@
-vless://0ae3428c-7c30-458d-92e4-146baedd06bd@www.visa.com.sg:443?encryption=none&security=tls&sni=zoo.cbu.net&fp=random&type=ws&host=zoo.cbu.net&path=%2F%3Fed%3D2560#%E6%96%B0%E5%8A%A0%E5%9D%A1
-trojan://132579@www.visa.com.sg:443?&security=tls&sni=zoo.cbu.net&fp=random&type=ws&host=zoo.cbu.net&path=%2F%3Fed%3D2560#%E6%96%B0%E5%8A%A0%E5%9D%A1
-ss://bm9uZToxMzI1Nzk=@www.visa.com.sg:443/?plugin=v2ray-plugin%3Bhost%3Dzoo.cbu.net%3Bpath%3D%252F%253Fed%253D2560%3Btls%3Bsni%3Dzoo.cbu.net#%E6%96%B0%E5%8A%A0%E5%9D%A1
-socks://MGFlMzQyOGMtN2MzMC00NThkLTkyZTQtMTQ2YmFlZGQwNmJkOjEzMjU3OQ==@www.visa.com.sg:443?security=tls&sni=zoo.cbu.net&path=%2F%3Fed%3D2560&transport=ws#%E6%96%B0%E5%8A%A0%E5%9D%A1
