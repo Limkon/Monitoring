@@ -8,7 +8,7 @@ import random
 import logging
 import traceback
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import List, Tuple, Optional
+from typing import Optional, Tuple
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -32,6 +32,7 @@ logger = logging.getLogger(__name__)
 
 class BrowsingConfig:
     """浏览模拟配置"""
+    # 如果在 GitHub Actions 中遇到资源耗尽，建议将此值降低 (例如 2)
     MAX_WORKERS = 4
     NUM_RANDOM_OPERATIONS = 3
     NUM_MOUSE_MOVES_PER_OP = 3
@@ -69,7 +70,8 @@ class BrowserSimulator:
         try:
             # 使用 tempfile 进行原子写入
             with tempfile.NamedTemporaryFile('w', delete=False, encoding='utf-8') as temp_file:
-                temp_file.write('\n'.join(output_lines) + '\n') # 确保最后一行有换行
+                temp_file.write('\n'.join(output_lines))
+                # 确保最后有换行符，视情况而定，这里保持原逻辑
                 temp_filename = temp_file.name
             shutil.move(temp_filename, filename)
             logger.info(f"檔案预处理完成，保留 {len(output_lines)} 个有效 URL。")
@@ -178,6 +180,7 @@ class BrowserSimulator:
             return url, False
 
         try:
+            driver.set_page_load_timeout(30) # 防止页面加载无限挂起
             driver.get(url)
             
             WebDriverWait(driver, BrowsingConfig.WEBDRIVER_WAIT_TIMEOUT).until(
@@ -208,9 +211,9 @@ class BrowserSimulator:
             if driver:
                 try:
                     driver.quit()
-                except Exception:
-                    pass
-            logger.info(f"URL '{url}' 处理完毕，WebDriver 已关闭。")
+                    logger.info(f"URL '{url}' WebDriver 已安全关闭。")
+                except Exception as e:
+                    logger.warning(f"关闭 URL '{url}' 的 WebDriver 时发生错误: {e}")
 
 def main():
     if len(sys.argv) not in [2, 3]:
