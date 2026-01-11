@@ -8,7 +8,6 @@ from datetime import datetime, timezone
 from urllib.parse import urlparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from typing import List, Dict, Optional, Union
 
 # --- 配置日志 ---
 logging.basicConfig(
@@ -54,7 +53,7 @@ class WebsiteMonitor:
         except ValueError:
             return False
 
-    def process_url_file(self) -> List[str]:
+    def process_url_file(self) -> list:
         """读取并清洗 URL 文件，去除重复项"""
         if not self.url_filename.exists():
             logger.error(f"❌ 错误: 文件 {self.url_filename} 未找到。")
@@ -81,8 +80,9 @@ class WebsiteMonitor:
         # 检查是否需要更新文件
         current_file_ideal_lines = []
         try:
-            current_content = self.url_filename.read_text(encoding='utf-8')
-            current_file_ideal_lines = [line.strip() for line in current_content.splitlines() if line.strip()]
+            if self.url_filename.exists():
+                current_content = self.url_filename.read_text(encoding='utf-8')
+                current_file_ideal_lines = [line.strip() for line in current_content.splitlines() if line.strip()]
         except Exception:
             pass
 
@@ -99,7 +99,7 @@ class WebsiteMonitor:
         
         return unique_urls
 
-    def check_website_status(self, url: str) -> Dict:
+    def check_website_status(self, url: str) -> dict:
         """检查单个网站的状态"""
         headers = {'User-Agent': MonitorConfig.USER_AGENT}
         result = {
@@ -169,7 +169,7 @@ class WebsiteMonitor:
         if status_str.startswith("✅"): return 5
         return 6
 
-    def update_readme(self, results: List[Dict]):
+    def update_readme(self, results: list):
         """更新 README.md 文件"""
         if not results:
             logger.warning("⚠️ 没有结果可以更新到README。")
@@ -224,7 +224,7 @@ class WebsiteMonitor:
         urls_to_check = self.process_url_file()
         if not urls_to_check:
             logger.warning(f"⚠️ 在 {self.url_filename} 中没有有效的URL可供检查。正在退出。")
-            return
+            sys.exit(1)
 
         logger.info(f"找到 {len(urls_to_check)} 个唯一且有效的URL进行监控。")
         logger.info(f"\n--- 第2步: 检查网站状态 (最大并发数={MonitorConfig.MAX_WORKERS}) ---")
