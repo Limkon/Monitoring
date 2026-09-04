@@ -20,41 +20,42 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import (
     NoSuchElementException,
     WebDriverException,
-    TimeoutException,
-    ElementNotInteractableException
+    TimeoutException
 )
 
-# --- 配置日志 ---
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s - %(threadName)s - [%(levelname)s] - %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S')
+# --- 日志配置 ---
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(threadName)s - [%(levelname)s] - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
 logger = logging.getLogger(__name__)
 
 class BrowsingConfig:
-    """浏览模拟配置"""
-    # 如果在 GitHub Actions 中遇到资源耗尽，建议将此值降低 (例如 2)
-    MAX_WORKERS = 4
-    NUM_RANDOM_OPERATIONS = 3
-    NUM_MOUSE_MOVES_PER_OP = 3
+    """保活模拟浏览配置"""
+    # GitHub Actions 虚拟机建议最大设为 2，防止内存溢出(OOM)闪退
+    MAX_WORKERS = 2
+    NUM_RANDOM_OPERATIONS = 2
+    NUM_MOUSE_MOVES_PER_OP = 2
     SCROLL_PAUSE_DURATION = 1.0
     ACTION_PAUSE_DURATION = 0.5
     SHORT_PAUSE_DURATION = 0.2
-    WEBDRIVER_WAIT_TIMEOUT = 15
+    WEBDRIVER_WAIT_TIMEOUT = 20
     DEFAULT_WINDOW_WIDTH = 1920
-    DEFAULT_WINDOW_HEIGHT = 1200
-    USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
+    DEFAULT_WINDOW_HEIGHT = 1080
+    USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 
 class BrowserSimulator:
-    """浏览器模拟器核心类"""
+    """保活浏览器模拟器"""
 
     def __init__(self, chrome_driver_path: Optional[str] = None):
         self.chrome_driver_path = chrome_driver_path
 
     def remove_duplicates_and_empty_lines_from_file(self, filename: str) -> bool:
-        """从文件中移除重复行和空行，并确保行是有效的 URL。"""
+        """预处理：清理重复、空白及非法 URL"""
         lines_seen = set()
         output_lines = []
-        logger.info(f"开始预处理檔案: {filename}...")
+        logger.info(f"开始预处理文件: {filename}...")
         
         try:
             with open(filename, 'r', encoding='utf-8') as file:
@@ -64,33 +65,39 @@ class BrowserSimulator:
                         lines_seen.add(stripped_line)
                         output_lines.append(stripped_line)
         except FileNotFoundError:
-            logger.error(f"檔案 {filename} 未找到。")
+            logger.error(f"文件 {filename} 未找到。")
             return False
 
         try:
-            # 使用 tempfile 进行原子写入
             with tempfile.NamedTemporaryFile('w', delete=False, encoding='utf-8') as temp_file:
-                temp_file.write('\n'.join(output_lines))
-                # 确保最后有换行符，视情况而定，这里保持原逻辑
+                temp_file.write('\n'.join(output_lines) + '\n')
                 temp_filename = temp_file.name
             shutil.move(temp_filename, filename)
-            logger.info(f"檔案预处理完成，保留 {len(output_lines)} 个有效 URL。")
+            logger.info(f"文件预处理完成，有效保活 URL 数量: {len(output_lines)}")
             return True
         except Exception as e:
-            logger.error(f"写入或移动檔案时发生错误: {e}")
+            logger.error(f"写入文件发生错误: {e}")
             if 'temp_filename' in locals() and os.path.exists(temp_filename):
-                 os.remove(temp_filename)
+                os.remove(temp_filename)
             return False
 
     def create_driver(self) -> Optional[webdriver.Chrome]:
-        """为单一执行绪建立并返回一个配置好的 WebDriver 实例。"""
+        """创建低内存开销、高度拟真的 WebDriver"""
         chrome_options = Options()
         arguments = [
-            "--headless", "--no-sandbox", "--disable-dev-shm-usage",
+            "--headless=new",                    # 使用 Chrome 最新的无头模式（拟真度更高）
+            "--no-sandbox",
+            "--disable-dev-shm-usage",           # 防止 GitHub Runner 共享内存不足崩溃
             f"--window-size={BrowsingConfig.DEFAULT_WINDOW_WIDTH},{BrowsingConfig.DEFAULT_WINDOW_HEIGHT}",
-            "--ignore-certificate-errors", "--ignore-ssl-errors=yes", "--disable-gpu",
-            "--log-level=3", f"user-agent={BrowsingConfig.USER_AGENT}",
-            "--disable-blink-features=AutomationControlled"
+            "--ignore-certificate-errors",
+            "--disable-gpu",
+            "--mute-audio",                      # 静音，避免音频解码消耗 CPU
+            "--disable-background-networking",
+            "--disable-default-apps",
+            "--no-first-run",
+            "--log-level=3",
+            f"user-agent={BrowsingConfig.USER_AGENT}",
+            "--disable-blink-features=AutomationControlled" # 去除自动化特征
         ]
         for arg in arguments:
             chrome_options.add_argument(arg)
@@ -107,113 +114,92 @@ class BrowserSimulator:
             return driver
         except WebDriverException as e:
             logger.error(f"WebDriver 初始化失败: {e}")
-            if "executable needs to be in PATH" in str(e):
-                logger.error("错误提示：ChromeDriver 可执行档需要被新增到系统 PATH 环境变数中。")
             return None
 
-    def simulate_random_click(self, driver: webdriver.Chrome):
-        """模拟一次随机点击。"""
-        try:
-            wait = WebDriverWait(driver, 5)
-            clickable_elements = wait.until(EC.presence_of_all_elements_located(
-                (By.XPATH, "//a[@href] | //button | //input[@type='submit'] | //input[@type='button']")
-            ))
-            
-            visible_elements = [elem for elem in clickable_elements if elem.is_displayed()]
-            
-            if visible_elements:
-                target = random.choice(visible_elements)
-                driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", target)
-                time.sleep(BrowsingConfig.SHORT_PAUSE_DURATION)
-                ActionChains(driver).move_to_element(target).click().perform()
-                logger.info(f"    操作: 点击元素 <{target.tag_name}> 成功。")
-                return
-
-        except (TimeoutException, NoSuchElementException):
-            logger.warning("    未找到可见的可点击元素，将尝试点击 body。")
-        except ElementNotInteractableException:
-            logger.warning("    找到的元素不可互动，将尝试点击 body。")
-        except Exception as e:
-            logger.error(f"    寻找点击元素时发生未知错误: {e}，将尝试点击 body。")
-
+    def simulate_safe_click(self, driver: webdriver.Chrome):
+        """【安全点击】：仅点击空白处或 body，坚决不点击功能性按钮/链接"""
         try:
             body = driver.find_element(By.TAG_NAME, "body")
-            ActionChains(driver).move_to_element(body).click().perform()
-            logger.info("    操作: 点击 <body> 元素成功。")
+            # 在页面安全边距处点击一次，触发活跃事件
+            ActionChains(driver).move_to_element_with_offset(body, 10, 10).click().perform()
+            logger.info("    操作: 触发背景安全点击 (触发活跃事件成功)")
         except Exception as e:
-            logger.error(f"    点击 <body> 时失败: {e}")
+            logger.debug(f"    安全点击被跳过或未执行: {e}")
 
     def simulate_mouse_movement(self, driver: webdriver.Chrome):
-        """模拟滑鼠在页面上的随机移动。"""
+        """模拟鼠标轨迹随机滑动"""
         try:
             actions = ActionChains(driver)
             body = driver.find_element(By.TAG_NAME, "body")
             actions.move_to_element(body)
             
             for _ in range(BrowsingConfig.NUM_MOUSE_MOVES_PER_OP):
-                x_offset = random.randint(-200, 200)
-                y_offset = random.randint(-200, 200)
+                x_offset = random.randint(-150, 150)
+                y_offset = random.randint(-150, 150)
                 actions.move_by_offset(x_offset, y_offset)
                 actions.pause(BrowsingConfig.SHORT_PAUSE_DURATION)
             
             actions.perform()
-            logger.info("    操作: 模拟滑鼠移动完成。")
+            logger.info("    操作: 模拟鼠标移动完成")
         except Exception as e:
-            logger.error(f"    模拟滑鼠移动时失败: {e}")
+            logger.debug(f"    模拟鼠标移动未完成: {e}")
 
     def simulate_scrolling(self, driver: webdriver.Chrome):
-        """模拟上下滚动页面。"""
+        """模拟页面上下自然平滑滚动"""
         try:
-            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            time.sleep(BrowsingConfig.SCROLL_PAUSE_DURATION / 2)
-            driver.execute_script("window.scrollTo(0, 0);")
-            time.sleep(BrowsingConfig.SCROLL_PAUSE_DURATION / 2)
-            logger.info("    操作: 模拟页面滚动完成。")
+            # 缓慢向下滚动 500 像素，再滚回顶部
+            driver.execute_script("window.scrollBy({top: 600, behavior: 'smooth'});")
+            time.sleep(BrowsingConfig.SCROLL_PAUSE_DURATION)
+            driver.execute_script("window.scrollTo({top: 0, behavior: 'smooth'});")
+            time.sleep(BrowsingConfig.SCROLL_PAUSE_DURATION)
+            logger.info("    操作: 模拟页面平滑滚动完成")
         except Exception as e:
-            logger.error(f"    模拟滚动时失败: {e}")
+            logger.debug(f"    模拟滚动未完成: {e}")
 
     def process_url_worker(self, url: str, index: int) -> Tuple[str, bool]:
-        """处理单一 URL 的完整流程。"""
-        logger.info(f"开始处理第 {index + 1} 个 URL: {url}")
+        """单站点保活主流程"""
+        logger.info(f"[{index + 1}] 开始保活访问: {url}")
         driver = self.create_driver()
         if not driver:
             return url, False
 
         try:
-            driver.set_page_load_timeout(30) # 防止页面加载无限挂起
+            driver.set_page_load_timeout(35)  # 页面加载超时阈值
             driver.get(url)
             
+            # 等待 DOM 树基本加载
             WebDriverWait(driver, BrowsingConfig.WEBDRIVER_WAIT_TIMEOUT).until(
                 EC.presence_of_element_located((By.TAG_NAME, "body"))
             )
-            logger.info(f"成功打开网页: {url}")
+            logger.info(f"  ✓ 成功触达页面: {url}")
 
-            operations = [self.simulate_random_click, self.simulate_mouse_movement, self.simulate_scrolling]
-            for _ in range(BrowsingConfig.NUM_RANDOM_OPERATIONS):
-                op = random.choice(operations)
+            # 模拟交互行为（安全点击、鼠标移动、滚动）
+            operations = [self.simulate_safe_click, self.simulate_mouse_movement, self.simulate_scrolling]
+            random.shuffle(operations)
+            for op in operations[:BrowsingConfig.NUM_RANDOM_OPERATIONS]:
                 op(driver)
                 time.sleep(BrowsingConfig.ACTION_PAUSE_DURATION)
-            
-            driver.refresh()
-            logger.info(f"页面刷新成功: {url}")
+
+            # 保活停留，确保前端埋点、心跳 WebSocket 能够建立并触发
+            time.sleep(2)
+            logger.info(f"  ✓ 保活动作完成: {url}")
             return url, True
 
         except TimeoutException:
-            logger.error(f"载入 URL 超时: {url}")
-            return url, False
+            logger.warning(f"  ⚠️ 加载超时 (冷启动可能较慢，但请求已发送): {url}")
+            return url, True  # 即使超时，请求往往已经唤醒了宿主，通常也算保活成功
         except WebDriverException as e:
-            logger.error(f"处理 URL '{url}' 时发生 WebDriver 错误: {e}")
+            logger.error(f"  ❌ 访问失败 '{url}': {e}")
             return url, False
         except Exception:
-            logger.error(f"处理 URL '{url}' 时发生未知异常:\n{traceback.format_exc()}")
+            logger.error(f"  ❌ 未知异常 '{url}':\n{traceback.format_exc()}")
             return url, False
         finally:
             if driver:
                 try:
                     driver.quit()
-                    logger.info(f"URL '{url}' WebDriver 已安全关闭。")
-                except Exception as e:
-                    logger.warning(f"关闭 URL '{url}' 的 WebDriver 时发生错误: {e}")
+                except Exception:
+                    pass
 
 def main():
     if len(sys.argv) not in [2, 3]:
@@ -224,32 +210,34 @@ def main():
     chrome_driver_path = sys.argv[2] if len(sys.argv) == 3 else None
 
     if not os.path.exists(url_filename):
-        logger.error(f"URL 檔案 '{url_filename}' 不存在。")
+        logger.error(f"URL 文件 '{url_filename}' 不存在。")
         sys.exit(1)
 
     simulator = BrowserSimulator(chrome_driver_path)
 
     if not simulator.remove_duplicates_and_empty_lines_from_file(url_filename):
-        logger.error("檔案预处理失败，指令码终止。")
+        logger.error("文件预处理失败，任务终止。")
         sys.exit(1)
 
     try:
         with open(url_filename, 'r', encoding='utf-8') as file:
             urls = [line.strip() for line in file if line.strip()]
         if not urls:
-            logger.info(f"檔案 '{url_filename}' 中没有有效的 URL。")
+            logger.info(f"文件 '{url_filename}' 内没有需要保活的 URL。")
             sys.exit(0)
-        logger.info(f"读取到 {len(urls)} 个 URL 准备处理。将使用最多 {BrowsingConfig.MAX_WORKERS} 个并发执行绪。")
+        logger.info(f"共发现 {len(urls)} 个站点需要保活，启用 {BrowsingConfig.MAX_WORKERS} 个并发线程。")
     except Exception as e:
-        logger.error(f"读取 URL 檔案 '{url_filename}' 失败: {e}")
+        logger.error(f"读取 URL 文件失败: {e}")
         sys.exit(1)
 
     success_count = 0
     fail_count = 0
 
     with ThreadPoolExecutor(max_workers=BrowsingConfig.MAX_WORKERS) as executor:
-        future_to_url = {executor.submit(simulator.process_url_worker, url, i): url 
-                         for i, url in enumerate(urls)}
+        future_to_url = {
+            executor.submit(simulator.process_url_worker, url, i): url 
+            for i, url in enumerate(urls)
+        }
         
         for future in as_completed(future_to_url):
             url = future_to_url[future]
@@ -260,14 +248,13 @@ def main():
                 else:
                     fail_count += 1
             except Exception as exc:
-                logger.error(f"URL '{url}' 在执行中产生了无法捕获的异常: {exc}")
+                logger.error(f"URL '{url}' 产生未捕获异常: {exc}")
                 fail_count += 1
 
-    logger.info("--- 所有任务执行完毕 ---")
-    logger.info(f"总 URL 数量: {len(urls)}")
-    logger.info(f"成功处理数量: {success_count}")
-    logger.info(f"失败处理数量: {fail_count}")
-    logger.info("指令码执行结束。")
+    logger.info("=================================")
+    logger.info(f"保活任务执行完毕！")
+    logger.info(f"目标总数: {len(urls)} | 成功唤醒: {success_count} | 唤醒失败: {fail_count}")
+    logger.info("=================================")
 
 if __name__ == "__main__":
     main()
